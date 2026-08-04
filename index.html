@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>World Maths Cup ⚽</title>
+  <!-- Keep this page out of search engines: reachable only if you have the link. -->
+  <meta name="robots" content="noindex, nofollow" />
+
+  <!-- Installable offline app (works with no internet once added to the Home Screen) -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#1f9d55" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Maths Cup" />
+  <link rel="apple-touch-icon" href="icon-180.png" />
+
+  <link rel="stylesheet" href="src/styles.css?v=17" />
+</head>
+<body>
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- Stadium scoreboard header -->
+  <header class="scoreboard">
+    <div class="board-left">
+      <div class="crest">⚽</div>
+      <div>
+        <h1>WORLD MATHS CUP</h1>
+        <div class="round-line"><span id="roundBadge">⚽</span> <span id="roundName">Group Stage</span></div>
+      </div>
+    </div>
+    <div class="board-right">
+      <div class="stat"><div class="stat-num" id="streakNum">0</div><div class="stat-lbl">🏆 unbeaten run</div></div>
+      <div class="stat"><div class="stat-num" id="goalsNum">0</div><div class="stat-lbl">⚽ goals scored</div></div>
+      <button id="muteBtn" class="chip-btn" title="Sound on/off">🔊</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- START SCREEN (menu tree) -->
+    <section id="startScreen" class="pitch card">
+      <h2 class="kick-title">Ready for kick-off? ⚽</h2>
+      <p class="lead">Choose what to practise, then play a match of <strong>10</strong>.
+        Every answer is checked step by step, with hints and the "long way" if you're stuck.</p>
+
+      <div class="menu-block">
+        <h3>① Pick a topic</h3>
+        <div id="subjectGrid" class="subject-grid"></div>
+      </div>
+
+      <div class="menu-block">
+        <h3>② Pick a level</h3>
+        <div id="levelRow" class="level-row"></div>
+      </div>
+
+      <details class="team-picker">
+        <summary>③ Your team &amp; colours (optional)</summary>
+        <div class="picker-row">
+          <label>Team name <input id="teamName" type="text" maxlength="16" placeholder="Lions FC" /></label>
+          <label>Colour 1 <input id="teamC1" type="color" value="#f4c430" /></label>
+          <label>Colour 2 <input id="teamC2" type="color" value="#1f9d55" /></label>
+        </div>
+      </details>
+
+      <button id="kickoffBtn" class="btn btn-primary big">KICK OFF ⚽</button>
+    </section>
+
+    <!-- GAME SCREEN -->
+    <section id="gameScreen" class="hidden">
+      <div class="match-dots" id="matchDots"></div>
+
+      <div class="pitch card problem-card">
+        <div class="pitch-lines"></div>
+        <div id="problemStory" class="story hidden"></div>
+        <div class="solve-label">SOLVE</div>
+        <div id="problemGiven" class="given-eq">—</div>
+        <div id="problemDiagram" class="problem-diagram hidden"></div>
+
+        <div class="ball-track">
+          <div class="goal-post">🥅</div>
+          <div id="ball" class="ball">⚽</div>
+        </div>
+      </div>
+
+      <div id="stepsStack" class="steps-stack"></div>
+
+      <div class="active-panel card">
+        <div id="stepPrompt" class="step-prompt">—</div>
+
+        <!-- tap cards / number chips live here -->
+        <div id="cardTray" class="card-tray"></div>
+
+        <!-- build box (equation / ratio / product building) -->
+        <div id="buildRow" class="build-row">
+          <input id="lineInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+                 inputmode="text" placeholder="tap the cards above to build your line…" />
+          <button id="btnBack" class="mini-btn" title="Remove last">⌫</button>
+          <button id="btnClear" class="mini-btn" title="Clear">✕</button>
+        </div>
+
+        <div class="check-row">
+          <button id="btnCheck" class="btn btn-primary">Check ✓</button>
+        </div>
+
+        <div class="btn-row">
+          <button id="btnHint" class="btn btn-ghost">Hint 💡</button>
+          <button id="btnWhy" class="btn btn-ghost">Why? 🤔</button>
+          <button id="btnLong" class="btn btn-ghost">Show the long way</button>
+        </div>
+        <div id="feedback" class="feedback hidden"></div>
+      </div>
+
+      <div class="controls">
+        <button id="nextBtn" class="btn btn-primary hidden">Next ▶</button>
+        <button id="quitBtn" class="btn btn-ghost">End match</button>
+      </div>
+
+      <div id="mascot" class="mascot">⚽<div class="mascot-say" id="mascotSay">Let's go!</div></div>
+    </section>
+  </main>
+
+  <!-- FULL-TIME SUMMARY -->
+  <div id="summaryModal" class="modal hidden">
+    <div class="modal-card card">
+      <div class="trophy">🏆</div>
+      <h2>FULL-TIME WHISTLE!</h2>
+      <div id="summaryBody"></div>
+      <button id="playAgainBtn" class="btn btn-primary big">Play another match ⚽</button>
+    </div>
+  </div>
+
+  <footer>Made by the Al Falasi brothers • solve it step by step • your progress is saved on this device</footer>
+
+  <script src="src/fraction.js?v=17"></script>
+  <script src="src/format.js?v=17"></script>
+  <script src="src/parser.js?v=17"></script>
+  <script src="src/numbers.js?v=17"></script>
+  <script src="src/explanations.js?v=17"></script>
+  <script src="src/steps.js?v=17"></script>
+  <script src="src/topics.js?v=17"></script>
+  <script src="src/topics2.js?v=17"></script>
+  <script src="src/topics3.js?v=17"></script>
+  <script src="src/topics4.js?v=17"></script>
+  <script src="src/topics5.js?v=17"></script>
+  <script src="src/primes.js?v=17"></script>
+  <script src="src/coords.js?v=17"></script>
+  <script src="src/solving.js?v=17"></script>
+  <script src="src/problems.js?v=17"></script>
+  <script src="src/app.js?v=17"></script>
+
+  <!-- Register the offline worker so the app keeps working with no internet -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function () { /* offline still fine after first load */ });
+      });
+    }
+  </script>
+</body>
+</html>

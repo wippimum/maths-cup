@@ -1,0 +1,14 @@
+{
+  "name": "World Maths Cup",
+  "short_name": "Maths Cup",
+  "description": "Step-by-step maths practice — equations, HCF, LCM, primes, ratio, decimals, percentages and problem solving, football World Cup style.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0e1720",
+  "theme_color": "#1f9d55",
+  "icons": [
+    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ]
+}
