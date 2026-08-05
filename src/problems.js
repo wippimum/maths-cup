@@ -182,7 +182,6 @@
   // ---- Integers ----
   function genNegAddSub() { const r = rand(1, 4); if (r === 1) return T.negAddSub(rand(-9, -1), rand(2, 9), false); if (r === 2) return T.negAddSub(rand(1, 9), rand(3, 12), true); if (r === 3) return T.negAddSub(rand(-9, -1), rand(2, 9), true); return T.negAddSub(rand(1, 9), -rand(2, 9), true); }
   function genNegMulDiv() { if (Math.random() < 0.5) { let a = nz(-9, 9), b = nz(-9, 9); if (a > 0 && b > 0 && Math.random() < 0.7) a = -a; return T.negMulDiv(a, b, false); } const b = nz(2, 9) * (Math.random() < 0.5 ? -1 : 1), q = nz(-9, 9); return T.negMulDiv(b * q, b, true); }
-  function genOrderOps() { const a = rand(2, 15), b = rand(2, 6), c = rand(2, 6), op1 = pick(['+', '−']); return T.orderOps(a, b, c, op1); }
 
   // ---- FDP ----
   function genFdpFromFraction() { const den = pick([2, 4, 5, 10, 20, 25]); const num = rand(1, den - 1); return T.fdpFromFraction(num, den); }
@@ -278,7 +277,16 @@
     { id: 'integers', name: 'Integers (negatives)', icon: '±', blurb: 'Add, subtract, multiply & divide negatives.', levels: [
       { id: 'int-addsub', name: 'Add & subtract', badge: '±', generate: () => genNegAddSub() },
       { id: 'int-muldiv', name: 'Multiply & divide', badge: '✖️', generate: () => genNegMulDiv() },
-      { id: 'int-order', name: 'Order of operations', badge: '🔢', generate: () => genOrderOps() },
+    ] },
+    // Order of operations used to be one thin level under Integers (a + b × c, and
+    // nothing else). It's the hard part of school Topic 2, so it's its own ladder now.
+    { id: 'bidmas', name: 'BIDMAS — order of operations', icon: '🧮', blurb: 'Which part of the sum do you do first?', levels: [
+      { id: 'bid-spot', name: 'Which part first?', badge: '🔍', generate: () => T.bidmasSpot() },
+      { id: 'bid-md', name: '× and ÷ before + and −', badge: '✖️', generate: () => T.bidmasMD() },
+      { id: 'bid-brackets', name: 'Brackets first', badge: '🔵', generate: () => T.bidmasBrackets() },
+      { id: 'bid-lr', name: 'Left to right', badge: '➡️', generate: () => T.bidmasLR() },
+      { id: 'bid-indices', name: 'Powers (indices)', badge: '²', generate: () => T.bidmasIndices() },
+      { id: 'bid-mix', name: 'Full BIDMAS 🏆', badge: '🏆', generate: () => T.bidmasMix() },
     ] },
     { id: 'rounding', name: 'Rounding', icon: '≈', blurb: 'Round whole numbers and decimals.', levels: [
       { id: 'round-nearest', name: 'Nearest 10 / 100 / 1000', badge: '🎯', generate: () => genRoundNearest() },

@@ -241,28 +241,11 @@
       ],
     };
   }
-  function orderOps(a, b, c, op1, op2) {
-    // a op1 b op2 c, with one of them × so BODMAS matters. Keep it simple: a + b × c  or  a × b + c
-    // We'll always make the middle be × so "do × first".
-    const first = b * c, ans = op1 === '+' ? a + first : a - first;
-    return {
-      subject: 'integers', given: `${a} ${op1} ${b} × ${c}`, answer: String(ans),
-      steps: [
-        pickStep({ key: 'which', prompt: `${a} ${op1} ${b} × ${c}: which do you do FIRST?`, hint: `× and ÷ come before + and −.`, why: `Order of operations (BODMAS): do multiplication and division before addition and subtraction.`,
-          resultText: `do ${b} × ${c} first`, expected: [`${b} × ${c}`], pool: [`${b} × ${c}`, `${a} ${op1} ${b}`], diagnose: () => ({ correct: false, id: 'order-first', ctx: { b, c } }) }),
-        pickStep({ key: 'mult', prompt: `${b} × ${c} = ?`, hint: `${b} × ${c}.`, why: `Multiply first.`, resultText: `${b} × ${c} = ${first}`, expected: [first], pool: numberPool([first], 4, 0, first + 8),
-          diagnose: () => ({ correct: false, id: 'num-wrong', ctx: { answer: first, expr: `${b} × ${c}` } }) }),
-        pickStep({ key: 'ans', prompt: `Now ${a} ${op1} ${first} = ?`, hint: `${a} ${op1} ${first}.`, why: `Finish with the addition or subtraction.`, resultText: `= ${ans}`, expected: [ans], pool: numberPool([ans], 4, ans - 8, ans + 8), isAnswer: true,
-          diagnose: () => ({ correct: false, id: 'num-wrong', ctx: { answer: ans, expr: `${a} ${op1} ${first}` } }) }),
-      ],
-    };
-  }
-
   const api = {
     fracSimplify, fracOfAmount, fracAdd,
     statMode, statRange, statMean, statMedian,
     roundNearest, roundDP,
-    negAddSub, negMulDiv, orderOps,
+    negAddSub, negMulDiv,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.WAC = Object.assign(root.WAC || {}, api);

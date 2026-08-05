@@ -195,7 +195,20 @@
     'neg-rewrite': (c) => `Two minuses make a plus: ${c.a} − (${c.b}) becomes ${c.a} + ${-c.b}.`,
     'neg-line': (c) => `Use a number line: ${c.expr} = ${c.answer}. + moves right, − moves left (you can cross zero into negatives).`,
     'neg-sign': (c) => `Same signs → positive, different signs → negative. So this answer is ${c.neg ? 'negative' : 'positive'}.`,
-    'order-first': (c) => `Do ${c.b} × ${c.c} first — multiplication comes before + and − (BODMAS).`,
+
+    // ---------- BIDMAS / order of operations ----------
+    'bid-brackets': (c) => `Brackets come first — always. Whatever else is in the line, ${c.part} gets done before it. ` +
+      `The brackets are there to tell you "this bit first".`,
+    'bid-indices': (c) => `Powers come next, straight after brackets. Do ${c.part} first — it means ` +
+      `${Array(c.pow || 2).fill(c.base).join(' × ')} — and only then the + − × ÷.`,
+    'bid-md': (c) => `× and ÷ are stronger than + and −, so they go first no matter where they sit in the line. ` +
+      `Do ${c.part} before anything else here.`,
+    'bid-lr': (c) => `This is the tricky one: ${c.kind} are the SAME strength, so neither wins. ` +
+      `When that happens you just read left to right — so ${c.part} goes first because it's furthest left.`,
+    'bid-as': (c) => `Only + and − are left, and they're the same strength, so work left to right: ${c.part} first.`,
+    'bid-wrong-op': (c) => `Check the sign in the middle — ${c.part} says ${c.word}, which gives ${c.answer}, not ${c.picked}.`,
+    'bid-power-times': (c) => `${c.base}${c.sup} doesn't mean ${c.base} × ${c.pow}. The little ${c.pow} counts how many ` +
+      `${c.base}s to multiply together: ${Array(c.pow).fill(c.base).join(' × ')} = ${c.answer}.`,
 
     // ---------- FDP ----------
     'fdp-dec': (c) => `${c.num}/${c.den} means ${c.num} ÷ ${c.den} = ${c.dec}.`,

@@ -16,7 +16,8 @@ the boys' own Year 6 worksheets (Topics 1–17), matching the school's methods:
 - **🔟 Decimals** — × ÷ by 10/100/1000, add & subtract
 - **％ Percentages** — % of an amount (10% / 1% build-up)
 - **½ Fractions** — simplify, fraction of an amount, add & subtract
-- **± Integers** — add/subtract/multiply/divide negatives, order of operations
+- **± Integers** — add/subtract/multiply/divide negatives
+- **🧮 BIDMAS** — which part of the sum comes first: brackets, powers, × ÷, then + −
 - **≈ Rounding** — nearest 10/100/1000 and decimal places
 - **📊 Statistics** — mean, median, mode, range
 - **🔗 Fractions↔Decimals↔%** — convert between all three
@@ -37,14 +38,17 @@ before scoring, your unbeaten run, and the trickiest thing that came up, with a 
 
 ## Put it on the iPads (works offline — e.g. on holiday) 📱
 
-The app is a small website, so "installing" means hosting it once, then adding it to each
+The app is a small website, so "installing" means opening the link once and adding it to each
 iPad's Home Screen. After one visit on Wi-Fi it caches itself and runs with **no internet**.
 
-**Step 1 — Put it online (once, ~3 minutes, free).**
-Easiest: [app.netlify.com/drop](https://app.netlify.com/drop). Sign up for a free account
-(so the link stays permanent), then **drag the whole `world-maths-cup` folder** onto the page.
-Netlify gives you a link like `https://your-name.netlify.app`. (GitHub Pages or Cloudflare
-Pages work too — any static host with HTTPS.)
+**It's already online:** **https://wippimum.github.io/maths-cup/**
+
+That's GitHub Pages serving this folder's `main` branch, so `git push` publishes an update
+(live in about 30 seconds). Two rules when you change anything:
+- bump `CACHE = 'wac-vN'` in `sw.js`, every `?v=N` in `index.html`, and the `build N` in the
+  footer — all to the same number, or a device may keep showing the old version;
+- the footer's build number tells you what a device is actually running, which is the quickest
+  way to tell a real bug from a stale copy.
 
 **Step 2 — Add to each iPad's Home Screen (~1 minute each).**
 1. On the iPad, open the link in **Safari** (must be Safari for this to work like an app).
@@ -118,7 +122,9 @@ src/parser.js         reads each typed line into { x, constant }
 src/format.js         pretty maths display (real minus signs)
 src/explanations.js   the kid-friendly mistake explanations  ← edit the wording here
 src/steps.js          the solve steps + which mistake each wrong line is
-src/problems.js       the rounds, random problems, worksheet samples & football stories
+src/topics*.js        the step builders for each topic (HCF, fractions, angles, …)
+src/bidmas.js         BIDMAS: a tiny expression engine that reduces one step at a time
+src/problems.js       the topic/level menu, random problems & football stories
 src/app.js            the game: flow, streak, sounds, celebrations
 ```
 
