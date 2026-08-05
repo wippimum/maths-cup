@@ -16,9 +16,28 @@
   <meta name="apple-mobile-web-app-title" content="Maths Cup" />
   <link rel="apple-touch-icon" href="icon-180.png" />
 
-  <link rel="stylesheet" href="src/styles.css?v=17" />
+  <link rel="stylesheet" href="src/styles.css?v=18" />
 </head>
 <body>
+  <!-- If any script fails (a silent failure looks exactly like "tapping does nothing"),
+       show the reason on screen instead of failing quietly. -->
+  <div id="errBar"></div>
+  <script>
+    window.addEventListener('error', function (e) {
+      var bar = document.getElementById('errBar');
+      if (!bar) return;
+      var where = (e.filename || '').split('/').pop().split('?')[0];
+      bar.textContent = '⚠︎ ' + (e.message || 'error') + (where ? '  [' + where + ':' + (e.lineno || '?') + ']' : '');
+      bar.style.display = 'block';
+    });
+    window.addEventListener('unhandledrejection', function (e) {
+      var bar = document.getElementById('errBar');
+      if (!bar) return;
+      bar.textContent = '⚠︎ ' + ((e.reason && e.reason.message) || e.reason);
+      bar.style.display = 'block';
+    });
+  </script>
+
   <canvas id="confettiCanvas"></canvas>
 
   <!-- Stadium scoreboard header -->
@@ -130,24 +149,25 @@
     </div>
   </div>
 
-  <footer>Made by the Al Falasi brothers • solve it step by step • your progress is saved on this device</footer>
+  <footer>Made by the Al Falasi brothers • solve it step by step • your progress is saved on this device
+    <span class="build">build 18</span></footer>
 
-  <script src="src/fraction.js?v=17"></script>
-  <script src="src/format.js?v=17"></script>
-  <script src="src/parser.js?v=17"></script>
-  <script src="src/numbers.js?v=17"></script>
-  <script src="src/explanations.js?v=17"></script>
-  <script src="src/steps.js?v=17"></script>
-  <script src="src/topics.js?v=17"></script>
-  <script src="src/topics2.js?v=17"></script>
-  <script src="src/topics3.js?v=17"></script>
-  <script src="src/topics4.js?v=17"></script>
-  <script src="src/topics5.js?v=17"></script>
-  <script src="src/primes.js?v=17"></script>
-  <script src="src/coords.js?v=17"></script>
-  <script src="src/solving.js?v=17"></script>
-  <script src="src/problems.js?v=17"></script>
-  <script src="src/app.js?v=17"></script>
+  <script src="src/fraction.js?v=18"></script>
+  <script src="src/format.js?v=18"></script>
+  <script src="src/parser.js?v=18"></script>
+  <script src="src/numbers.js?v=18"></script>
+  <script src="src/explanations.js?v=18"></script>
+  <script src="src/steps.js?v=18"></script>
+  <script src="src/topics.js?v=18"></script>
+  <script src="src/topics2.js?v=18"></script>
+  <script src="src/topics3.js?v=18"></script>
+  <script src="src/topics4.js?v=18"></script>
+  <script src="src/topics5.js?v=18"></script>
+  <script src="src/primes.js?v=18"></script>
+  <script src="src/coords.js?v=18"></script>
+  <script src="src/solving.js?v=18"></script>
+  <script src="src/problems.js?v=18"></script>
+  <script src="src/app.js?v=18"></script>
 
   <!-- Register the offline worker so the app keeps working with no internet -->
   <script>

@@ -26,6 +26,16 @@ body {
 }
 .hidden { display: none !important; }
 
+/* Which build this device is actually running — tells us instantly if an iPad is stale */
+.build { opacity: .45; margin-left: 6px; }
+
+/* Error bar: hidden unless a script actually fails (see index.html) */
+#errBar {
+  display: none; position: fixed; left: 0; right: 0; top: 0; z-index: 100;
+  background: #b3261e; color: #fff; font: 600 13px/1.35 ui-monospace, Menlo, monospace;
+  padding: 8px 12px; word-break: break-word;
+}
+
 /* ---------- scoreboard header ---------- */
 .scoreboard {
   display: flex; justify-content: space-between; align-items: center;
