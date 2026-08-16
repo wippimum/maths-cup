@@ -35,6 +35,14 @@
     if (!Array.isArray(s.history)) s.history = [];
     // migrate the old algebra-only save (had .round / .consecutiveWins)
     if (s.round && !s.progress.algebra) { s.subject = 'algebra'; s.level = s.round; s.progress.algebra = { levelId: s.round, consec: s.consecutiveWins || 0 }; }
+    // Ratio lost its own tile and moved under Fractions. Without this, anyone who
+    // was last playing ratio would open the app on Numeracy times tables, because
+    // an unknown subject id silently falls back to the first tile.
+    if (s.subject === 'ratio') {
+      s.subject = 'fractions';
+      if (s.progress.ratio && !s.progress.fractions) s.progress.fractions = s.progress.ratio;
+      delete s.progress.ratio;
+    }
     return s;
   }
   function persist() { try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) {} }
@@ -451,12 +459,23 @@
   }
 
   // ---------------- scores & history ----------------
+  // History rows are read back by the subject id they were SAVED with, which may no
+  // longer own that level — ratio matches were logged as 'ratio' before ratio moved
+  // under Fractions. Fall back to whichever tile holds the level now, so an old row
+  // still reads "Share in a ratio" instead of the raw id.
+  function ownerOf(subjectId, levelId) {
+    const named = SUBJECTS.find((s) => s.id === subjectId);
+    if (named && named.levels.some((x) => x.id === levelId)) return named;
+    return SUBJECTS.find((s) => s.levels.some((x) => x.id === levelId)) || null;
+  }
   function levelNameOf(subjectId, levelId) {
-    const l = subjectById(subjectId).levels.find((x) => x.id === levelId);
+    const s = ownerOf(subjectId, levelId);
+    const l = s && s.levels.find((x) => x.id === levelId);
     return l ? l.name.replace(/\s*🏆\s*$/, '') : levelId;
   }
   function levelRankOf(subjectId, levelId) {
-    return subjectById(subjectId).levels.findIndex((x) => x.id === levelId);
+    const s = ownerOf(subjectId, levelId);
+    return s ? s.levels.findIndex((x) => x.id === levelId) : -1;
   }
   function showHistory() {
     $('historyBody').innerHTML = WAC.panelHTML(save.history, todayStr(), {

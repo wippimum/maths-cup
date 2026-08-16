@@ -672,6 +672,13 @@
       { id: 'frac-mixed', name: 'Mixed & improper', badge: '🔄', generate: () => genMixedNumbers() },
       { id: 'frac-ofwhat', name: 'What fraction of…?', badge: '❓', generate: () => genFractionOf() },
       { id: 'frac-muldiv', name: 'Multiply & divide', badge: '🏆', generate: () => genFracMulDiv() },
+      // Ratio isn't a topic on the Year 6 course, so it has no tile of its own.
+      // It lives here because it is the same skill: simplifying a ratio divides
+      // both sides by the HCF exactly as simplifying a fraction does, and sharing
+      // in a ratio is finding fractions of an amount. Still flagged stretch.
+      { id: 'ratio-simplify', name: 'Simplify a ratio', badge: '⚖️', stretch: true, generate: () => genRatioSimplify() },
+      { id: 'ratio-share', name: 'Share in a ratio', badge: '🤝', stretch: true, generate: () => genRatioShare() },
+      { id: 'ratio-hard', name: 'Ratio: three-way & backwards', badge: '⭐', stretch: true, generate: () => genRatioHard() },
     ] },
     { id: 'algebra1', topic: 5, name: 'Introduction to Algebra', icon: '🔤', blurb: 'What the letters mean, writing expressions, substituting and simplifying.', levels: [
       { id: 'alg1-notation', name: 'Notation & writing expressions', badge: '🔤', generate: () => genAlgNotation() },
@@ -759,11 +766,6 @@
       { id: 'vol-fev', name: 'Faces, edges & vertices', badge: '🔷', generate: () => genSolidCount() },
       { id: 'vol-prism', name: 'Prisms & missing sides', badge: '📦', generate: () => genPrismOrMissing() },
       { id: 'vol-hard', name: 'Surface area', badge: '⭐', stretch: true, generate: () => T.surfaceArea(rand(3, 9), rand(2, 7), rand(2, 8)) },
-    ] },
-    { id: 'ratio', name: 'Ratio (extra)', icon: '⚖️', blurb: 'Not a Year 6 topic — extra practice for later.', levels: [
-      { id: 'ratio-simplify', name: 'Simplify', badge: '➗', stretch: true, generate: () => genRatioSimplify() },
-      { id: 'ratio-share', name: 'Share an amount', badge: '🤝', stretch: true, generate: () => genRatioShare() },
-      { id: 'ratio-hard', name: 'Three-way & backwards', badge: '⭐', stretch: true, generate: () => genRatioHard() },
     ] },
     { id: 'solve', name: 'Problem Solving', icon: '🧩', blurb: '10 problems, easy → hard, in tiny steps.', levels: [
       { id: 'solve-easy', name: 'Warm-up (easier)', badge: '🌱', generate: () => T.solveRandom() },
