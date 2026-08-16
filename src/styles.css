@@ -399,3 +399,11 @@ footer { text-align: center; color: #9fb0bf; font-size: .78rem; padding: 10px 0 
 .fig-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 .fig-row svg { background: rgba(255,255,255,.94); border-radius: 12px; padding: 6px;
   box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+
+/* ⭐ stretch levels — beyond the school's Year 6 course, kept but clearly marked */
+.level-card.stretch { border-style: dashed; }
+.lvl-stretch {
+  display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px;
+  background: rgba(244,196,48,.9); color: #3a2d00; font-size: .64rem;
+  font-weight: 800; letter-spacing: .04em; text-transform: uppercase; vertical-align: middle;
+}

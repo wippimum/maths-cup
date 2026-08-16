@@ -5,15 +5,15 @@
   const $ = (id) => document.getElementById(id);
   const MATCH_LEN = 10;
 
-  const SUBJ_SHORT = { algebra: 'Equations', hcf: 'HCF', lcm: 'LCM', primes: 'Primes', ratio: 'Ratio', decimals: 'Decimals', percent: 'Percentages', solve: 'Problem solving', fractions: 'Fractions', integers: 'Integers', bidmas: 'BIDMAS', rounding: 'Rounding', stats: 'Statistics', fdp: 'Fractions↔%', numeracy: 'Numeracy', angles: 'Angles', area: 'Perimeter & area', volume: 'Volume', coords: 'Coordinates', geometry: 'Shape facts', graphs: 'Data & graphs' };
+  const SUBJ_SHORT = { algebra1: 'Algebra basics', measures: 'Units & measures', algebra: 'Equations', hcf: 'HCF', lcm: 'LCM', primes: 'Primes', ratio: 'Ratio', decimals: 'Decimals', percent: 'Percentages', solve: 'Problem solving', fractions: 'Fractions', integers: 'Integers', bidmas: 'BIDMAS', rounding: 'Rounding', stats: 'Statistics', fdp: 'Fractions↔%', numeracy: 'Numeracy', angles: 'Angles', area: 'Perimeter & area', volume: 'Volume', coords: 'Coordinates', geometry: 'Shape facts', graphs: 'Data & graphs' };
   // School (Toddle) topic numbers. Some app tiles share a topic (Number Properties = T3),
   // and Ratio / Problem solving aren't a single Toddle Year-6 topic, so they're left blank.
   const TOPIC_NO = {
-    numeracy: 1, integers: 2, bidmas: 2, hcf: 3, lcm: 3, primes: 3, fractions: 4, coords: 6, rounding: 7,
-    decimals: 8, algebra: 9, angles: 10, fdp: 11, area: 12, stats: 13, graphs: 14, percent: 15,
-    geometry: 16, volume: 17,
+    numeracy: 1, integers: 2, bidmas: 2, hcf: 3, lcm: 3, primes: 3, fractions: 4, algebra1: 5,
+    coords: 6, rounding: 7, decimals: 8, algebra: 9, angles: 10, fdp: 11, area: 12, measures: 12,
+    stats: 13, graphs: 14, percent: 15, geometry: 16, volume: 17,
   };
-  const TASK_WORD = { algebra: 'SOLVE', hcf: 'FIND THE HCF', lcm: 'FIND THE LCM', primes: 'PRIMES', ratio: 'RATIO', decimals: 'WORK OUT', percent: 'WORK OUT', solve: 'PROBLEM', fractions: 'FRACTIONS', integers: 'WORK OUT', bidmas: 'WORK IT OUT IN ORDER', rounding: 'ROUND', stats: 'STATISTICS', fdp: 'CONVERT', numeracy: 'WORK OUT', angles: 'FIND THE ANGLE', area: 'WORK OUT', volume: 'VOLUME', coords: 'COORDINATES', geometry: 'SHAPE FACTS', graphs: 'READ THE CHART' };
+  const TASK_WORD = { algebra1: 'ALGEBRA', measures: 'CONVERT', algebra: 'SOLVE', hcf: 'FIND THE HCF', lcm: 'FIND THE LCM', primes: 'PRIMES', ratio: 'RATIO', decimals: 'WORK OUT', percent: 'WORK OUT', solve: 'PROBLEM', fractions: 'FRACTIONS', integers: 'WORK OUT', bidmas: 'WORK IT OUT IN ORDER', rounding: 'ROUND', stats: 'STATISTICS', fdp: 'CONVERT', numeracy: 'WORK OUT', angles: 'FIND THE ANGLE', area: 'WORK OUT', volume: 'VOLUME', coords: 'COORDINATES', geometry: 'SHAPE FACTS', graphs: 'READ THE CHART' };
 
   // ---------------- persistent save ----------------
   const KEY = 'wac-save-v1';
@@ -111,7 +111,11 @@
     subj.levels.forEach((l) => {
       const card = document.createElement('button');
       card.className = 'level-card' + (l.id === pendingLevel ? ' sel' : '');
-      card.innerHTML = `<span class="lvl-badge">${l.badge}</span> ${l.name}`;
+      // ⭐ marks a level that goes BEYOND the school's Year 6 course — kept as stretch,
+      // but flagged so nobody mistakes it for something they were taught.
+      card.innerHTML = `<span class="lvl-badge">${l.badge}</span> ${l.name}`
+        + (l.stretch ? `<span class="lvl-stretch">stretch</span>` : '');
+      if (l.stretch) card.classList.add('stretch');
       card.onclick = () => { pendingLevel = l.id; renderLevels(); };
       row.appendChild(card);
     });

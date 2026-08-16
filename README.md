@@ -4,38 +4,57 @@ A friendly football-themed maths trainer that works **one small step at a time**
 hints, a "why does this work?" explanation, and the "long way" whenever you're stuck.
 Made by **the Al Falasi brothers** (Year 6 → Year 7).
 
-## Topics (pick from the menu) — the full Year 6 course
+## Topics — the actual Year 6 course
 
-Choose a topic on the first screen, then a level, then kick off a match of 10. Built from
-the boys' own Year 6 worksheets (Topics 1–17), matching the school's methods.
+The menu follows the school's **Toddle unit plans**, topic by topic. Every
+"Specific understanding" the school lists has at least one level, and `T5`, `T12` and so
+on are the school's own topic numbers, shown on each tile.
 
-**Every topic has at least three levels that get properly harder** — the last one on each
-ladder (🏆) is a Year 7-and-beyond stretch, not just bigger numbers. Three clean wins
-promotes you to the next level, or you can jump straight to any level from the menu.
+| | Topic | Levels |
+| --- | --- | --- |
+| T1 | **Numeracy** | place value · ordering · decimals and negatives |
+| T2 | **Integers** · **BIDMAS** | add/subtract · multiply/divide · two-step negatives · the six-rung BIDMAS ladder |
+| T3 | **HCF** · **LCM** · **Primes** | listing method, small → big pairs · spot primes, prime hunt, two prime factors, factor trees · **squares, cubes and roots** |
+| T4 | **Fractions** | simplify · of an amount · add & subtract · **mixed ↔ improper** · **what fraction of…?** · multiply & divide |
+| T5 | **Algebra Basics** | **notation & writing expressions · substituting numbers · substituting negatives · collecting like terms · expressions for perimeter** |
+| T6 | **Coordinates** · symmetry | read · negatives · reflect · complete a shape (symmetry lives under Shape facts) |
+| T7 | **Rounding** | nearest 10/100/1000 · decimal places |
+| T8 | **Decimals** | × ÷ by powers of ten · add & subtract · × and ÷ decimals |
+| T9 | **Equations** | one-step → two-step → x on both sides → negatives everywhere |
+| T10 | **Angles** | **name & estimate, vertically opposite** · on a line/around a point · triangles · quadrilaterals & isosceles |
+| T11 | **Fractions↔Decimals↔%** | fraction → decimal → % · % → fraction · order a mixed set |
+| T12 | **Perimeter & Area** · **Units & Measures** | rectangles · triangles · compound shapes & backwards · **metric conversion: length, mass, then area and volume** |
+| T13 | **Statistics** | mode & range · mean · median · **compare two sets by mean and range** |
+| T14 | **Data & Graphs** | bar charts · awkward scales · pictograms & means · **pie charts, line graphs & frequency tables** · **Venn diagrams** |
+| T15 | **Percentages** | % of an amount · any whole % (10% + 1%) · **what percentage of…?** · increase & decrease |
+| T16 | **Shape facts** | sides and angles · properties of quadrilaterals · **polygons and circle parts** |
+| T17 | **Volume** | **name the solid & its net** · volume of a cuboid · faces, edges & vertices · prisms & missing sides |
+| — | **Problem solving** | 10 worded problems, easy → hard, in one-step pieces |
 
-| Topic | Level 1 → | Level 2 → | Challenge 🏆 |
-| --- | --- | --- | --- |
-| **⚽ Equations** | x + b = c | ax + b = c, then both sides | negatives both sides, then **brackets** a(x + b) = c |
-| **🔵 HCF** | small pairs | bigger pairs | **three numbers at once** |
-| **🟢 LCM** | small pairs | bigger pairs | **three numbers at once** |
-| **🔢 Primes** | is it prime? | prime hunt, two prime factors | factor trees, index form, make-a-square ⭐ |
-| **⚖️ Ratio** | simplify | share an amount | **3-part ratios, and working back from a difference or one share** |
-| **🔟 Decimals** | × ÷ 10/100/1000 | add & subtract | **multiplying and dividing by a decimal** |
-| **％ Percentages** | % of an amount | any whole % (10% + 1%) | **increase, decrease, % change and reverse percentages** |
-| **½ Fractions** | simplify, of an amount | add & subtract | **multiply & divide (keep–flip–change)** |
-| **± Integers** | add & subtract | multiply & divide | **two operations at once, signs everywhere** |
-| **🧮 BIDMAS** | which part first? | × ÷ before + −, brackets | left-to-right, powers, full mix |
-| **≈ Rounding** | nearest 10/100/1000 | decimal places | **significant figures & estimating** |
-| **📊 Statistics** | mode & range | mean, median | **find a missing value from the mean, even-length medians, negatives** |
-| **🔗 F↔D↔%** | fraction → decimal → % | % → fraction | **order a mixed set of all three** |
-| **#️⃣ Place value** | place value | ordering | **decimal place value and ordering negatives** |
-| **📐 Angles** | line / point | triangles | **quadrilaterals, isosceles, parallel lines, polygon angle sums** |
-| **🟩 Perimeter & Area** | rectangles | triangles | **compound L-shapes, parallelograms, trapezia, area → missing side** |
-| **🧊 3D & Volume** | cuboid volume | faces, edges, vertices | **surface area, missing dimensions, triangular prisms** |
-| **📍 Coordinates** | read | negatives, reflect, complete | **midpoint of a line** |
-| **🔷 Shape facts** | sides & angles | properties of quadrilaterals | **lines of symmetry vs rotational order** |
-| **📈 Data & Graphs** | bar charts | **charts whose scale goes up in 2s/5s/10s** | **two-way tables, pictograms, mean from a chart** |
-| **🧩 Problem solving** | warm-up tiers | full easy→hard lesson | **tiers 4–10, four-step problems** |
+**Bold** entries are the ones built from the unit plans after an audit found the app had
+drifted from the course.
+
+### ⭐ Stretch levels
+
+A handful of levels go **beyond** the Year 6 course. They are kept — they are good
+practice and the boys wanted harder work — but every one is marked `STRETCH` in the menu
+so nobody mistakes it for something the school has taught:
+
+significant figures · reverse percentages · surface area · trapezium area · parallel-line
+angle rules and polygon angle sums · HCF/LCM of three numbers · two-way tables · reverse
+mean · midpoints · brackets in equations · and the whole **Ratio** topic, which is not a
+Year 6 Toddle topic at all.
+
+`test/test-curriculum.js` enforces this: every objective must have a level, and every
+level must either map to an objective or be flagged as stretch.
+
+### Non-calculator
+
+Topics 7, 8, 11 and 15 are explicitly non-calculator, so the generators are constrained to
+match. Percentage change goes via a simplified fraction (38/190 → 1/5 → 20%), not
+`38 ÷ 190 × 100`; reverse percentages step down to the HCF (75% = £30 → 25% = £10 → £40)
+rather than dividing by 1%; and decimal multiplication is capped so stripping the points
+never leaves something like 41 × 55.
 
 For the number/geometry topics you **tap the chips** that belong (some wrong ones are mixed
 in). Every wrong answer gets a kind, specific explanation — never just "wrong".
@@ -148,6 +167,11 @@ node test/test-bidmas.js    # the BIDMAS ladder, checked against an independent 
 node test/test-history.js   # the match log: totals, bests, streaks, durations and the
                             # weekly email — a parent reads these numbers, so they must
                             # be right (and topic names must be escaped, not injected)
+node test/test-curriculum.js # every Toddle objective has a level, and every level either
+                            # maps to an objective or is flagged as stretch
+node test/test-build.js     # the app is correctly assembled: every src file has a script
+                            # tag AND an sw.js entry, version stamps agree, load order is
+                            # sound, and no names or addresses leaked into a public repo
 ```
 
 `REPS=200 node test/test-levels.js` runs a deeper sweep (the default is 60 problems per level).

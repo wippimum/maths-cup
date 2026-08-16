@@ -243,6 +243,16 @@
     'expand-none': (c) => `The bracket hasn't been expanded yet. Multiply both terms inside by ${c.a}: you should get ${c.a}x ${c.ab < 0 ? '− ' + Math.abs(c.ab) : '+ ' + c.ab}.`,
     'expand-rhs': (c) => `Careful — the ${c.a} only multiplies what's INSIDE the bracket. The ${c.c} on the other side of the = is left exactly as it is.`,
 
+    // ---------- Toddle objectives (algebra1.js / curriculum1.js / curriculum2.js) ----------
+    'algebra-notation': (c) => `Not that one. ${c.why || ''} The answer is ${c.answer}.`,
+    'shape-name': (c) => `Not quite — it's the ${c.answer}. ${c.why || ''}`,
+    'spot-power': (c) => c.cube
+      ? `A cube number comes from multiplying a number by itself three times. The cube numbers here are ${c.yes}.`
+      : `A square number comes from multiplying a number by itself. The square numbers here are ${c.yes}.`,
+    'like-terms': (c) => `Like terms must have exactly the same letter. The ${c.letter}-terms here are ${c.terms} — a ${c.letter}-term and any other letter can never be added together.`,
+    'collect-write': (c) => `Not quite — the simplified expression is ${c.answer}. Put the collected terms together, biggest letter first, then any plain number.`,
+    'mixed-form': (c) => `Write it as a mixed number: ${c.whole} whole ones and ${c.n}/${c.d} left over, so ${c.whole} ${c.n}/${c.d}.`,
+
     // ---------- challenge levels (harder.js / harder2.js) ----------
     'hcf-common': (c) => `A common factor has to be in ALL the lists, not just one or two. The ones that appear everywhere are: ${c.cf}.`,
     'lcm-multiple': (c) => `Count up in ${c.n}s: ${c.ms}. A multiple is what you land on — nothing in between counts.`,
