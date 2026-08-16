@@ -148,7 +148,7 @@
         buildStep({ key: 'order', prompt: `First put the numbers in order, smallest to biggest (tap the cards in order).`,
           hint: `Start with the smallest and work up: ${sorted.join(', ')}.`, why: `The median is the middle value, so the data must be in order first.`,
           longWay: `In order: ${sorted.join(', ')}`, resultText: `ordered: ${sorted.join(', ')}`,
-          pieces: data.map(String), distractors: [], isAnswer: false,
+          pieces: data.map(String), solution: sorted.join(' '), distractors: [], isAnswer: false,
           check: (raw) => { const p = parseNumberList(raw); return (p.length === sorted.length && p.every((v, i) => v === sorted[i])) ? { correct: true } : { correct: false, id: 'stat-median-order', ctx: { sorted: sorted.join(', ') } }; } }),
         pickStep({ key: 'mid', prompt: `Now tap the MIDDLE number (the same amount on each side).`, hint: `Cross off from both ends until one is left: ${mid}.`, why: `With them in order, the median is the middle value.`,
           resultText: `Median = ${mid}`, expected: [mid], pool: uniqSort(sorted), isAnswer: true, diagnose: () => ({ correct: false, id: 'stat-wrong', ctx: { what: 'middle', v: mid } }) }),

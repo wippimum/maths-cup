@@ -70,7 +70,7 @@
       subject: 'numeracy', given: `Put these in order, ${desc ? 'biggest to smallest' : 'smallest to biggest'}: ${list(nums)}`, answer: sorted.join(', '),
       steps: [buildStep({ key: 'order', prompt: `Tap the numbers in order, ${desc ? 'biggest first' : 'smallest first'}.`,
         hint: `In order: ${sorted.join(', ')}.`, why: `Compare place value from the left: the number with the bigger left-most digit is bigger (when they have the same number of digits).`,
-        longWay: `Ordered: ${sorted.join(', ')}`, resultText: sorted.join(', '), pieces: nums.map(String), distractors: [], isAnswer: true,
+        longWay: `Ordered: ${sorted.join(', ')}`, resultText: sorted.join(', '), pieces: nums.map(String), solution: sorted.join(' '), distractors: [], isAnswer: true,
         check: (raw) => { const p = parseNumberList(raw); return (p.length === sorted.length && p.every((v, i) => v === sorted[i])) ? { correct: true } : { correct: false, id: 'order-numbers', ctx: { sorted: sorted.join(', '), desc } }; } })],
     };
   }

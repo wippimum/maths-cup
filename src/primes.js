@@ -120,7 +120,10 @@
     return { subject: 'primes', given: `${n} = ${idx}. What is the smallest number to multiply ${n} by to make a SQUARE number?`, sig: `sq:${n}`, answer: `${mult} → ${sq}`,
       steps: [
         pickStep({ key: 'odd', prompt: `In ${n} = ${idx}, which prime has an ODD power? (that's the one to fix)`, hint: `A square number has every prime power EVEN. Here ${oddPrime} has an odd power.`,
-          why: `A perfect square factorises into primes with all EVEN powers (e.g. 36 = 2² × 3²). Find the prime whose power is odd.`, resultText: `${oddPrime} has an odd power`, expected: [oddPrime], pool: uniqSort(primesPresent.concat([oddPrime])),
+          why: `A perfect square factorises into primes with all EVEN powers (e.g. 36 = 2² × 3²). Find the prime whose power is odd.`, resultText: `${oddPrime} has an odd power`, expected: [oddPrime],
+          // n may have a single prime factor (8 = 2³), which would leave one card and
+          // give the answer away — offer other small primes as real alternatives.
+          pool: uniqSort(primesPresent.concat([oddPrime], primesPresent.length > 2 ? [] : [2, 3, 5, 7].filter((p) => !primesPresent.includes(p)).slice(0, 3))),
           diagnose: () => ({ correct: false, id: 'square-odd', ctx: { n, idx, oddPrime } }) }),
         pickStep({ key: 'sq', prompt: `Multiply by ${mult} to make every power even. What square do you get? ${n} × ${mult} = ?`, hint: `${n} × ${mult} = ${sq} (a square number).`, why: `Multiplying by ${mult} bumps the odd power up to even, so the result is a perfect square: ${sq}.`,
           resultText: `${n} × ${mult} = ${sq}`, expected: [sq], pool: numberPool([sq], 4, sq - 20, sq + 20), isAnswer: true,

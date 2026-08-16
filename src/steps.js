@@ -53,6 +53,9 @@
       `You only work out the numbers in front; the x stays.`,
     tidy: `Just tidy the numbers on one side — the x side doesn't change. Doing one small ` +
       `calculation at a time makes slips much easier to spot.`,
+    expand: `A number outside a bracket multiplies EVERYTHING inside it, not just the first term. ` +
+      `3(x + 4) means 3 lots of (x + 4) = 3x + 12. Miss the second term and every line after it is wrong, ` +
+      `so expand carefully before you start moving things across.`,
   };
 
   function makeStep(opts) {
@@ -255,6 +258,32 @@
     return [moveX, combine, moveNum, evalStep, divide];
   }
 
+  // ===== Champions round: a(x + b) = c — expand the bracket first =====
+  function bracketSteps(a, b, c) {
+    const ab = a * b;
+    const expand = makeStep({
+      key: 'expand',
+      prompt: `The bracket comes first. Multiply EVERYTHING inside it by ${a}, then write the new line.`,
+      hint: `${a} × x = ${a}x and ${a} × ${signed(b)} = ${signed(ab)}, so the line becomes ${side(a, ab)} = ${fmtN(c)}.`,
+      why: WHY.expand,
+      longWay: `${a}(x ${signed(b)}) = ${fmtN(c)}\n${a} × x = ${a}x\n${a} × ${signed(b)} = ${signed(ab)}\n${side(a, ab)} = ${fmtN(c)}`,
+      fromText: `${a}(x ${signed(b)}) = ${fmtN(c)}`,
+      resultText: `${side(a, ab)} = ${fmtN(c)}`,
+      expected: { left: E(a, ab), right: E(0, c) },
+      wrongs: [
+        { expected: { left: E(a, b), right: E(0, c) }, id: 'expand-partial', ctx: { a, b, ab } },
+        { expected: { left: E(1, b), right: E(0, c) }, id: 'expand-none', ctx: { a, b, ab } },
+        { expected: { left: E(a, ab), right: E(0, a * c) }, id: 'expand-rhs', ctx: { a, c } },
+      ],
+      tapHelp: [
+        { text: `${a}(`, msg: `Yes — that ${a} is multiplying the WHOLE bracket, so it hits both terms inside.` },
+        { text: 'x', msg: `${a} × x = ${a}x. Now don't forget the ${signed(b)} as well.` },
+        { text: signed(b), msg: `${a} × ${signed(b)} = ${signed(ab)}. This is the one people forget.` },
+      ],
+    });
+    return [expand].concat(typeASteps(a, ab, c));
+  }
+
   // ---- tap-to-choose-a-term help ----
   function givenTapHelpA(a, b, c) {
     return [
@@ -281,7 +310,7 @@
     return [];
   }
 
-  const api = { typeASteps, typeBSteps, warmupSteps, simplifyNote, WHY };
+  const api = { typeASteps, typeBSteps, warmupSteps, bracketSteps, simplifyNote, WHY };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.WAC = Object.assign(root.WAC || {}, api);
 })(typeof window !== 'undefined' ? window : globalThis);

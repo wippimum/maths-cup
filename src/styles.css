@@ -251,6 +251,14 @@ footer { text-align: center; color: #9fb0bf; font-size: .78rem; padding: 10px 0 
 .problem-diagram { position: relative; z-index: 1; margin: 8px auto 2px; text-align: center; }
 .problem-diagram svg { max-width: 100%; height: auto; background: rgba(255,255,255,.94); border-radius: 12px; padding: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
 
+/* two-way tables and pictograms come through as HTML, not SVG */
+.wtable { margin: 0 auto; border-collapse: collapse; background: rgba(255,255,255,.94); color: #12324a;
+  border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.25); font-size: 1rem; }
+.wtable th, .wtable td { border: 1px solid #b9cbd8; padding: 7px 14px; text-align: center; }
+.wtable thead th, .wtable tbody th { background: #dcebf3; font-weight: 700; }
+.wtable td b { color: #c0392b; font-size: 1.15em; }
+@media (max-width: 480px) { .wtable th, .wtable td { padding: 6px 9px; font-size: .95rem; } }
+
 /* ---------- menu tree ---------- */
 .menu-block { position: relative; z-index: 1; margin: 12px 0; }
 .menu-block h3 { margin: 0 0 8px; font-size: 1rem; letter-spacing: 1px; }

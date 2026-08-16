@@ -57,6 +57,11 @@
       prompt: o.prompt, hint: o.hint, why: o.why, longWay: o.longWay,
       resultText: o.resultText, isAnswer: !!o.isAnswer,
       pieces: o.pieces, distractors: o.distractors || [],
+      // What a correct build looks like once the cards are laid out in order.
+      // The cards themselves are shuffled on screen (and for ordering questions the
+      // pieces are deliberately NOT in the right order), so the tests need this to
+      // know what "solved" looks like. Defaults to the pieces as given.
+      solution: o.solution != null ? o.solution : (o.pieces || []).join(' '),
     };
     s.check = o.check;
     return s;
@@ -122,7 +127,9 @@
         longWay: `Common factors: ${list(cf)} → the highest is ${h}.`,
         resultText: `HCF = ${h}`,
         expected: [h],
-        pool: cf,
+        // When the HCF is 1 the common-factor list is a single card, which hands the
+        // answer over for free. Top the pool up so there is always a real choice.
+        pool: cf.length > 2 ? cf : numberPool(cf, 4, 2, Math.max(a, b)),
         isAnswer: true,
         diagnose: (v) => S(cf).includes(v)
           ? { correct: false, id: 'hcf-not-highest', ctx: { h } }
@@ -162,7 +169,10 @@
     const ma = multiples(a, kA), mb = multiples(b, kB);
     const cm = common(ma, mb);                 // shared multiples in the shown lists
     const ab = a * b;
-    const lcmPool = uniqSort(S(cm).map(Number).includes(ab) ? cm : [...cm, ab]);
+    // Always offer the a×b trap alongside the real common multiples, and top up if
+    // that still leaves only one card (which would give the answer away for free).
+    let lcmPool = uniqSort(S(cm).map(Number).includes(ab) ? cm : [...cm, ab]);
+    if (lcmPool.length < 3) lcmPool = numberPool(lcmPool, 3, Math.min(a, b), L + 2 * Math.max(a, b));
     const steps = [
       multipleStep(a, kA, 'a'),
       multipleStep(b, kB, 'b'),

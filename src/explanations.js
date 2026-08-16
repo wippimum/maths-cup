@@ -238,6 +238,21 @@
     // ---------- Data & graphs ----------
     'bar-read': (c) => `Read the ${c.cat} bar across to the scale — it's ${c.v}.`,
 
+    // ---------- brackets (Champions round) ----------
+    'expand-partial': (c) => `You multiplied the x but left the ${c.b < 0 ? c.b : '+' + c.b} alone. The ${c.a} outside multiplies EVERYTHING in the bracket: ${c.a} × x = ${c.a}x AND ${c.a} × ${c.b} = ${c.ab}.`,
+    'expand-none': (c) => `The bracket hasn't been expanded yet. Multiply both terms inside by ${c.a}: you should get ${c.a}x ${c.ab < 0 ? '− ' + Math.abs(c.ab) : '+ ' + c.ab}.`,
+    'expand-rhs': (c) => `Careful — the ${c.a} only multiplies what's INSIDE the bracket. The ${c.c} on the other side of the = is left exactly as it is.`,
+
+    // ---------- challenge levels (harder.js / harder2.js) ----------
+    'hcf-common': (c) => `A common factor has to be in ALL the lists, not just one or two. The ones that appear everywhere are: ${c.cf}.`,
+    'lcm-multiple': (c) => `Count up in ${c.n}s: ${c.ms}. A multiple is what you land on — nothing in between counts.`,
+    'frac-reciprocal': (c) => `To divide by a fraction, flip it over: ${c.c}/${c.d} becomes ${c.d}/${c.c}. Then change the ÷ into a ×.`,
+    'fdp-convert': (c) => `Turn every one into a percentage first so they can be compared fairly: ${c.pairs}.`,
+    'fdp-order': (c) => `Not the right order. Compare the percentages you worked out, then write them back in their original forms: ${c.order}.`,
+    'angle-pair': (c) => `These are ${c.name}. ${c.why}`,
+    'symmetry': (c) => `A ${c.name} has ${c.rotational ? `rotational symmetry of order ${c.val}` : `${c.val} line${c.val === 1 ? '' : 's'} of symmetry`}. Lines of symmetry and rotational order are two different counts — don't mix them up.`,
+    'table-line': (c) => `Pick a line with only one gap in it. The ${c.row} row is ${c.a} + ? = ${c.r1}, so that one can be solved straight away.`,
+
     // ---------- generic choose/pick ----------
     'choose-wrong': () => `Not quite — check which ones really belong, then untap the wrong ones and add any missing.`,
     'pick-wrong': () => `Not that one — read the prompt again and pick the number it's asking for.`,

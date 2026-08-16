@@ -6,30 +6,32 @@
    Cache-first on code means an installed iPad keeps serving yesterday's build for ever and
    a fix looks like it did nothing — so code always tries the network, and falls back to the
    cache the moment the network isn't there, which is what keeps offline working. */
-const CACHE = 'wac-v19';
+const CACHE = 'wac-v20';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icon-180.png',
-  './src/styles.css?v=19',
-  './src/fraction.js?v=19',
-  './src/format.js?v=19',
-  './src/parser.js?v=19',
-  './src/numbers.js?v=19',
-  './src/explanations.js?v=19',
-  './src/steps.js?v=19',
-  './src/topics.js?v=19',
-  './src/topics2.js?v=19',
-  './src/topics3.js?v=19',
-  './src/topics4.js?v=19',
-  './src/topics5.js?v=19',
-  './src/primes.js?v=19',
-  './src/coords.js?v=19',
-  './src/bidmas.js?v=19',
-  './src/solving.js?v=19',
-  './src/problems.js?v=19',
-  './src/app.js?v=19'
+  './src/styles.css?v=20',
+  './src/fraction.js?v=20',
+  './src/format.js?v=20',
+  './src/parser.js?v=20',
+  './src/numbers.js?v=20',
+  './src/explanations.js?v=20',
+  './src/steps.js?v=20',
+  './src/topics.js?v=20',
+  './src/topics2.js?v=20',
+  './src/topics3.js?v=20',
+  './src/topics4.js?v=20',
+  './src/topics5.js?v=20',
+  './src/primes.js?v=20',
+  './src/coords.js?v=20',
+  './src/harder.js?v=20',
+  './src/harder2.js?v=20',
+  './src/bidmas.js?v=20',
+  './src/solving.js?v=20',
+  './src/problems.js?v=20',
+  './src/app.js?v=20'
 ];
 
 self.addEventListener('install', (e) => {

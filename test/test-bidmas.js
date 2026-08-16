@@ -3,7 +3,8 @@
 const path = '../src/';
 const W = {};
 for (const f of ['numbers', 'format', 'fraction', 'parser', 'explanations', 'steps', 'topics',
-  'topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'solving', 'bidmas', 'problems']) {
+  'topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'harder', 'harder2',
+  'solving', 'bidmas', 'problems']) {
   Object.assign(W, require(path + f + '.js'));
 }
 

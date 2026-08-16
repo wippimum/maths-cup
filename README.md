@@ -7,28 +7,35 @@ Made by **the Al Falasi brothers** (Year 6 → Year 7).
 ## Topics (pick from the menu) — the full Year 6 course
 
 Choose a topic on the first screen, then a level, then kick off a match of 10. Built from
-the boys' own Year 6 worksheets (Topics 1–17), matching the school's methods:
+the boys' own Year 6 worksheets (Topics 1–17), matching the school's methods.
 
-- **⚽ Equations** — linear equations, "move it across and flip it" (build each line by tapping cards)
-- **🔵 HCF** · **🟢 LCM** — list factors / multiples, find the common ones (listing method)
-- **🔢 Primes** — spot primes, prime hunt, and prime factorisation
-- **⚖️ Ratio** — simplify (using the HCF) and share amounts
-- **🔟 Decimals** — × ÷ by 10/100/1000, add & subtract
-- **％ Percentages** — % of an amount (10% / 1% build-up)
-- **½ Fractions** — simplify, fraction of an amount, add & subtract
-- **± Integers** — add/subtract/multiply/divide negatives
-- **🧮 BIDMAS** — which part of the sum comes first: brackets, powers, × ÷, then + −
-- **≈ Rounding** — nearest 10/100/1000 and decimal places
-- **📊 Statistics** — mean, median, mode, range
-- **🔗 Fractions↔Decimals↔%** — convert between all three
-- **#️⃣ Place value & ordering**
-- **📐 Angles** — on a line, around a point, in a triangle (with diagrams)
-- **🟩 Perimeter & Area** — rectangles and triangles (with diagrams)
-- **🧊 3D Shapes & Volume** — cuboid volume; faces, edges, vertices
-- **📍 Coordinates** — read coordinates and reflect points (with a grid)
-- **🔷 Shape facts** — sides, angles, symmetry
-- **📈 Data & Graphs** — read bar charts
-- **🧩 Problem solving** — worded problems in tiny one-step calculations
+**Every topic has at least three levels that get properly harder** — the last one on each
+ladder (🏆) is a Year 7-and-beyond stretch, not just bigger numbers. Three clean wins
+promotes you to the next level, or you can jump straight to any level from the menu.
+
+| Topic | Level 1 → | Level 2 → | Challenge 🏆 |
+| --- | --- | --- | --- |
+| **⚽ Equations** | x + b = c | ax + b = c, then both sides | negatives both sides, then **brackets** a(x + b) = c |
+| **🔵 HCF** | small pairs | bigger pairs | **three numbers at once** |
+| **🟢 LCM** | small pairs | bigger pairs | **three numbers at once** |
+| **🔢 Primes** | is it prime? | prime hunt, two prime factors | factor trees, index form, make-a-square ⭐ |
+| **⚖️ Ratio** | simplify | share an amount | **3-part ratios, and working back from a difference or one share** |
+| **🔟 Decimals** | × ÷ 10/100/1000 | add & subtract | **multiplying and dividing by a decimal** |
+| **％ Percentages** | % of an amount | any whole % (10% + 1%) | **increase, decrease, % change and reverse percentages** |
+| **½ Fractions** | simplify, of an amount | add & subtract | **multiply & divide (keep–flip–change)** |
+| **± Integers** | add & subtract | multiply & divide | **two operations at once, signs everywhere** |
+| **🧮 BIDMAS** | which part first? | × ÷ before + −, brackets | left-to-right, powers, full mix |
+| **≈ Rounding** | nearest 10/100/1000 | decimal places | **significant figures & estimating** |
+| **📊 Statistics** | mode & range | mean, median | **find a missing value from the mean, even-length medians, negatives** |
+| **🔗 F↔D↔%** | fraction → decimal → % | % → fraction | **order a mixed set of all three** |
+| **#️⃣ Place value** | place value | ordering | **decimal place value and ordering negatives** |
+| **📐 Angles** | line / point | triangles | **quadrilaterals, isosceles, parallel lines, polygon angle sums** |
+| **🟩 Perimeter & Area** | rectangles | triangles | **compound L-shapes, parallelograms, trapezia, area → missing side** |
+| **🧊 3D & Volume** | cuboid volume | faces, edges, vertices | **surface area, missing dimensions, triangular prisms** |
+| **📍 Coordinates** | read | negatives, reflect, complete | **midpoint of a line** |
+| **🔷 Shape facts** | sides & angles | properties of quadrilaterals | **lines of symmetry vs rotational order** |
+| **📈 Data & Graphs** | bar charts | **charts whose scale goes up in 2s/5s/10s** | **two-way tables, pictograms, mean from a chart** |
+| **🧩 Problem solving** | warm-up tiers | full easy→hard lesson | **tiers 4–10, four-step problems** |
 
 For the number/geometry topics you **tap the chips** that belong (some wrong ones are mixed
 in). Every wrong answer gets a kind, specific explanation — never just "wrong".
@@ -100,7 +107,22 @@ Working out the numbers is its own line, so an arithmetic slip (like `33 − 2 =
 - ⚽ **Group Stage** — `ax + b = c`
 - 🥅 **Round of 16** — `ax − b = c`, answers can be negative
 - 🏟️ **Quarter-final** — `ax + b = cx + d` (x on both sides)
-- 🏆 **Semi-final / Final** — everything mixed, negatives anywhere
+- 🥈 **Semi-final** — everything mixed, negatives anywhere
+- 🏆 **The Final** — **brackets**: `a(x + b) = c`, expand before you move anything
+
+## Tests
+
+Three Node scripts, no dependencies — run them from this folder after any change:
+
+```
+node test/test-levels.js    # every level of every subject: steps answerable, exactly one
+                            # right option, every wrong option explained, ≥3 levels per topic
+node test/test-truth.js     # re-derives every challenge answer independently — catches a
+                            # tidy-looking step that teaches the WRONG number
+node test/test-bidmas.js    # the BIDMAS ladder, checked against an independent eval
+```
+
+`REPS=200 node test/test-levels.js` runs a deeper sweep (the default is 60 problems per level).
 
 ## The method (the one Mum is teaching)
 
