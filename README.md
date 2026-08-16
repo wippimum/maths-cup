@@ -185,6 +185,9 @@ node test/test-curriculum.js # every Toddle objective has a level, and every lev
 node test/test-build.js     # the app is correctly assembled: every src file has a script
                             # tag AND an sw.js entry, version stamps agree, load order is
                             # sound, and no names or addresses leaked into a public repo
+node test/test-vocab.js     # the app says what the class says: every term from the unit
+                            # plans appears in text a player actually reads, and no
+                            # correct-but-different synonym is used instead
 ```
 
 `REPS=200 node test/test-levels.js` runs a deeper sweep (the default is 60 problems per level).

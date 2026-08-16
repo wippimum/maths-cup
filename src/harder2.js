@@ -211,11 +211,11 @@
       steps: [
         nStep({ key: 'side', prompt: `The right-hand edge (marked ?) isn't given. Work it out: ${B} − ${d} = ?`,
           hint: `${B} − ${d} = ${right}.`,
-          why: `The whole left side is ${B} cm. The step down the right is ${d} cm of that, so the short right-hand edge is what's left: ${B} − ${d}. Finding a missing length from the ones you ARE given is what makes a compound shape harder than a plain rectangle.`,
+          why: `The whole left side is ${B} cm. The step down the right is ${d} cm of that, so the short right-hand edge is what's left: ${B} − ${d}. Finding a missing length from the ones you ARE given is what makes a composite shape harder than a plain rectangle.`,
           resultText: `the right-hand edge is ${right} cm`, answer: right, lo: 1, hi: B + 6, expr: `${B} − ${d}` }),
         nStep({ key: 'bot', prompt: `Now cut along the dashed line into two rectangles. The BOTTOM one is ${A} cm by ${right} cm: ${A} × ${right} = ?`,
           hint: `${A} × ${right}.`,
-          why: `A compound shape has no formula of its own. Cut it into rectangles you DO know, work each one out, then add them up.`,
+          why: `A composite shape has no formula of its own. Cut it into rectangles you DO know, work each one out, then add them up.`,
           resultText: `bottom rectangle = ${bottom} cm²`, answer: bottom, lo: Math.max(1, bottom - 20), hi: bottom + 20, expr: `${A} × ${right}` }),
         nStep({ key: 'top', prompt: `The TOP rectangle is ${A - c} cm by ${d} cm: ${A - c} × ${d} = ?`,
           hint: `${A - c} × ${d}.`,

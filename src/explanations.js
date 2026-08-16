@@ -182,6 +182,7 @@
     'frac-vs-rest': (c) => `That compares the ${c.sn} with the ${c.rest} left over. A fraction compares with the WHOLE instead, so the bottom is ${c.sd}: ${c.sn}/${c.sd}.`,
     'frac-complement': (c) => `Careful — ${c.rest} is how many did NOT. The question asks how many ${c.q}, and that's ${c.sn}: ${c.sn}/${c.sd}.`,
     'lcd': (c) => `The common denominator is the LCM of ${c.d1} and ${c.d2} = ${c.L} (the smallest number both go into).`,
+    'order-wrong': (c) => `Not that order. ${c.word === 'biggest first' ? 'Start with the biggest' : 'Start with the smallest'} and work across: ${c.order}.`,
     'not-simplified-frac': (c) => `That's the right value ✅ but it can be simplified. Divide top and bottom by their HCF → ${c.res}.`,
 
     // ---------- Statistics ----------

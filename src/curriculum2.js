@@ -437,9 +437,66 @@
     };
   }
 
+  // ============================================================ T13 · choosing the right average
+  // "Identify the advantages and disadvantages of the mean, median and mode in context,
+  //  and choose the most appropriate average for a given data set (e.g. when outliers
+  //  are present)." Calculating an average was already covered; DECIDING was not.
+  //  Every set here is built with one deliberate outlier, and the numbers are chosen so
+  //  the mean divides exactly — this stays non-calculator like the rest of T13.
+  const AVG_CTX = [
+    { s: 'goals scored by the players in a match', unit: '', high: 'one striker scored a hatful' },
+    { s: 'minutes each pupil took to finish a puzzle', unit: ' min', high: 'one pupil got stuck for ages' },
+    { s: 'prices of the shirts in a shop', unit: '', high: 'one signed shirt costs a fortune' },
+    { s: 'ages of the people at a family lunch', unit: '', high: 'great-grandad is there too' },
+  ];
+  function whichAverage() {
+    const c = pick(AVG_CTX);
+    // four close values plus one far-off outlier
+    const base = rand(2, 9);
+    const body = [base, base, base + rand(1, 2), base + rand(2, 4)];
+    const outlier = base + rand(20, 40);
+    const all = body.concat([outlier]);
+    const sorted = all.slice().sort((x, y) => x - y);
+    const median = sorted[2];
+    const total = all.reduce((a, b) => a + b, 0);
+    // keep the mean a whole number so this stays non-calculator
+    if (total % 5 !== 0) return whichAverage();
+    const mean = total / 5;
+    if (mean <= median) return whichAverage();          // the outlier must actually drag the mean up
+    const shown = shuffle(all.slice());
+    return {
+      subject: 'stats', sig: `wa:${sorted.join(',')}`,
+      given: `Here are the ${c.s}: ${shown.join(', ')}. Which average best describes this set?`,
+      answer: 'the median',
+      steps: [
+        nStep({ key: 'out', prompt: `One value is nothing like the others. Which is the OUTLIER?`,
+          hint: `${outlier} is miles above the rest (${sorted.slice(0, 4).join(', ')}).`,
+          why: `An OUTLIER is a value far away from the rest of the data — here, ${outlier}, because ${c.high}. Spotting it first matters, because an outlier pulls some averages about far more than others.`,
+          resultText: `the outlier is ${outlier}`, answer: outlier, pool: uniqSort(all.slice()),
+          expr: `the value far from the rest` }),
+        nStep({ key: 'mean', prompt: `Work out the MEAN: (${shown.join(' + ')}) ÷ 5 = ?`,
+          hint: `The five add up to ${total}, and ${total} ÷ 5 = ${mean}.`,
+          why: `The mean shares the total out equally. Because the outlier ${outlier} is in that total, it drags the mean up with it.`,
+          longWay: `${shown.join(' + ')} = ${total}\n${total} ÷ 5 = ${mean}`,
+          resultText: `mean = ${mean}${c.unit}`, answer: mean, lo: 1, hi: mean + 20, expr: `${total} ÷ 5` }),
+        nStep({ key: 'median', prompt: `Now the MEDIAN. In order they are ${sorted.join(', ')} — what is the middle one?`,
+          hint: `The middle of five values is the 3rd: ${median}.`,
+          why: `The median is the middle value once they are in order. Only its POSITION matters, so however huge the outlier is, it just sits at the end and the middle stays put.`,
+          resultText: `median = ${median}${c.unit}`, answer: median, pool: uniqSort(all.slice()),
+          expr: `the middle value of ${sorted.join(', ')}` }),
+        sStep({ key: 'pick', prompt: `Most of the data is around ${median}${c.unit}, but the mean came out at ${mean}${c.unit}. Which average describes this set better?`,
+          hint: `The median (${median}${c.unit}) — the mean has been dragged up by the outlier.`,
+          why: `Use the MEDIAN when there is an outlier. The mean counts every value, so one extreme number drags it away from where the data actually sits — ${mean}${c.unit} is higher than four of the five values, which describes almost nobody. The median ignores how far out the outlier is, so it stays near the bulk of the data.\n\nThe mean is the better choice when there is NO outlier, because it uses every value rather than just the middle one.`,
+          resultText: `the median (${median}${c.unit})`, answer: 'the median',
+          pool: shuffle(['the median', 'the mean', 'the mode', 'the range']), isAnswer: true }),
+      ],
+    };
+  }
+
   const api = {
     classifyAngle, verticallyOpposite, circlePart, namePolygon,
     nameSolid, netOfSolid, pieChart, lineGraph, frequencyTable, vennDiagram, compareSets,
+    whichAverage,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.WAC = Object.assign(root.WAC || {}, api);

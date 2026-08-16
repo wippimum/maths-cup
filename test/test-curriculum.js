@@ -50,6 +50,7 @@ const COVERAGE = {
     'Express a number as a fraction of another number': ['frac-ofwhat'],
     'Find fractions of an amount': ['frac-of'],
     'Convert between mixed numbers and improper fractions': ['frac-mixed'],
+    'Order and compare fractions with common denominators': ['frac-order'],
     'Add and subtract fractions, same and different denominators': ['frac-add'],
     'Multiply fractions / divide fractions': ['frac-muldiv'],
   },
@@ -106,6 +107,7 @@ const COVERAGE = {
     'Interpret linear and non-linear graphs, incl. conversion graphs': ['stat-graphs'],
     'Mean, median, mode and range from a list': ['stat-modrange', 'stat-mean', 'stat-median'],
     'Compare two data sets using mean and range': ['stat-compare'],
+    'Choose the most appropriate average in context (e.g. when outliers are present)': ['stat-which'],
   },
   'T14 Graphical Representation of Data': {
     'Interpret and draw a pictogram': ['gr-pict'],

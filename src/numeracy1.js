@@ -192,7 +192,10 @@
     return {
       subject: 'integers', sig: `dc:${e.story.slice(0, 30)}:${e.a}`, given: e.story, answer: String(e.a),
       steps: [nStep({ key: 'dc', prompt: `Work it out: ${e.expr} = ?`, hint: `${e.expr} = ${n2(e.a)}.`,
-        why: e.why, resultText: `${n2(e.a)}`, answer: e.a, lo: e.a - 20, hi: e.a + 20, expr: e.expr, isAnswer: true })],
+        // The course calls these DIRECTED NUMBERS — numbers carrying a + or − direction.
+        // Name it, so the word in the lesson is the word in the app.
+        why: `${e.why}\n\nNumbers like these are called DIRECTED NUMBERS: the sign tells you the direction, not just the size. Below zero, in debt, and below sea level are all the negative direction.`,
+        resultText: `${n2(e.a)}`, answer: e.a, lo: e.a - 20, hi: e.a + 20, expr: e.expr, isAnswer: true })],
     };
   }
 

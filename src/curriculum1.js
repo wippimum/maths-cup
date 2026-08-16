@@ -276,7 +276,76 @@
     };
   }
 
-  const api = { powerRoot, spotSquares, mixedToImproper, improperToMixed, partOfWhole, convert };
+  // ============================================================ T4 · order and compare fractions
+  // "Order and compare fractions with common denominators." This objective had no
+  // question at all — fdp-order looks like it covers it, but that one orders a MIXED
+  // set of fractions, decimals and percentages, which is the T11 objective instead.
+  // Half the time the denominators already match (compare the numerators); half the
+  // time they must be made common first, which is what the objective builds towards.
+  function orderFractions() {
+    const desc = Math.random() < 0.5;
+    const same = Math.random() < 0.5;
+    const d = pick([5, 6, 8, 9, 10, 12]);
+    let items;
+    if (same) {
+      const ns = shuffle(Array.from({ length: d - 1 }, (_, i) => i + 1)).slice(0, 3);
+      if (new Set(ns).size < 3) return orderFractions();
+      items = ns.map((n) => ({ label: `${n}/${d}`, val: n / d, n, d }));
+    } else {
+      // denominators that share a small common denominator, so converting stays mental
+      const [d1, d2] = pick([[2, 4], [3, 6], [4, 8], [2, 6], [5, 10], [3, 12], [4, 12]]);
+      const L = d1 * d2 / gcd(d1, d2);
+      const a = rand(1, d1 - 1), b = rand(1, d2 - 1), c2 = rand(1, L - 1);
+      items = [{ label: `${a}/${d1}`, val: a / d1 }, { label: `${b}/${d2}`, val: b / d2 }, { label: `${c2}/${L}`, val: c2 / L }];
+      if (new Set(items.map((i) => i.val)).size < 3) return orderFractions();
+      items.forEach((i) => { i.n = Math.round(i.val * L); i.d = L; });
+    }
+    const D = items[0].d;
+    const sorted = items.slice().sort((x, y) => (desc ? y.val - x.val : x.val - y.val));
+    const labels = items.map((i) => i.label);
+    const word = desc ? 'biggest first' : 'smallest first';
+    const steps = [];
+    if (!same) {
+      steps.push(nStep({ key: 'cd', prompt: `The bottoms are different, so they cannot be compared yet. What common denominator will they all go into?`,
+        hint: `${items.map((i) => i.label.split('/')[1]).join(', ')} all divide into ${D}.`,
+        why: `Fractions can only be compared when the bottoms match, because only then does one piece of each mean the same size. That shared bottom is the COMMON DENOMINATOR.`,
+        resultText: `common denominator = ${D}`, answer: D, pool: uniqSort([D, D + 1, D * 2, Math.max(2, Math.round(D / 2))]),
+        expr: `a number they all divide into` }));
+      steps.push(sStep({ key: 'conv', prompt: `Rewrite them all over ${D}. Which set is right?`,
+        hint: `${items.map((i) => `${i.label} = ${i.n}/${D}`).join(', ')}.`,
+        why: `Multiply the top and bottom of each by the same number. Each one becomes an EQUIVALENT FRACTION — same value, new denominator — so now they can be lined up fairly.`,
+        longWay: items.map((i) => `${i.label} = ${i.n}/${D}`).join('\n'),
+        resultText: items.map((i) => `${i.label} = ${i.n}/${D}`).join(', '),
+        answer: items.map((i) => `${i.n}/${D}`).join(', '),
+        // The wrong option is the real mistake: changing the bottom to the common
+        // denominator but leaving the top alone, which silently changes the value.
+        pool: shuffle([...new Set([items.map((i) => `${i.n}/${D}`).join(', '),
+          items.map((i) => `${i.label.split('/')[0]}/${D}`).join(', '),
+          items.map((i) => `${i.n + 1}/${D}`).join(', ')])]),
+        expr: `each fraction over ${D}` }));
+    }
+    steps.push(buildStep({ key: 'order', prompt: `Now tap them in order, ${word}.`,
+      hint: `In order: ${sorted.map((i) => i.label).join(', ')}.`,
+      why: same
+        ? `When the denominators already match, every piece is the same size, so the fraction with the biggest NUMERATOR is the biggest — you only have to compare the top numbers.`
+        : `Over the common denominator ${D} the pieces are all the same size, so compare the numerators: ${sorted.map((i) => i.n).join(' , ')}. Write the answer back in the fractions you were given.`,
+      longWay: items.map((i) => `${i.label} = ${i.n}/${D}`).join('\n'),
+      resultText: sorted.map((i) => i.label).join(', '),
+      pieces: labels.slice(), solution: sorted.map((i) => i.label).join(' '), distractors: [], isAnswer: true,
+      check: (raw) => {
+        const toks = String(raw).trim().split(/\s+/).filter(Boolean);
+        const want = sorted.map((i) => i.label);
+        if (toks.length === want.length && toks.every((t, k) => t === want[k])) return { correct: true };
+        return { correct: false, id: 'order-wrong', ctx: { order: want.join(', '), word } };
+      } }));
+    return {
+      subject: 'fractions', sig: `of:${labels.join('|')}:${desc ? 'd' : 'a'}`,
+      given: `Put these fractions in order, ${word}: ${labels.join(', ')}`,
+      answer: sorted.map((i) => i.label).join(', '), steps,
+    };
+  }
+
+  const api = { powerRoot, spotSquares, mixedToImproper, improperToMixed, partOfWhole, convert, orderFractions };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.WAC = Object.assign(root.WAC || {}, api);
 })(typeof window !== 'undefined' ? window : globalThis);

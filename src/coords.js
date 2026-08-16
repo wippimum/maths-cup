@@ -63,7 +63,9 @@
     const neg = min < 0;
     return { subject: 'coords', given: `Write the coordinates of the point${neg ? ' (watch the negatives!)' : ''}`, sig: `rc:${x},${y},${min}`, diagram: svgGrid(min, max, [{ x, y }]), answer: `(${x}, ${y})`,
       steps: [coordBuild('coord', `Read the point and build its coordinates: ( x , y ). Along first, then up. Don't forget the brackets!`,
-        `Go along to ${x}, then up to ${y}: (${x}, ${y}).`, `Coordinates are (across, up) — read x (across) first, then y (up). Negative x is to the LEFT of 0, negative y is BELOW 0.`, x, y)] };
+        `Go along to ${x}, then up to ${y}: (${x}, ${y}).`,
+        `Coordinates are (across, up) — read x (across) first, then y (up). Negative x is to the LEFT of 0, negative y is BELOW 0.`
+        + (neg ? `\n\nThe two axes cut the grid into four QUADRANTS. This point is in the one where x is ${x < 0 ? 'negative' : 'positive'} and y is ${y < 0 ? 'negative' : 'positive'}.` : ''), x, y)] };
   }
 
   // ---- reflect a point (four-quadrant, negative answers) ----

@@ -183,6 +183,47 @@ const CASES = {
     const truth = C / A - B;
     const got = Number(String(p.answer));
     if (Math.abs(got - truth) > 1e-9) bad(`brackets: ${p.given} claims x = ${p.answer}, truth ${truth}`); else ok(); },
+  // ---- T4 ordering fractions ----
+  'orderFractions': () => {
+    const val = (s) => { const [a, b] = s.split('/').map(Number); return a / b; };
+    const p = W.orderFractions();
+    const desc = /biggest first/.test(p.given);
+    const given = p.given.split(': ')[1].split(', ');
+    const ans = p.answer.split(', ');
+    // same set, just rearranged
+    if (given.slice().sort().join('|') !== ans.slice().sort().join('|')) {
+      bad(`orderFractions: answer is not the same set as the question — ${p.given} => ${p.answer}`); return;
+    }
+    ok();
+    for (let i = 1; i < ans.length; i++) {
+      const back = desc ? val(ans[i]) > val(ans[i - 1]) : val(ans[i]) < val(ans[i - 1]);
+      if (back) { bad(`orderFractions: ${p.given} => ${p.answer} is out of order`); return; }
+    }
+    ok();
+    // any equivalence the conversion step states must actually be equal
+    const conv = p.steps.find((s) => s.key === 'conv');
+    if (!conv) { ok(); return; }
+    for (const pair of conv.resultText.split(', ')) {
+      const [l, r] = pair.split(' = ');
+      if (Math.abs(val(l) - val(r)) > 1e-9) { bad(`orderFractions: claims ${pair}, which is false`); return; }
+    }
+    ok(); },
+  // ---- T13 choosing the right average ----
+  'whichAverage': () => {
+    const p = W.whichAverage();
+    const nums = p.given.match(/: ([\d, ]+)\. Which/)[1].split(', ').map(Number);
+    if (nums.length !== 5) { bad(`whichAverage: expected 5 values, got ${nums.length}`); return; }
+    ok();
+    const total = nums.reduce((a, b) => a + b, 0), mean = total / 5;
+    const sorted = nums.slice().sort((a, b) => a - b), median = sorted[2];
+    const step = (k) => p.steps.find((s) => s.key === k);
+    if (!Number.isInteger(mean)) bad(`whichAverage: mean ${mean} is not whole — this level is non-calculator`); else ok();
+    if (!step('mean').check(mean).correct) bad(`whichAverage: mean step rejects the true mean ${mean} of ${nums}`); else ok();
+    if (!step('median').check(median).correct) bad(`whichAverage: median step rejects the true median ${median} of ${nums}`); else ok();
+    if (!step('out').check(sorted[4]).correct) bad(`whichAverage: outlier step rejects ${sorted[4]} in ${nums}`); else ok();
+    // the whole point of the question: the outlier must really drag the mean off
+    if (!(mean > median)) bad(`whichAverage: mean ${mean} is not above median ${median}, so the median is not the better answer`); else ok();
+    if (sorted[4] - sorted[3] < 10) bad(`whichAverage: ${sorted[4]} is not clearly an outlier next to ${sorted[3]}`); else ok(); },
 };
 
 for (const [name, fn] of Object.entries(CASES)) {

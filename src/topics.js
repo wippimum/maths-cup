@@ -108,7 +108,7 @@
         key: 'common-factors',
         prompt: `Which numbers are factors of BOTH ${a} and ${b}? Tap the common factors.`,
         hint: `Look for the numbers that show up in the factors of ${a} AND the factors of ${b}.`,
-        why: `A common factor divides both numbers. The biggest one will be our HCF.`,
+        why: `A common factor divides both numbers. The biggest one will be our HCF. Writing out both sets and picking what they share is called the LISTING METHOD — it is slower than the prime-factor way, but you can see exactly why the answer is the answer.`,
         longWay: `Factors of ${a}: ${list(fa)}\nFactors of ${b}: ${list(fb)}\nIn both: ${list(cf)}`,
         resultText: `Common factors: ${list(cf)}`,
         expected: cf,

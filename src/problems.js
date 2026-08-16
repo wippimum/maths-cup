@@ -670,6 +670,7 @@
       { id: 'frac-of', name: 'Fraction of an amount', badge: '½', generate: () => genFracOfAmount() },
       { id: 'frac-add', name: 'Add & subtract', badge: '➕', generate: () => Math.random() < 0.4 ? genFracAddSame() : genFracAddDiff() },
       { id: 'frac-mixed', name: 'Mixed & improper', badge: '🔄', generate: () => genMixedNumbers() },
+      { id: 'frac-order', name: 'Order & compare fractions', badge: '🔽', generate: () => T.orderFractions() },
       { id: 'frac-ofwhat', name: 'What fraction of…?', badge: '❓', generate: () => genFractionOf() },
       { id: 'frac-muldiv', name: 'Multiply & divide', badge: '🏆', generate: () => genFracMulDiv() },
       // Ratio isn't a topic on the Year 6 course, so it has no tile of its own.
@@ -724,16 +725,17 @@
       { id: 'meas-mixed', name: 'Mixed conversions', badge: '🔄', generate: () => T.convert(pick(['length', 'mass', 'length'])) },
       { id: 'meas-areavol', name: 'Area & volume units 🏆', badge: '🏆', generate: () => genConvertHard() },
     ] },
-    { id: 'area', topic: 12, name: 'Mensuration of 2D Shapes', icon: '🟩', blurb: 'Perimeter and area of rectangles, triangles and compound shapes.', levels: [
+    { id: 'area', topic: 12, name: 'Mensuration of 2D Shapes', icon: '🟩', blurb: 'Perimeter and area of rectangles, triangles and composite shapes.', levels: [
       { id: 'area-rect', name: 'Rectangles', badge: '🟩', generate: () => genRect() },
       { id: 'area-tri', name: 'Triangle area', badge: '🔺', generate: () => genTri() },
-      { id: 'area-comp', name: 'Compound shapes & backwards', badge: '🧩', generate: () => { const r = rand(1, 3); return r === 1 ? T.compoundArea() : r === 2 ? T.parallelogramArea(rand(4, 14), rand(3, 11)) : T.missingSide(rand(4, 12), rand(3, 11)); } },
+      { id: 'area-comp', name: 'Composite shapes & backwards', badge: '🧩', generate: () => { const r = rand(1, 3); return r === 1 ? T.compoundArea() : r === 2 ? T.parallelogramArea(rand(4, 14), rand(3, 11)) : T.missingSide(rand(4, 12), rand(3, 11)); } },
       { id: 'area-trap', name: 'Trapezium area', badge: '⭐', stretch: true, generate: () => { let a = rand(3, 10), b = rand(4, 14); if (a === b) b += 1; let h = rand(3, 10); if (((a + b) * h) % 2 !== 0) h += 1; return T.trapeziumArea(a, b, h); } },
     ] },
     { id: 'stats', topic: 13, name: 'Statistical Measures', icon: '📊', blurb: 'Mode, range, mean and median, then comparing two sets.', levels: [
       { id: 'stat-modrange', name: 'Mode & range', badge: '📊', generate: () => Math.random() < 0.5 ? genStatMode() : genStatRange() },
       { id: 'stat-mean', name: 'Mean', badge: '➗', generate: () => genStatMean() },
       { id: 'stat-median', name: 'Median', badge: '🔽', generate: () => genStatMedian() },
+      { id: 'stat-which', name: 'Which average? (outliers)', badge: '🤔', generate: () => T.whichAverage() },
       { id: 'stat-graphs', name: 'Reading graphs', badge: '📉', generate: () => T.lineGraph() },
       { id: 'stat-compare', name: 'Compare two sets', badge: '⚖️', generate: () => T.compareSets() },
       { id: 'stat-hard', name: 'Missing values & negatives', badge: '⭐', stretch: true, generate: () => genStatHard() },
