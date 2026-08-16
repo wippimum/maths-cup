@@ -63,7 +63,24 @@ Object.entries(AFTER).forEach(([f, deps]) => {
   });
 });
 
-// 4. nothing personal committed — this repo is public.
+// 4. the current step must only ever be read through curStep()
+//
+// Once the last step of a problem is solved, game.stepIndex sits PAST the end of the
+// array, so game.problem.steps[game.stepIndex] is undefined. Reading .mode off that threw
+// "Cannot read properties of undefined" the moment a child pressed Enter after solving —
+// finishProblem() disables lineInput, which BLURS it, so the global Enter handler stopped
+// skipping. curStep() returns null there and every caller checks it.
+const app = fs.readFileSync(path.join(ROOT, 'src', 'app.js'), 'utf8');
+const direct = app.split('\n')
+  .map((line, i) => ({ line, n: i + 1 }))
+  // the one legal read is curStep()'s own body, which falls back to null
+  .filter((r) => /steps\s*\[\s*game\.stepIndex\s*\]/.test(r.line) && !/\|\|\s*null\s*;/.test(r.line));
+direct.forEach((r) => bad(`app.js:${r.n} indexes steps[game.stepIndex] directly — use curStep(), which is null once the problem is finished`));
+if (!direct.length) ok();
+if (!/function curStep\(\)/.test(app)) bad('app.js has no curStep() helper'); else ok();
+if (!/return \(step && step\.mode\) \|\| 'build'/.test(app)) bad('stepMode() no longer tolerates a missing step'); else ok();
+
+// 5. nothing personal committed — this repo is public.
 // "the Al Falasi brothers" in the footer is deliberate; it is the boys' FIRST names and
 // any email address that must never appear, so the URL can't be tied back to them.
 const SECRETS = [/[\w.+-]+@[\w-]+\.[\w.]+/, /\bHamdan\b/i, /\bSultan\b/i,

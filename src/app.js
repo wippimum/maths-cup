@@ -223,10 +223,17 @@
   }
 
   // ---------------- active panel + input modes ----------------
-  function stepMode(step) { return step.mode || 'build'; }
+  // Once the last step is solved, stepIndex sits PAST the end of the array, so there is
+  // no current step. Everything that reaches for one has to cope with that.
+  function curStep() {
+    if (!game || !game.problem) return null;
+    return game.problem.steps[game.stepIndex] || null;
+  }
+  function stepMode(step) { return (step && step.mode) || 'build'; }
 
   function renderActive() {
-    const step = game.problem.steps[game.stepIndex];
+    const step = curStep();
+    if (!step) return;
     $('stepPrompt').textContent = step.prompt;
     $('feedback').classList.add('hidden');
     $('btnLong').classList.toggle('hidden', !step.longWay);
@@ -289,7 +296,8 @@
 
   // ---------------- checking ----------------
   function checkStep() {
-    const step = game.problem.steps[game.stepIndex];
+    const step = curStep();
+    if (!step) return;
     const mode = stepMode(step);
     const input = currentInput(step);
     if ((mode === 'build' && !input) || ((mode === 'choose' || mode === 'pick') && input.length === 0)) {
@@ -530,10 +538,19 @@
     $('btnBack').onclick = backspaceToken;
     $('btnClear').onclick = () => { $('lineInput').value = ''; };
     $('lineInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') checkStep(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && game && !$('gameScreen').classList.contains('hidden') && document.activeElement !== $('lineInput')) { const step = game.problem.steps[game.stepIndex]; if (stepMode(step) !== 'build') checkStep(); } });
-    $('btnHint').onclick = () => { const step = game.problem.steps[game.stepIndex]; showFeedback('info', 'Hint 💡', step.hint); };
-    $('btnWhy').onclick = () => { const step = game.problem.steps[game.stepIndex]; let body = step.why; if (save.longWay && step.longWay) body += `<pre>${step.longWay}</pre>`; showFeedback('info', 'Why does this work? 🤔', body); };
-    $('btnLong').onclick = () => { const step = game.problem.steps[game.stepIndex]; save.longWay = true; persist(); showFeedback('info', 'The long way 🧮', `<pre>${step.longWay || step.hint}</pre>`); };
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' || !game || $('gameScreen').classList.contains('hidden')) return;
+      if (document.activeElement === $('lineInput')) return;      // its own handler deals with it
+      // Solved the problem? Enter means "on to the next one" — which is what the child is
+      // reaching for anyway. Disabling lineInput blurs it, so we land here rather than above.
+      const next = $('nextBtn');
+      if (!next.classList.contains('hidden')) { next.click(); return; }
+      const step = curStep();
+      if (step && stepMode(step) !== 'build') checkStep();
+    });
+    $('btnHint').onclick = () => { const step = curStep(); if (step) showFeedback('info', 'Hint 💡', step.hint); };
+    $('btnWhy').onclick = () => { const step = curStep(); if (!step) return; let body = step.why; if (save.longWay && step.longWay) body += `<pre>${step.longWay}</pre>`; showFeedback('info', 'Why does this work? 🤔', body); };
+    $('btnLong').onclick = () => { const step = curStep(); if (!step) return; save.longWay = true; persist(); showFeedback('info', 'The long way 🧮', `<pre>${step.longWay || step.hint}</pre>`); };
     $('nextBtn').onclick = nextProblem;
     $('quitBtn').onclick = endMatch;
     $('playAgainBtn').onclick = playAgain;
