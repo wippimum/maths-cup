@@ -773,6 +773,7 @@
       { id: 'solve-easy', name: 'Warm-up (easier)', badge: '🌱', generate: () => T.solveRandom() },
       { id: 'solve-lesson', name: 'Lesson (easy → hard)', badge: '🧩', generate: () => T.solveRandom() },
       { id: 'solve-hard', name: 'Challenge (harder)', badge: '🔥', generate: () => T.solveRandom() },
+      { id: 'solve-exam', name: 'Exam-style 🏆', badge: '🏆', generate: () => T.solveRandom() },
     ] },
   ];
   function subjectById(id) { return SUBJECTS.find((s) => s.id === id) || SUBJECTS[0]; }

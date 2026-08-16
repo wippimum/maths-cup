@@ -1,6 +1,6 @@
-/* test-vocab.js — the words the app puts in front of Hamdan must be the words his
-   class uses. Every term below is taken from the "Specific understandings" of his
-   Toddle unit plans (~/Toddle_Hamdan_6M-MAT2/Topic_NN_*.docx); the school's phrasing
+/* test-vocab.js — the words the app puts in front of the player must be the words
+   the class uses. Every term below is taken from the "Specific understandings" of the
+   school's Toddle unit plans (kept outside this repo); the school's phrasing
    wins over any synonym that happens to be correct maths.
 
    The corpus is NOT the source code — a term sitting in a code comment is a term the

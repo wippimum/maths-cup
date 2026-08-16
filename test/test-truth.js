@@ -183,6 +183,41 @@ const CASES = {
     const truth = C / A - B;
     const got = Number(String(p.answer));
     if (Math.abs(got - truth) > 1e-9) bad(`brackets: ${p.given} claims x = ${p.answer}, truth ${truth}`); else ok(); },
+  // ---- Problem Solving, tiers 11-17 ----
+  // These carry decimals, percentages and unit conversions, so a wrong answer here is
+  // far easier to ship than in the whole-number tiers. Each one is re-derived from the
+  // QUESTION TEXT, independently of the code that built it.
+  'solveHardTiers': () => {
+    const F = (s) => Math.round(parseFloat(s) * 100);
+    const probs = W.buildSolveLesson('solve-exam', 10);
+    for (const q of probs) {
+      const g = q.given, A = String(q.answer); let m;
+      const claim = (got, want, tier) => {
+        if (Math.abs(got - want) > 1e-9) bad(`solve T${tier}: ${g} claims ${A}, truth ${want}`); else ok();
+      };
+      if ((m = g.match(/costs ([\d.]+) dh and .* costs ([\d.]+) dh\. Mum buys (\d+) of the first and (\d+)/))) {
+        claim(F(A), F(m[1]) * +m[3] + F(m[2]) * +m[4], 11);
+      } else if ((m = g.match(/It costs ([\d.]+) dh to buy (\d+) .*would (\d+)/))) {
+        claim(F(A), F(m[1]) / +m[2] * +m[3], 12);
+      } else if ((m = g.match(/(?:are|has) (\d+) (?:chocolates|members|spaces).*?(\d+) of them/))) {
+        claim(parseInt(A, 10), Math.round((+m[1] - +m[2]) / +m[1] * 100), 13);
+      } else if ((m = g.match(/([\d.]+) (kg|litres|m) .*?(\d+) (g|ml|cm)/))) {
+        claim(parseInt(A, 10), Math.round(parseFloat(m[1]) * (m[2] === 'm' ? 100 : 1000)) - +m[3], 14);
+      } else if ((m = g.match(/hold (\d+) .* NEEDED for (\d+)/))) {
+        claim(parseInt(A, 10), Math.ceil(+m[2] / +m[1]), 15);
+      } else if ((m = g.match(/(?:bill is|costs) (\d+) dh, and .*?(\d+)%/))) {
+        claim(F(A), Math.round(+m[1] * 100 * (100 + +m[2]) / 100), 16);
+      } else if ((m = g.match(/(0\.\d+) are \w+, (\d+)% are/))) {
+        claim(parseInt(A, 10), 100 - Math.round(parseFloat(m[1]) * 100) - +m[2], 17);
+      } else {
+        bad(`solve: no independent check matched "${g}" — a new tier needs one here`);
+      }
+      // and the final step must accept the answer the problem states
+      const last = q.steps[q.steps.length - 1];
+      const bare = A.replace(/[^0-9.]/g, '');
+      if (last.check(bare).correct || last.check(A).correct) ok();
+      else bad(`solve: final step rejects the stated answer ${A} for "${g}"`);
+    } },
   // ---- T4 ordering fractions ----
   'orderFractions': () => {
     const val = (s) => { const [a, b] = s.split('/').map(Number); return a / b; };
