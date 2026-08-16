@@ -21,6 +21,10 @@
     streak: 0, lastPlayedDate: null, goalsScored: 0, muted: false, longWay: false,
     team: { name: '', c1: '#f4c430', c2: '#1f9d55' },
     mistakeTotals: {}, subject: 'algebra', level: 'group', progress: {},
+    // One record per finished match (see history.js), plus where the weekly summary
+    // gets emailed. The address is typed in on the device and never leaves it —
+    // it must not be committed, because this repo is public.
+    history: [], parentEmail: '',
   };
   let save = load();
   function load() {
@@ -28,6 +32,7 @@
     try { s = Object.assign({}, defaults, JSON.parse(localStorage.getItem(KEY) || '{}')); }
     catch (e) { s = Object.assign({}, defaults); }
     if (!s.progress) s.progress = {};
+    if (!Array.isArray(s.history)) s.history = [];
     // migrate the old algebra-only save (had .round / .consecutiveWins)
     if (s.round && !s.progress.algebra) { s.subject = 'algebra'; s.level = s.round; s.progress.algebra = { levelId: s.round, consec: s.consecutiveWins || 0 }; }
     return s;
@@ -130,7 +135,8 @@
     persist(); applyTeam(); refreshHeader();
 
     game = { subject: save.subject, level: save.level, match: buildMatchFor(save.subject, save.level, MATCH_LEN),
-      matchIndex: 0, matchStats: { firstTry: 0, mistakes: {}, totalMistakes: 0 }, earnedPromotion: false };
+      matchIndex: 0, matchStats: { firstTry: 0, mistakes: {}, totalMistakes: 0 }, earnedPromotion: false,
+      timeMs: 0, tick: Date.now() };
     $('startScreen').classList.add('hidden');
     $('gameScreen').classList.remove('hidden');
     renderDots(); loadProblem();
@@ -145,6 +151,23 @@
       wrap.appendChild(d);
     }
   }
+
+  // ---------------- how long they actually worked ----------------
+  // Wall-clock from kick-off to full-time would count the iPad being put down
+  // mid-match, which makes "time practising" meaningless. Instead we add up the
+  // gaps between one action and the next, and ignore any gap longer than IDLE_CAP —
+  // that's a break, not maths. Same reason we stop the clock while the tab is hidden.
+  const IDLE_CAP = 120000;                       // 2 minutes on a single step
+  function clockTick() {
+    if (!game) return;
+    const now = Date.now();
+    game.timeMs += Math.min(now - game.tick, IDLE_CAP);
+    game.tick = now;
+  }
+  function clockResume() { if (game) game.tick = Date.now(); }
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) clockTick(); else clockResume();
+  });
 
   // ---------------- load a problem ----------------
   function loadProblem() {
@@ -268,6 +291,7 @@
       return;
     }
     const res = step.check(input);
+    clockTick();                                  // every Check closes off a work segment
 
     if (res.correct) {
       const steps = game.problem.steps, skip = res.skip || 0;
@@ -372,6 +396,18 @@
   function fullTime() {
     const today = todayStr();
     if (save.lastPlayedDate !== today) { save.streak = isYesterday(save.lastPlayedDate) ? save.streak + 1 : 1; save.lastPlayedDate = today; }
+
+    // Log the match BEFORE promotion changes save.level, so the record says which
+    // level was actually played rather than the one they were promoted into.
+    const stats = game.matchStats;
+    clockTick();
+    const secs = Math.round(game.timeMs / 1000);
+    save.history = WAC.addMatch(save.history, {
+      d: today, t: Date.now(), s: save.subject, l: save.level,
+      p: Math.round((stats.firstTry / MATCH_LEN) * 100),
+      m: stats.totalMistakes, c: stats.totalMistakes === 0 ? 1 : 0, sec: secs,
+    });
+
     let promoted = null;
     if (game.earnedPromotion) {
       const levels = subjectById(save.subject).levels, idx = levels.findIndex((l) => l.id === save.level);
@@ -389,6 +425,7 @@
     html += `<ul class="stat-list">`;
     html += `<li>⚽ Goals this match: <strong>${MATCH_LEN}</strong> &nbsp;·&nbsp; career total ${save.goalsScored}</li>`;
     html += `<li>🟡 Mistakes fixed before scoring: <strong>${st.totalMistakes}</strong></li>`;
+    html += `<li>⏱️ Time on the pitch: <strong>${WAC.fmtDur(secs)}</strong></li>`;
     html += `<li>🏆 Unbeaten run: <strong>${save.streak} day${save.streak === 1 ? '' : 's'}</strong></li>`;
     html += `</ul>`;
     if (promoted) html += `<div class="promo">🎉 PROMOTED! You're through to <strong>${promoted.name}</strong> ${promoted.badge}</div>`;
@@ -399,6 +436,58 @@
     } else html += `<p>💡 Amazing — no mistakes at all today. Try a harder level next!</p>`;
     $('summaryBody').innerHTML = html;
     $('summaryModal').classList.remove('hidden');
+  }
+
+  // ---------------- scores & history ----------------
+  function levelNameOf(subjectId, levelId) {
+    const l = subjectById(subjectId).levels.find((x) => x.id === levelId);
+    return l ? l.name.replace(/\s*🏆\s*$/, '') : levelId;
+  }
+  function levelRankOf(subjectId, levelId) {
+    return subjectById(subjectId).levels.findIndex((x) => x.id === levelId);
+  }
+  function showHistory() {
+    $('historyBody').innerHTML = WAC.panelHTML(save.history, todayStr(), {
+      names: SUBJ_SHORT, levelName: levelNameOf, levelRank: levelRankOf,
+    });
+    $('startScreen').classList.add('hidden');
+    $('historyScreen').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
+  function hideHistory() {
+    $('historyScreen').classList.add('hidden');
+    $('startScreen').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
+  function emailWeek() {
+    if (!save.parentEmail) {
+      const a = prompt('Which email address should the weekly summary go to?\n(Saved on this iPad only.)', '');
+      if (!a || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(a.trim())) return;
+      save.parentEmail = a.trim(); persist();
+    }
+    const body = WAC.weeklySummary(save.history, todayStr(), SUBJ_SHORT);
+    const subject = `World Maths Cup — week to ${todayStr()}`;
+    // mailto opens Mail with everything filled in; nothing is sent without a tap.
+    location.href = `mailto:${encodeURIComponent(save.parentEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+  function copyBackup() {
+    const blob = JSON.stringify({ v: 1, history: save.history, progress: save.progress, goalsScored: save.goalsScored, streak: save.streak });
+    const done = () => alert(`Copied ${save.history.length} matches to the clipboard.\nPaste it somewhere safe (Notes, a message to yourself).`);
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(blob).then(done, () => prompt('Copy this:', blob));
+    else prompt('Copy this:', blob);
+  }
+  function restoreBackup() {
+    const raw = prompt('Paste a backup here to restore it.\nThis REPLACES the scores on this iPad.');
+    if (!raw) return;
+    let data;
+    try { data = JSON.parse(raw); } catch (e) { alert("That doesn't look like a backup — nothing was changed."); return; }
+    if (!data || !Array.isArray(data.history)) { alert("That doesn't look like a backup — nothing was changed."); return; }
+    if (!confirm(`Restore ${data.history.length} matches? The scores currently on this iPad will be replaced.`)) return;
+    save.history = data.history;
+    if (data.progress) save.progress = data.progress;
+    if (typeof data.goalsScored === 'number') save.goalsScored = data.goalsScored;
+    if (typeof data.streak === 'number') save.streak = data.streak;
+    persist(); refreshHeader(); showHistory();
   }
 
   function playAgain() { $('summaryModal').classList.add('hidden'); pendingSubject = save.subject; pendingLevel = save.level; startMatch(); }
@@ -426,6 +515,11 @@
   function init() {
     applyTeam(); renderMenu(); refreshHeader();
     $('kickoffBtn').onclick = startMatch;
+    $('historyBtn').onclick = showHistory;
+    $('historyBackBtn').onclick = hideHistory;
+    $('emailWeekBtn').onclick = emailWeek;
+    $('copyBackupBtn').onclick = copyBackup;
+    $('restoreBtn').onclick = restoreBackup;
     $('btnCheck').onclick = checkStep;
     $('btnBack').onclick = backspaceToken;
     $('btnClear').onclick = () => { $('lineInput').value = ''; };

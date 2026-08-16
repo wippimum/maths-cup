@@ -16,6 +16,9 @@
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
+/* The background lives on <html> as well, or rubber-band scrolling on iOS shows
+   a white band past the end of the page. */
+html { background: #0e1720; }
 body {
   font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
   color: var(--ink);
@@ -331,4 +334,63 @@ footer { text-align: center; color: #9fb0bf; font-size: .78rem; padding: 10px 0 
   .scoreboard h1 { font-size: 1.05rem; }
   .subject-grid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); }
   .piece, .chip { font-size: 1.1rem; padding: 8px 12px; }
+}
+
+/* ---------- scores & history screen ---------- */
+.btn.wide { display: block; width: 100%; margin-top: 10px; }
+#historyScreen { position: relative; z-index: 1; }
+#historyBody { position: relative; z-index: 1; }
+.h-empty { background: rgba(255,255,255,.94); color: #12324a; border-radius: 14px; padding: 18px; }
+.h-head { position: relative; z-index: 1; margin: 20px 0 8px; color: #fff; font-size: 1.05rem; letter-spacing: .02em; }
+
+.h-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.h-tile { background: rgba(255,255,255,.94); color: #12324a; border-radius: 14px; padding: 12px 6px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+.h-tile-v { font-size: 1.6rem; font-weight: 800; line-height: 1.1; }
+.h-tile-l { font-size: .72rem; opacity: .72; margin-top: 2px; }
+
+/* capped width, or the 7-column grid stretches into huge squares on a tablet */
+.h-cal { background: rgba(255,255,255,.94); border-radius: 14px; padding: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  max-width: 340px; margin: 0 auto; }
+.h-cal-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 5px; }
+.h-cal-days { margin-bottom: 3px; }
+.h-cal-lbl { text-align: center; font-size: .7rem; font-weight: 700; color: #12324a; opacity: .55; }
+.h-cell { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; border-radius: 7px;
+  font-size: .72rem; font-weight: 700; color: #12324a; background: #e7edf2; }
+.h-cell.off { background: #e7edf2; color: #9db0bf; }
+.h-cell.on  { background: #b7e3c6; }
+.h-cell.mid { background: #6ec98d; color: #08331b; }
+.h-cell.hot { background: #1f9d55; color: #fff; }
+.h-cell.fut { background: #f2f5f7; color: #cdd8e0; }
+.h-cell.now { outline: 2.5px solid var(--team1); outline-offset: 1px; }
+
+.h-bests { display: grid; gap: 6px; }
+.h-best { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 10px;
+  background: rgba(255,255,255,.94); color: #12324a; border-radius: 11px; padding: 9px 13px; }
+.h-best-t { font-weight: 700; }
+.h-best-l { font-size: .74rem; opacity: .6; text-align: right; }
+.h-best-p { font-weight: 800; min-width: 3.2em; text-align: right; }
+.h-best-p.full { color: #0a7d34; }
+
+.h-log { width: 100%; border-collapse: collapse; background: rgba(255,255,255,.94); color: #12324a;
+  border-radius: 14px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+.h-log td { padding: 8px 12px; border-bottom: 1px solid #e3ebf1; font-size: .9rem; }
+.h-log tr:last-child td { border-bottom: 0; }
+.h-when { white-space: nowrap; opacity: .65; font-size: .8rem; }
+.h-dur { display: block; font-size: .72rem; opacity: .8; }
+.h-what { font-weight: 700; }
+.h-lvl { display: block; font-weight: 400; font-size: .74rem; opacity: .6; }
+.h-pct { text-align: right; font-weight: 800; white-space: nowrap; }
+.h-pct.good { color: #0a7d34; }
+.h-pct.low { color: #c0392b; }
+.h-clean { width: 1.6em; text-align: center; }
+.h-more { color: #cfe0d6; font-size: .82rem; text-align: center; margin: 8px 0 0; }
+
+.h-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.h-actions .btn { flex: 1 1 auto; }
+.h-note { position: relative; z-index: 1; color: #cfe0d6; font-size: .82rem; margin: 10px 0 0; }
+
+@media (max-width: 480px) {
+  .h-tiles { grid-template-columns: repeat(2, 1fr); }
+  .h-best { grid-template-columns: 1fr auto; }
+  .h-best-l { grid-column: 1 / -1; text-align: left; margin-top: -3px; }
 }

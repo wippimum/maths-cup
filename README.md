@@ -110,6 +110,31 @@ Working out the numbers is its own line, so an arithmetic slip (like `33 − 2 =
 - 🥈 **Semi-final** — everything mixed, negatives anywhere
 - 🏆 **The Final** — **brackets**: `a(x + b) = c`, expand before you move anything
 
+## Scores & history 📈
+
+Every finished match is recorded — date, topic, level, score %, mistakes fixed, and how
+long it took. Tap **📈 My scores & history** on the menu to see:
+
+- **totals** — matches played, average score, day streak, and total time practising;
+- **a streak calendar** — the last five weeks, with the days they played shaded (darker
+  green for more than one match that day);
+- **a personal best for every topic**, showing which level the best score was set on;
+- **the last 30 matches**, newest first, with a 🏆 on any perfect one.
+
+**Time is practice time, not wall-clock.** The clock adds up the gaps between one action
+and the next and throws away any gap longer than two minutes, and it stops entirely while
+the app is in the background — so putting the iPad down mid-match doesn't inflate the total.
+
+**✉️ Email this week home** opens Mail with a plain-text summary already written: matches,
+average, time, a per-topic breakdown, and a line flagging the weakest topic of the week.
+The address is asked for once and stored **on that iPad only** — it is deliberately not in
+this repo, which is public.
+
+**Where it's stored, and the one risk.** Everything lives in that device's `localStorage`,
+so it works completely offline and each iPad keeps its own record. The one way to lose it is
+clearing website data or moving to a new iPad, so there's **📋 Copy backup** (puts the whole
+history on the clipboard to paste somewhere safe) and **↩️ Restore from backup**.
+
 ## Tests
 
 Three Node scripts, no dependencies — run them from this folder after any change:
@@ -120,6 +145,9 @@ node test/test-levels.js    # every level of every subject: steps answerable, ex
 node test/test-truth.js     # re-derives every challenge answer independently — catches a
                             # tidy-looking step that teaches the WRONG number
 node test/test-bidmas.js    # the BIDMAS ladder, checked against an independent eval
+node test/test-history.js   # the match log: totals, bests, streaks, durations and the
+                            # weekly email — a parent reads these numbers, so they must
+                            # be right (and topic names must be escaped, not injected)
 ```
 
 `REPS=200 node test/test-levels.js` runs a deeper sweep (the default is 60 problems per level).
