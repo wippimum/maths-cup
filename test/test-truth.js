@@ -5,7 +5,7 @@
    Run: node test/test-truth.js */
 const path = '../src/';
 const W = {};
-for (const f of ['numbers', 'format', 'fraction', 'parser', 'explanations', 'steps', 'topics',
+for (const f of ['numbers', 'format', 'fraction', 'parser', 'explanations', 'figures', 'steps', 'topics',
   'topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'harder', 'harder2',
   'bidmas', 'solving', 'problems']) {
   Object.assign(W, require(path + f + '.js'));
@@ -56,10 +56,20 @@ const CASES = {
     const p = W.percentAny(pc, A, ''); claim('percentAny', p, (A * pc) / 100); },
   'percentChange': () => { const pc = [5, 10, 15, 20, 25, 40][rnd(0, 5)], A = 20 * rnd(3, 30), up = Math.random() < 0.5;
     const p = W.percentChange(pc, A, up, '£', 'x'); claim('percentChange', p, up ? A + (A * pc) / 100 : A - (A * pc) / 100); },
-  'percentChangeFind': () => { const oldV = 10 * rnd(2, 20), pc = [10, 20, 25, 50][rnd(0, 3)], up = Math.random() < 0.5;
-    const newV = up ? oldV + (oldV * pc) / 100 : oldV - (oldV * pc) / 100;
-    if (!Number.isInteger(newV)) return;
-    const p = W.percentChangeFind(oldV, newV, '£', 'x'); claim('percentChangeFind', p, pc); },
+  'percentChangeFind': () => {
+    // must stay non-calculator: the change over the original has to simplify to a
+    // fraction they know as a percentage
+    const F = [[1, 2, 50], [1, 4, 25], [3, 4, 75], [1, 5, 20], [2, 5, 40], [3, 5, 60], [4, 5, 80],
+      [1, 10, 10], [3, 10, 30], [7, 10, 70], [9, 10, 90], [1, 20, 5], [3, 20, 15]][rnd(0, 12)];
+    const k = rnd(2, 20), oldV = F[1] * k, change = F[0] * k, up = Math.random() < 0.5;
+    const newV = up ? oldV + change : oldV - change;
+    if (newV <= 0) return;
+    const p = W.percentChangeFind(oldV, newV, '£', 'x');
+    claim('percentChangeFind', p, F[2]);
+    // and the arithmetic must stay small enough to do in your head
+    const simp = p.steps.find((s) => s.key === 'frac');
+    if (!simp) { bad('percentChangeFind: no simplify step'); return; }
+    if (gcd(change, oldV) === 1) bad(`percentChangeFind: ${change}/${oldV} does not simplify at all`); else ok(); },
   'percentReverse': () => { const pc = [10, 20, 25, 40, 50][rnd(0, 4)], orig = 20 * rnd(2, 25), up = Math.random() < 0.5;
     const now = (orig * (up ? 100 + pc : 100 - pc)) / 100;
     if (!Number.isInteger(now)) return;
@@ -67,7 +77,14 @@ const CASES = {
     claim('percentReverse', p, orig);
     // and the story must be self-consistent: p% of the original really gives `now`
     const back = up ? orig + (orig * pc) / 100 : orig - (orig * pc) / 100;
-    if (back !== now) bad(`percentReverse: ${pc}% of ${orig} does not lead back to ${now}`); else ok(); },
+    if (back !== now) bad(`percentReverse: ${pc}% of ${orig} does not lead back to ${now}`); else ok();
+    // every number the child has to produce must be a whole number, or the
+    // no-calculator route has broken down somewhere
+    p.steps.forEach((s) => {
+      const want = s.pool.filter((v) => s.check(v).correct)[0];
+      if (!/^-?\d+$/.test(String(want))) bad(`percentReverse: step ${s.key} wants a non-whole answer "${want}"`);
+      else ok();
+    }); },
   'fracMul': () => { const b = rnd(2, 9), d = rnd(2, 9), a = rnd(1, b - 1), c = rnd(1, d - 1);
     const p = W.fracMul(a, b, c, d), [sn, sd] = String(p.answer).split('/').map(Number);
     if (Math.abs(sn / sd - (a * c) / (b * d)) > 1e-9) bad(`fracMul: ${a}/${b} × ${c}/${d} → ${p.answer}`); else ok();

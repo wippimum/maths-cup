@@ -302,10 +302,17 @@
     return { subject: 'percent', given: story, sig: `pchg:${p}:${A}:${up ? 'u' : 'd'}`, answer: `${u}${final}`, steps };
   }
   // Find the percentage change from old → new.
+  // NO CALCULATOR. "38 ÷ 190 × 100" is not something a Year 7 can do in their head, and
+  // it isn't the school's method either — Topic 15 is non-calculator throughout. The
+  // route taught is: change as a FRACTION of the original → simplify → use the common
+  // fraction/percentage equivalents from Topic 11. So the generator only ever produces
+  // changes that simplify to a friendly fraction.
   function percentChangeFind(oldV, newV, unit, story) {
     const u = unit || '';
     const up = newV > oldV, change = Math.abs(newV - oldV);
+    const g = gcd(change, oldV), sn = change / g, sd = oldV / g;
     const pct = Math.round((change / oldV) * 100);
+    const cf = common(factors(change), factors(oldV));
     return {
       subject: 'percent', given: story, sig: `pcf:${oldV}:${newV}`, answer: `${pct}% ${up ? 'increase' : 'decrease'}`,
       steps: [
@@ -313,40 +320,57 @@
           hint: `${Math.max(oldV, newV)} − ${Math.min(oldV, newV)} = ${change}.`,
           why: `Percentage change always starts with the actual change: how much it went ${up ? 'up' : 'down'} by.`,
           resultText: `change = ${u}${change}`, answer: change, lo: 0, hi: change + 15, expr: `${Math.max(oldV, newV)} − ${Math.min(oldV, newV)}` }),
-        nStep({ key: 'div', prompt: `Now compare it to the ORIGINAL: ${change} ÷ ${oldV} × 100 = ? (%)`,
-          hint: `${change} ÷ ${oldV} = ${fmt(change / oldV)}, and × 100 = ${pct}.`,
-          why: `You always divide by the ORIGINAL amount, not the new one. That is the single most common mistake here — the original is the 100% you are measuring against.`,
-          longWay: `${change} ÷ ${oldV} = ${fmt(change / oldV)}\n${fmt(change / oldV)} × 100 = ${pct}%`,
-          resultText: `${pct}% ${up ? 'increase' : 'decrease'}`, answer: pct, lo: Math.max(1, pct - 15), hi: pct + 15,
-          expr: `${change} ÷ ${oldV} × 100`, isAnswer: true }),
+        nStep({ key: 'hcf', prompt: `Now write the change as a fraction of the ORIGINAL: ${change}/${oldV}. To simplify it, what is the HCF of ${change} and ${oldV}?`,
+          hint: `Common factors of ${change} and ${oldV}: ${list(cf)} — take the biggest, ${g}.`,
+          why: `You compare the change to the ORIGINAL amount, never the new one — the original is the 100% you are measuring against. Simplifying ${change}/${oldV} first is what keeps this a no-calculator question.`,
+          resultText: `HCF of ${change} and ${oldV} = ${g}`, answer: g, pool: cf.length > 2 ? cf : numberPool(cf, 3, 2, Math.max(change, 12)),
+          expr: `the HCF of ${change} and ${oldV}` }),
+        sStep({ key: 'frac', prompt: `Divide top and bottom by ${g}. What does ${change}/${oldV} simplify to?`,
+          hint: `${change} ÷ ${g} = ${sn} and ${oldV} ÷ ${g} = ${sd}, so ${sn}/${sd}.`,
+          why: `A simple fraction like ${sn}/${sd} is one you already know as a percentage — that is the whole point of simplifying first.`,
+          resultText: `${change}/${oldV} = ${sn}/${sd}`, answer: `${sn}/${sd}`, expr: `${change}/${oldV} simplified`,
+          pool: shuffle([...new Set([`${sn}/${sd}`, `${sd}/${sn}`, `${change}/${oldV}`, `${sn}/${sd + 1}`])]) }),
+        nStep({ key: 'pct', prompt: `Last step: what is ${sn}/${sd} as a percentage?`,
+          hint: `${sn}/${sd} = ${pct}%.`,
+          why: `Use the equivalents you know: 1/2 = 50%, 1/4 = 25%, 1/5 = 20%, 1/10 = 10%, 1/20 = 5%. Here ${sn}/${sd} = ${pct}%.`,
+          longWay: `Change: ${change}\nAs a fraction of the original: ${change}/${oldV}\nSimplify (÷${g}): ${sn}/${sd}\nAs a percentage: ${pct}%\nSo it is a ${pct}% ${up ? 'increase' : 'decrease'}.`,
+          resultText: `${pct}% ${up ? 'increase' : 'decrease'}`, answer: pct,
+          pool: uniqSort([pct, 100 - pct, sd, Math.round(pct / 2), pct * 2].filter((v) => v > 0 && v <= 100)),
+          expr: `${sn}/${sd} as a percentage`, isAnswer: true }),
       ],
     };
   }
   // REVERSE percentage: the price AFTER the change is given; find the original.
+  // Textbooks reach for 1%, but "£48 ÷ 80" is not a mental step. Stepping down to the
+  // HCF of the percentage and 100 instead keeps every division small: for 80% you go
+  // via 20% (÷4, then ×5), for 75% via 25% (÷3, then ×4), for 90% via 10% (÷9, ×10).
   function percentReverse(p, orig, up, unit, story) {
     const u = unit || '';
     const nowPct = up ? 100 + p : 100 - p;
     const now = (orig * nowPct) / 100;
-    const onePct = orig / 100;
-    return {
-      subject: 'percent', given: story, sig: `prev:${p}:${orig}:${up ? 'u' : 'd'}`, answer: `${u}${orig}`,
-      steps: [
-        nStep({ key: 'pct', prompt: `The original price is 100%. After a ${p}% ${up ? 'increase' : 'decrease'}, ${u}${now} is what percentage of the original?`,
-          hint: `100 ${up ? '+' : '−'} ${p} = ${nowPct}%.`,
-          why: `This is the whole trick. ${u}${now} is NOT 100% — it is ${nowPct}% of the original. Working ${p}% of ${u}${now} would be wrong, because the ${p}% was taken from the original, not from this.`,
-          resultText: `${u}${now} = ${nowPct}%`, answer: nowPct, pool: uniqSort([nowPct, 100, p, up ? 100 - p : 100 + p]), expr: `100 ${up ? '+' : '−'} ${p}` }),
-        nStep({ key: 'one', prompt: `So ${nowPct}% = ${u}${now}. What is 1%? ${now} ÷ ${nowPct} = ?`,
-          hint: `${now} ÷ ${nowPct} = ${onePct}.`,
-          why: `Divide down to 1% first — from 1% you can build back up to any percentage you like, including 100%.`,
-          resultText: `1% = ${u}${onePct}`, answer: onePct, lo: 1, hi: onePct + Math.max(10, onePct), expr: `${now} ÷ ${nowPct}` }),
-        nStep({ key: 'orig', prompt: `Now scale 1% up to the full 100%: ${onePct} × 100 = ?`,
-          hint: `${onePct} × 100 = ${orig}.`,
-          why: `100% is the original price — the number you were asked for.`,
-          longWay: `${nowPct}% = ${u}${now}\n1% = ${u}${now} ÷ ${nowPct} = ${u}${onePct}\n100% = ${u}${onePct} × 100 = ${u}${orig}\nCheck: ${p}% of ${u}${orig} is ${u}${(orig * p) / 100}, and ${u}${orig} ${up ? '+' : '−'} ${u}${(orig * p) / 100} = ${u}${now} ✓`,
-          resultText: `Original = ${u}${orig}`, answer: orig, lo: Math.max(0, orig - 25), hi: orig + 25,
-          expr: `${onePct} × 100`, isAnswer: true }),
-      ],
-    };
+    const step = gcd(nowPct, 100);            // the percentage we drop down to
+    const parts = nowPct / step;              // how many of them make up `now`
+    const unitVal = now / parts;              // what `step`% is worth
+    const ups = 100 / step;                   // how many to build back to 100%
+    const steps = [
+      nStep({ key: 'pct', prompt: `The original price is 100%. After a ${p}% ${up ? 'increase' : 'decrease'}, ${u}${now} is what percentage of the original?`,
+        hint: `100 ${up ? '+' : '−'} ${p} = ${nowPct}%.`,
+        why: `This is the whole trick. ${u}${now} is NOT 100% — it is ${nowPct}% of the original. Taking ${p}% of ${u}${now} would be wrong, because the ${p}% came off the ORIGINAL price, not off this one.`,
+        resultText: `${u}${now} = ${nowPct}%`, answer: nowPct, pool: uniqSort([nowPct, 100, p, up ? 100 - p : 100 + p]), expr: `100 ${up ? '+' : '−'} ${p}` }),
+    ];
+    if (parts > 1) {
+      steps.push(nStep({ key: 'unit', prompt: `${nowPct}% = ${u}${now}, and ${nowPct}% is ${parts} lots of ${step}%. So what is ${step}%? ${now} ÷ ${parts} = ?`,
+        hint: `${now} ÷ ${parts} = ${unitVal}.`,
+        why: `Step down to a percentage that divides into both ${nowPct} and 100 — here ${step}%. That keeps the division small enough to do without a calculator, and ${step}% builds straight back up to 100%.`,
+        resultText: `${step}% = ${u}${unitVal}`, answer: unitVal, lo: 1, hi: unitVal + Math.max(12, unitVal), expr: `${now} ÷ ${parts}` }));
+    }
+    steps.push(nStep({ key: 'orig', prompt: `100% is ${ups} lots of ${step}%. So the original = ${unitVal} × ${ups} = ?`,
+      hint: `${unitVal} × ${ups} = ${orig}.`,
+      why: `100% is the original price — the number the question asked for.`,
+      longWay: `${nowPct}% = ${u}${now}\n${step}% = ${u}${now} ÷ ${parts} = ${u}${unitVal}\n100% = ${u}${unitVal} × ${ups} = ${u}${orig}\nCheck: ${p}% of ${u}${orig} is ${u}${(orig * p) / 100}, and ${u}${orig} ${up ? '+' : '−'} ${u}${(orig * p) / 100} = ${u}${now} ✓`,
+      resultText: `Original = ${u}${orig}`, answer: orig, lo: Math.max(0, orig - 25), hi: orig + 25,
+      expr: `${unitVal} × ${ups}`, isAnswer: true }));
+    return { subject: 'percent', given: story, sig: `prev:${p}:${orig}:${up ? 'u' : 'd'}`, answer: `${u}${orig}`, steps };
   }
 
   // ============================================================ FRACTIONS — multiply & divide

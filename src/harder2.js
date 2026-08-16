@@ -166,8 +166,21 @@
     }
     return {
       subject: 'angles', given: whole ? `Find the size of EACH interior angle of a regular ${POLY[n]}` : `Find the sum of the interior angles of a ${POLY[n]}`,
-      sig: `poly:${n}:${whole ? 'each' : 'sum'}`, answer: whole ? `${each}°` : `${sum}°`, steps,
+      sig: `poly:${n}:${whole ? 'each' : 'sum'}`, answer: whole ? `${each}°` : `${sum}°`,
+      // Draw it with the diagonals from one corner: the triangles you're asked to
+      // count are then something to look at, not something to picture.
+      diagram: svgPolyFan(n), steps,
     };
+  }
+  function svgPolyFan(n) {
+    const pts = W.fig.regularPts(n), S = 150, pad = 16;
+    const X = (p) => pad + (p[0] / 100) * S, Y = (p) => pad + (p[1] / 100) * S;
+    const poly = pts.map((p) => `${X(p)},${Y(p)}`).join(' ');
+    let body = `<polygon points="${poly}" fill="${FILL}" stroke="${INK}" stroke-width="3"/>`;
+    for (let i = 2; i < n - 1; i++) {
+      body += `<line x1="${X(pts[0])}" y1="${Y(pts[0])}" x2="${X(pts[i])}" y2="${Y(pts[i])}" stroke="${RED}" stroke-width="2" stroke-dasharray="5 4"/>`;
+    }
+    return `<svg viewBox="0 0 ${S + pad * 2} ${S + pad * 2}" width="${S + pad * 2}" height="${S + pad * 2}" role="img">${body}</svg>`;
   }
 
   // ============================================================ AREA — challenge
@@ -266,10 +279,11 @@
   function missingSide(L, Wd) {
     const area = L * Wd, per = 2 * (L + Wd);
     return {
-      subject: 'area', given: `A rectangle has an area of ${area} cm² and a length of ${L} cm. Find its PERIMETER.`,
+      subject: 'area', given: `This rectangle has an area of ${area} cm². Find its PERIMETER.`,
       sig: `ms:${L}x${Wd}`, answer: `${per} cm`,
+      diagram: W.fig.rect(L, '?', { inside: `area = ${area} cm²`, missing: 'W' }),
       steps: [
-        nStep({ key: 'w', prompt: `Area = length × width, so work backwards: width = ${area} ÷ ${L} = ?`,
+        nStep({ key: 'w', prompt: `Area = length × width. The length is ${L} cm, so work backwards: width = ${area} ÷ ${L} = ?`,
           hint: `${area} ÷ ${L} = ${Wd}.`,
           why: `You are given the answer to a multiplication and one of the numbers, so divide to find the other. This is the reverse of the usual area question.`,
           resultText: `width = ${Wd} cm`, answer: Wd, lo: 1, hi: Wd + 12, expr: `${area} ÷ ${L}` }),
@@ -313,10 +327,10 @@
   function missingDimension(l, w, h) {
     const vol = l * w * h, base = l * w;
     return {
-      subject: 'volume', given: `A cuboid has a volume of ${vol} cm³. Its length is ${l} cm and its width is ${w} cm. Find its HEIGHT.`,
-      sig: `md:${l},${w},${h}`, answer: `${h} cm`,
+      subject: 'volume', given: `This cuboid has a volume of ${vol} cm³. Find its HEIGHT.`,
+      sig: `md:${l},${w},${h}`, answer: `${h} cm`, diagram: W.fig.cuboid(l, w, h, 'h'),
       steps: [
-        nStep({ key: 'base', prompt: `Volume = length × width × height. First work out length × width: ${l} × ${w} = ?`,
+        nStep({ key: 'base', prompt: `Volume = length × width × height. The length is ${l} cm and the width is ${w} cm, so first: ${l} × ${w} = ?`,
           hint: `${l} × ${w} = ${base}.`,
           why: `Deal with the two dimensions you know first — that turns the problem into a single missing-number multiplication.`,
           resultText: `base = ${base} cm²`, answer: base, lo: 1, hi: base + 18, expr: `${l} × ${w}` }),
@@ -420,9 +434,15 @@
     { q: 'Which of these is NOT always true of a rectangle?', a: 'all sides equal', opts: ['all sides equal', 'opposite sides equal', 'four right angles', 'diagonals equal'], why: 'A rectangle only needs its OPPOSITE sides equal. If all four are equal it is a square — a special case, not the rule.' },
     { q: 'The diagonals of a square cross at what angle?', a: '90', opts: ['90', '45', '60', '180'], why: 'A square\'s diagonals bisect each other at right angles — a property it shares with the rhombus.' },
   ];
+  // Shapes the question offers as options get drawn side by side, so the child compares
+  // pictures rather than trying to hold four quadrilaterals in their head.
+  const DRAWABLE = ['square', 'rectangle', 'rhombus', 'parallelogram', 'trapezium', 'kite',
+    'equilateral triangle', 'isosceles triangle', 'scalene triangle'];
   function shapeProperty(entry) {
+    const drawable = entry.opts.filter((o) => DRAWABLE.includes(o));
     return {
       subject: 'geometry', given: entry.q, sig: 'sp:' + entry.q, answer: String(entry.a),
+      diagram: drawable.length >= 2 ? W.fig.gallery(drawable, 92) : undefined,
       steps: [pickStep({ key: 'prop', prompt: entry.q, hint: entry.why, why: entry.why,
         resultText: `answer: ${entry.a}`, expected: [entry.a], pool: shuffle(entry.opts.slice()), isAnswer: true,
         diagnose: () => ({ correct: false, id: 'geom-fact', ctx: { a: entry.a, why: entry.why } }) })],
@@ -445,8 +465,10 @@
     const other = rotational ? s.lines : s.order;
     return {
       subject: 'geometry', sig: `sym:${s.name}:${rotational ? 'r' : 'l'}`,
-      given: rotational ? `What is the ORDER OF ROTATIONAL SYMMETRY of a ${s.name}?` : `How many LINES OF SYMMETRY does a ${s.name} have?`,
+      given: rotational ? `What is the ORDER OF ROTATIONAL SYMMETRY of this ${s.name}?` : `How many LINES OF SYMMETRY does this ${s.name} have?`,
       answer: String(val),
+      // The shape only — never its mirror lines, which would BE the answer.
+      diagram: W.fig.shape(s.name, { size: 140 }),
       steps: [
         pickStep({ key: 'sym', prompt: rotational
           ? `Spin a ${s.name} through one full turn. How many times does it look exactly the same? (including back at the start)`

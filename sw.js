@@ -6,33 +6,34 @@
    Cache-first on code means an installed iPad keeps serving yesterday's build for ever and
    a fix looks like it did nothing — so code always tries the network, and falls back to the
    cache the moment the network isn't there, which is what keeps offline working. */
-const CACHE = 'wac-v21';
+const CACHE = 'wac-v22';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icon-180.png',
-  './src/styles.css?v=21',
-  './src/fraction.js?v=21',
-  './src/format.js?v=21',
-  './src/parser.js?v=21',
-  './src/numbers.js?v=21',
-  './src/explanations.js?v=21',
-  './src/steps.js?v=21',
-  './src/topics.js?v=21',
-  './src/topics2.js?v=21',
-  './src/topics3.js?v=21',
-  './src/topics4.js?v=21',
-  './src/topics5.js?v=21',
-  './src/primes.js?v=21',
-  './src/coords.js?v=21',
-  './src/history.js?v=21',
-  './src/harder.js?v=21',
-  './src/harder2.js?v=21',
-  './src/bidmas.js?v=21',
-  './src/solving.js?v=21',
-  './src/problems.js?v=21',
-  './src/app.js?v=21'
+  './src/styles.css?v=22',
+  './src/fraction.js?v=22',
+  './src/format.js?v=22',
+  './src/parser.js?v=22',
+  './src/numbers.js?v=22',
+  './src/explanations.js?v=22',
+  './src/figures.js?v=22',
+  './src/steps.js?v=22',
+  './src/topics.js?v=22',
+  './src/topics2.js?v=22',
+  './src/topics3.js?v=22',
+  './src/topics4.js?v=22',
+  './src/topics5.js?v=22',
+  './src/primes.js?v=22',
+  './src/coords.js?v=22',
+  './src/history.js?v=22',
+  './src/harder.js?v=22',
+  './src/harder2.js?v=22',
+  './src/bidmas.js?v=22',
+  './src/solving.js?v=22',
+  './src/problems.js?v=22',
+  './src/app.js?v=22'
 ];
 
 self.addEventListener('install', (e) => {

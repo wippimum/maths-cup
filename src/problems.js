@@ -307,10 +307,14 @@
   // ---- Decimals: × and ÷ a decimal ----
   function genDecMulDiv() {
     if (Math.random() < 0.55) {
-      const one = Math.random() < 0.5;
-      const x = one ? T._randDec(1, 0, 9) : T._randDec(1, 1, 12);
-      const y = Math.random() < 0.4 ? String(rand(3, 19)) : T._randDec(1, 0, 9);
-      if (Number(x) === 0 || Number(y) === 0) return genDecMulDiv();
+      // The method strips the points and multiplies the whole numbers, so THAT product
+      // is what the child actually has to do by hand. 4.1 × 5.5 becomes 41 × 55, which
+      // is a calculator job — keep one factor small and the product modest.
+      const x = T._randDec(1, 0, 9);                       // 0.1 – 9.9
+      const y = Math.random() < 0.4 ? String(rand(2, 12)) : T._randDec(1, 0, 9);
+      const sx = Math.round(Number(x) * 10), sy = Number(y) % 1 === 0 ? Number(y) : Math.round(Number(y) * 10);
+      if (!sx || !sy) return genDecMulDiv();
+      if (Math.min(sx, sy) > 12 || sx * sy > 400) return genDecMulDiv();
       return T.decMul(x, y);
     }
     // build a clean division: quotient × divisor = dividend, divisor is a decimal
@@ -322,6 +326,10 @@
 
   // ---- Percentages ----
   const PC_ITEMS = [['jacket', '£'], ['bike', '£'], ['phone', '£'], ['pair of boots', '£'], ['season ticket', '£']];
+  // The fraction/percentage equivalents Topic 11 asks them to recall — halves, quarters,
+  // fifths, tenths (and 1/20 = 5%). Anything outside this needs a calculator.
+  const PC_FRACTIONS = [[1, 2, 50], [1, 4, 25], [3, 4, 75], [1, 5, 20], [2, 5, 40], [3, 5, 60],
+    [4, 5, 80], [1, 10, 10], [3, 10, 30], [7, 10, 70], [9, 10, 90], [1, 20, 5], [3, 20, 15]];
   function genPercentHard() {
     const r = rand(1, 4);
     const A100 = 100 * rand(2, 15);
@@ -335,12 +343,17 @@
       return T.percentChange(p, A, up, '£', story);
     }
     if (r === 2) {                                    // find the percentage change
-      const oldV = 10 * rand(2, 20);
-      const pct = pick([5, 10, 20, 25, 40, 50]);
+      // The change over the original MUST simplify to a fraction they already know as a
+      // percentage (Topic 11), or this stops being a non-calculator question.
+      const f = pick(PC_FRACTIONS);                   // [numerator, denominator, percentage]
+      const k = rand(2, 20);
+      const oldV = f[1] * k, change = f[0] * k;
       const up = Math.random() < 0.5;
-      const newV = up ? oldV + (oldV * pct) / 100 : oldV - (oldV * pct) / 100;
-      if (!Number.isInteger(newV) || newV <= 0) return genPercentHard();
-      const story = `A season ticket cost £${oldV} last year and costs £${newV} this year. What is the percentage ${up ? 'increase' : 'decrease'}?`;
+      const newV = up ? oldV + change : oldV - change;
+      if (newV <= 0 || oldV > 600) return genPercentHard();
+      const story = up
+        ? `A season ticket cost £${oldV} last year and costs £${newV} this year. What is the percentage increase?`
+        : `A coat was £${oldV} and is now £${newV} in the sale. What is the percentage decrease?`;
       return T.percentChangeFind(oldV, newV, '£', story);
     }
     if (r === 3) {                                    // REVERSE percentage
@@ -482,7 +495,13 @@
   function genVolumeHard() {
     const r = rand(1, 3);
     if (r === 1) return T.surfaceArea(rand(3, 9), rand(2, 7), rand(2, 8));
-    if (r === 2) return T.missingDimension(rand(2, 8), rand(2, 7), rand(2, 9));
+    // The last step is volume ÷ (l × w), so the base is the DIVISOR. Keep it inside the
+    // times tables — dividing 252 by 28 is a written-method slog, not a volume question.
+    if (r === 2) {
+      let l, w, g = 0;
+      do { l = rand(2, 8); w = rand(2, 6); g++; } while (l * w > 24 && g < 40);
+      return T.missingDimension(l, w, rand(2, 9));
+    }
     let b = rand(3, 10), h = rand(2, 9); if ((b * h) % 2 !== 0) h += 1;
     return T.prismVolume(b, h, rand(3, 12));
   }

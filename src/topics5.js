@@ -30,6 +30,8 @@
   function solidCount(solid, what) {
     const val = solid[what];
     return { subject: 'volume', given: `How many ${what.toUpperCase()} does a ${solid.name} have?`, sig: `sc:${solid.name}:${what}`, answer: String(val),
+      // You cannot count the faces of a shape you can't see — always draw the solid.
+      diagram: (root.WAC.fig ? root.WAC.fig.solid(solid.name) : ''),
       steps: [pickStep({ key: 'count', prompt: `How many ${what} does a ${solid.name} have?`, hint: `A ${solid.name} has ${val} ${what}.`,
         why: `Faces are the flat surfaces, edges are where two faces meet, and vertices are the corners.`, resultText: `${val} ${what}`, expected: [val],
         pool: uniqSort([val, val + 2, val - 2, val + 4].filter((x) => x > 0)), isAnswer: true, diagnose: () => ({ correct: false, id: 'solid-count', ctx: { name: solid.name, what, val } }) })] };
@@ -82,14 +84,17 @@
     { q: 'How many sides does a pentagon have?', a: 5, opts: [4, 5, 6, 8], why: 'Penta- means five.' },
     { q: 'How many sides does an octagon have?', a: 8, opts: [6, 7, 8, 10], why: 'Octa- means eight (like octopus).' },
     { q: 'How many sides does a quadrilateral have?', a: 4, opts: [3, 4, 5, 6], why: 'Quad- means four.' },
-    { q: 'How many right angles does a rectangle have?', a: 4, opts: [2, 3, 4, 6], why: 'Every corner of a rectangle is a right angle.' },
-    { q: 'The angles in a triangle add up to?', a: 180, opts: [90, 180, 270, 360], why: 'The three angles in any triangle total 180°.' },
-    { q: 'The angles in a quadrilateral add up to?', a: 360, opts: [180, 270, 360, 540], why: 'A quadrilateral splits into two triangles: 2 × 180 = 360°.' },
-    { q: 'How many lines of symmetry does a square have?', a: 4, opts: [2, 3, 4, 8], why: 'Two diagonals plus the two lines through the middle.' },
+    { q: 'How many right angles does a rectangle have?', a: 4, opts: [2, 3, 4, 6], shape: 'rectangle', why: 'Every corner of a rectangle is a right angle.' },
+    { q: 'The angles in a triangle add up to?', a: 180, opts: [90, 180, 270, 360], shape: 'scalene triangle', why: 'The three angles in any triangle total 180°.' },
+    { q: 'The angles in a quadrilateral add up to?', a: 360, opts: [180, 270, 360, 540], shape: 'trapezium', why: 'A quadrilateral splits into two triangles: 2 × 180 = 360°.' },
+    { q: 'How many lines of symmetry does a square have?', a: 4, opts: [2, 3, 4, 8], shape: 'square', why: 'Two diagonals plus the two lines through the middle.' },
     { q: 'How many equal sides does an equilateral triangle have?', a: 3, opts: [1, 2, 3, 0], why: 'Equilateral means all three sides equal.' },
   ];
   function geometryFact(fact) {
     return { subject: 'geometry', given: fact.q, sig: 'gf:' + fact.q, answer: String(fact.a),
+      // Only where the picture helps you REASON. "How many sides has a hexagon?"
+      // is deliberately left undrawn — a hexagon on screen just is the answer.
+      diagram: (fact.shape && root.WAC.fig ? root.WAC.fig.shape(fact.shape, { size: 120 }) : undefined),
       steps: [pickStep({ key: 'fact', prompt: fact.q, hint: fact.why, why: fact.why, resultText: `answer: ${fact.a}`, expected: [fact.a], pool: fact.opts, isAnswer: true,
         diagnose: () => ({ correct: false, id: 'geom-fact', ctx: { a: fact.a, why: fact.why } }) })] };
   }

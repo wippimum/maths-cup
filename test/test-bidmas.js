@@ -2,7 +2,7 @@
    Run: node test/test-bidmas.js  (or: cd test && node test-bidmas.js) */
 const path = '../src/';
 const W = {};
-for (const f of ['numbers', 'format', 'fraction', 'parser', 'explanations', 'steps', 'topics',
+for (const f of ['numbers', 'format', 'fraction', 'parser', 'explanations', 'figures', 'steps', 'topics',
   'topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'harder', 'harder2',
   'solving', 'bidmas', 'problems']) {
   Object.assign(W, require(path + f + '.js'));

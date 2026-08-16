@@ -4,7 +4,7 @@
    Run: node test/test-levels.js   (or: cd test && node test-levels.js) */
 const path = '../src/';
 const W = {};
-for (const f of ['numbers', 'format', 'fraction', 'parser', 'explanations', 'steps', 'topics',
+for (const f of ['numbers', 'format', 'fraction', 'parser', 'explanations', 'figures', 'steps', 'topics',
   'topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'harder', 'harder2',
   'bidmas', 'solving', 'problems']) {
   Object.assign(W, require(path + f + '.js'));
