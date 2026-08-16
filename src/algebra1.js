@@ -172,58 +172,108 @@
   }
 
   // ============================================================ 4. COLLECTING LIKE TERMS
-  function collectLikeTerms(withNumbers) {
-    const a1 = rand(2, 8), a2 = nz(-4, 6), b1 = rand(2, 7), b2 = nz(-4, 5);
-    const n1 = withNumbers ? rand(1, 9) : 0, n2v = withNumbers ? nz(-6, 6) : 0;
-    const sa = a1 + a2, sb = b1 + b2, sn = n1 + n2v;
-    if (sa <= 0 || sb <= 0) return collectLikeTerms(withNumbers);
-    // the expression as written, in a deliberately jumbled order
-    const parts = [[a1, 'a'], [b1, 'b'], [a2, 'a'], [b2, 'b']];
-    if (withNumbers) { parts.splice(2, 0, [n1, '']); parts.push([n2v, '']); }
-    const shown = expr(parts);
-    const aTerms = parts.filter((p) => p[1] === 'a').map((p) => term(p[0], 'a'));
-    const answer = expr(withNumbers ? [[sa, 'a'], [sb, 'b'], [sn, '']] : [[sa, 'a'], [sb, 'b']]);
-    const steps = [
-      chooseStep({
-        key: 'spot', prompt: `Tap all the terms that are LIKE terms with a.`,
-        hint: `The a-terms here are ${aTerms.join(' and ')}.`,
-        why: `Like terms have exactly the same letter part. ${aTerms.join(' and ')} are all lots of a, so they can be combined. An a-term and a b-term can never be added together — they are different things.`,
-        resultText: `a-terms: ${aTerms.join(', ')}`,
-        expected: aTerms,
-        pool: parts.filter((p) => p[0] !== 0).map((p) => term(p[0], p[1])),
-        diagnose: () => ({ correct: false, id: 'like-terms', ctx: { letter: 'a', terms: aTerms.join(', ') } }),
-      }),
-      nStep({ key: 'a', prompt: `Combine them: ${a1} ${a2 < 0 ? M : '+'} ${Math.abs(a2)} = ? (that is how many a's)`,
-        hint: `${a1} ${a2 < 0 ? M : '+'} ${Math.abs(a2)} = ${sa}.`,
-        why: `Only the numbers in front get added — the a stays an a. ${a1} lots of a ${a2 < 0 ? 'take away' : 'plus'} ${Math.abs(a2)} lots of a gives ${sa} lots of a.`,
-        resultText: `${term(sa, 'a')}`, answer: sa, expr: `${a1} ${a2 < 0 ? M : '+'} ${Math.abs(a2)}` }),
-      nStep({ key: 'b', prompt: `Now the b's: ${b1} ${b2 < 0 ? M : '+'} ${Math.abs(b2)} = ?`,
-        hint: `${b1} ${b2 < 0 ? M : '+'} ${Math.abs(b2)} = ${sb}.`,
-        why: `Same again with the b-terms.`,
-        resultText: `${term(sb, 'b')}`, answer: sb, expr: `${b1} ${b2 < 0 ? M : '+'} ${Math.abs(b2)}` }),
-    ];
-    if (withNumbers) {
-      steps.push(nStep({ key: 'n', prompt: `And the plain numbers: ${n1} ${n2v < 0 ? M : '+'} ${Math.abs(n2v)} = ?`,
-        hint: `${n1} ${n2v < 0 ? M : '+'} ${Math.abs(n2v)} = ${sn}.`,
-        why: `Plain numbers are like terms with each other too.`,
-        resultText: `${sn}`, answer: sn, expr: `${n1} ${n2v < 0 ? M : '+'} ${Math.abs(n2v)}` }));
+  // Graded to match the CGP Foundation exercises the school sets (pp. 89-90):
+  //   tier 1  b + b + b + b        one letter, all positive        (Ex 1)
+  //   tier 2  q − 3q − 2q          one letter, ANSWER CAN BE NEGATIVE (Ex 2)
+  //   tier 3  5x + 2y + 3x         two letters                     (Ex 3)
+  //   tier 4  3x + 6 − 6x − 4      letters and plain numbers       (Ex 4-5)
+  //   tier 5  x² + 3x + 2 + 2x + 3 with a squared term             (Ex 7)
+  // The book starts far easier than a two-letter expression, and it lets the answer come
+  // out negative — both of which the first version of this level skipped.
+  const LETTERS = ['a', 'b', 'c', 'd', 'm', 'n', 'p', 'q', 's', 'x', 'y', 'z'];
+  function twoLetters() {
+    const a = pick(LETTERS);
+    let b = pick(LETTERS); let g = 0;
+    while (b === a && g++ < 20) b = pick(LETTERS);
+    return [a, b];
+  }
+  function collectLikeTerms(tier) {
+    const t = tier || 1;
+    // each "kind" is a letter part with the coefficients written in the question
+    let kinds;
+    if (t === 1) {
+      const L = pick(LETTERS);
+      kinds = [{ l: L, coefs: Array.from({ length: rand(3, 4) }, () => rand(1, 6)) }];
+    } else if (t === 2) {
+      const L = pick(LETTERS);
+      const n = rand(3, 4);
+      kinds = [{ l: L, coefs: Array.from({ length: n }, (_, i) => (i === 0 ? rand(1, 8) : nz(-6, 5))) }];
+    } else if (t === 3) {
+      const [A, B] = twoLetters();
+      kinds = [{ l: A, coefs: [rand(1, 8), nz(-5, 6)] }, { l: B, coefs: [rand(1, 7), nz(-4, 5)] }];
+    } else if (t === 4) {
+      const L = pick(LETTERS);
+      kinds = [{ l: L, coefs: [rand(1, 8), nz(-7, 6)] }, { l: '', coefs: [rand(2, 12), nz(-9, 9)] }];
+    } else {
+      const L = pick(['x', 'p', 'b']);
+      kinds = [{ l: L + '²', coefs: [rand(1, 3), rand(1, 3)] },
+        { l: L, coefs: [rand(1, 6), nz(-4, 5)] },
+        { l: '', coefs: [rand(1, 9), nz(-6, 6)] }];
     }
+    // no kind may vanish, or the answer gets a hole in it
+    kinds.forEach((k) => { k.sum = k.coefs.reduce((a, b) => a + b, 0); });
+    if (kinds.some((k) => k.sum === 0)) return collectLikeTerms(t);
+
+    // write the terms interleaved, the way a question actually looks
+    const written = [];
+    const queues = kinds.map((k) => k.coefs.slice());
+    while (queues.some((q) => q.length)) {
+      for (let i = 0; i < queues.length; i++) {
+        if (!queues[i].length) continue;
+        // take one or two from a queue at a time so they don't come out perfectly alternating
+        const take = queues[i].length > 1 && Math.random() < 0.35 ? 2 : 1;
+        for (let k = 0; k < take; k++) if (queues[i].length) written.push([queues[i].shift(), kinds[i].l]);
+      }
+    }
+    const shown = expr(written);
+    const answer = expr(kinds.map((k) => [k.sum, k.l]));
+    const first = kinds[0];
+    const firstTerms = written.filter((w) => w[1] === first.l).map((w) => term(w[0], w[1]));
+
+    const steps = [];
+    if (kinds.length > 1) {
+      steps.push(chooseStep({
+        key: 'spot', prompt: `Tap every term that is a LIKE term with ${first.l ? term(1, first.l) : 'a plain number'}.`,
+        hint: `They are ${firstTerms.join(' and ')}.`,
+        why: first.l
+          ? `Like terms contain exactly the same letter part. ${firstTerms.join(' and ')} are all lots of ${first.l}. A ${first.l}-term and a ${kinds[1].l || 'plain number'} can never be added together — they are different things.`
+          : `Plain numbers are like terms with each other, so they collect together just like the letter terms do.`,
+        resultText: `${first.l || 'number'} terms: ${firstTerms.join(', ')}`,
+        expected: firstTerms,
+        pool: written.map((w) => term(w[0], w[1])),
+        diagnose: () => ({ correct: false, id: 'like-terms', ctx: { letter: first.l || 'number', terms: firstTerms.join(', ') } }),
+      }));
+    }
+    kinds.forEach((k, i) => {
+      const sum = k.coefs.map((c, j) => (j === 0 ? String(c) : (c < 0 ? `${M} ${Math.abs(c)}` : `+ ${c}`))).join(' ');
+      steps.push(nStep({
+        key: 'k' + i,
+        prompt: `${i === 0 ? 'Now combine them' : 'Next'}: ${sum} = ? ${k.l ? `(that is how many ${k.l})` : '(the plain numbers)'}`,
+        hint: `${sum} = ${k.sum}.`,
+        why: k.l
+          ? `Only the numbers in front are added — the ${k.l} itself does not change. ${k.sum < 0 ? `The answer here is negative, and that is fine: ${term(k.sum, k.l)} is a perfectly good term.` : ''}`
+          : `The plain numbers collect together on their own.`,
+        resultText: term(k.sum, k.l), answer: k.sum,
+        lo: k.sum - 12, hi: k.sum + 12, expr: sum,
+      }));
+    });
     steps.push(buildStep({
       key: 'write', prompt: `Write the simplified expression.`,
       hint: `${answer}.`,
-      why: `Put the collected terms together. It cannot be simplified any further, because ${term(sa, 'a')} and ${term(sb, 'b')} are not like terms.`,
+      why: kinds.length > 1
+        ? `Put the collected terms together. It will not simplify further — ${kinds.map((k) => term(k.sum, k.l)).join(' and ')} are not like terms.`
+        : `All the terms were like terms, so they collapse into the single term ${answer}.`,
       longWay: `${shown}\n= ${answer}`,
       resultText: answer,
-      pieces: answer.split(/\s+/),
-      solution: answer.split(/\s+/).join(' '),
-      distractors: [term(sa + sb, 'a'), 'ab', String(sa + sb)],
+      pieces: answer.split(/\s+/), solution: answer.split(/\s+/).join(' '),
+      distractors: [term(kinds.reduce((a, k) => a + k.sum, 0), first.l), String(kinds.reduce((a, k) => a + k.sum, 0))],
       isAnswer: true,
       check: (raw) => {
         const got = String(raw).replace(/\s+/g, ' ').trim();
         return got === answer ? { correct: true } : { correct: false, id: 'collect-write', ctx: { answer } };
       },
     }));
-    return { subject: 'algebra1', sig: `cl:${shown}`, given: `Simplify  ${shown}`, answer, steps };
+    return { subject: 'algebra1', sig: `cl:${t}:${shown}`, given: `Simplify  ${shown}`, answer, steps };
   }
 
   // ============================================================ 5. PERIMETER & AREA EXPRESSIONS

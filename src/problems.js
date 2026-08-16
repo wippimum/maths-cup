@@ -601,10 +601,13 @@
   function genAlgNotation() { return Math.random() < 0.55 ? T.notation() : T.writeExpression(); }
   function genAlgSub() { return Math.random() < 0.75 ? T.substitute(false) : T.substituteHarder(); }
   function genAlgSubNeg() { return T.substitute(true); }
-  function genAlgCollect() { return T.collectLikeTerms(Math.random() < 0.5); }
+  // graded the way the CGP Foundation exercises are (one letter → negatives → two
+  // letters → with plain numbers → with a squared term)
+  function genAlgCollect(easy) { return T.collectLikeTerms(easy ? pick([1, 1, 2, 2, 3]) : pick([3, 4, 4, 5])); }
   function genAlgPerimeter() { return T.perimeterExpression(); }
 
   // ===================== subject menu =====================
+  const FRAC_EQ_LEVEL = { id: 'eq-frac', name: 'One-step with fractions', badge: '½', generate: () => T.fractionEquation() };
   const ALG_LEVELS = ROUNDS.map((r) => ({
     id: r.id, name: r.name, badge: r.badge, stretch: r.stretch,
     generate() {
@@ -615,20 +618,20 @@
   }));
 
   const SUBJECTS = [
-    { id: 'algebra', name: 'Equation World Cup', icon: '⚽', blurb: 'Solve linear equations, move-and-flip.', levels: ALG_LEVELS },
-    { id: 'hcf', name: 'HCF — Highest Common Factor', icon: '🔵', blurb: 'List factors, find the biggest shared one.', levels: [
+    { id: 'algebra', name: 'Linear Equations', icon: '⚽', blurb: 'One-step, one-step with fractions, then two-step and x on both sides.', levels: [ALG_LEVELS[0], FRAC_EQ_LEVEL].concat(ALG_LEVELS.slice(1)) },
+    { id: 'hcf', name: 'Number Properties · HCF', icon: '🔵', blurb: 'List factors, find the biggest shared one.', levels: [
       { id: 'hcf-warm', name: 'Warm-up', badge: '🤝', generate: () => T.hcfProblem(...pick(HCF_WARM)) },
       { id: 'hcf-main', name: 'Main', badge: '🔵', generate: () => Math.random() < 0.5 ? T.hcfProblem(...pick(HCF_MAIN)) : T.hcfProblem(...genPair(10, 40)) },
       { id: 'hcf-big', name: 'Bigger numbers', badge: '🔴', generate: () => Math.random() < 0.3 ? hcfStory() : T.hcfProblem(...pick(HCF_BIG)) },
       { id: 'hcf-pro', name: 'Three numbers', badge: '⭐', stretch: true, generate: () => genHcf3() },
     ] },
-    { id: 'lcm', name: 'LCM — Lowest Common Multiple', icon: '🟢', blurb: 'List multiples, find the smallest shared one.', levels: [
+    { id: 'lcm', name: 'Number Properties · LCM', icon: '🟢', blurb: 'List multiples, find the smallest shared one.', levels: [
       { id: 'lcm-warm', name: 'Warm-up', badge: '🤝', generate: () => T.lcmProblem(...pick(LCM_WARM)) },
       { id: 'lcm-main', name: 'Main', badge: '🟢', generate: () => Math.random() < 0.5 ? T.lcmProblem(...pick(LCM_MAIN)) : T.lcmProblem(...genLcmPair(3, 12)) },
       { id: 'lcm-big', name: 'Bigger numbers', badge: '🟡', generate: () => Math.random() < 0.4 ? lcmStory() : T.lcmProblem(...genLcmPair(4, 15)) },
       { id: 'lcm-pro', name: 'Three numbers', badge: '⭐', stretch: true, generate: () => genLcm3() },
     ] },
-    { id: 'primes', name: 'Prime Numbers', icon: '🔢', blurb: 'Spot primes, factor trees, index form, squares and roots.', levels: [
+    { id: 'primes', name: 'Number Properties · Primes', icon: '🔢', blurb: 'Spot primes, factor trees, index form, squares and roots.', levels: [
       { id: 'prime-spot', name: 'Is it prime?', badge: '🕵️', generate: () => T.isItPrime(rand(2, 40)) },
       { id: 'prime-hunt', name: 'Prime hunt', badge: '🎯', generate: () => genPrimeHunt() },
       { id: 'prime-two', name: 'Two prime factors', badge: '✖️', generate: () => genTwoPrimes() },
@@ -637,12 +640,12 @@
       { id: 'prime-square', name: 'Make a square', badge: '⭐', stretch: true, generate: () => T.makeSquare(pick(T.SQUARE_BANK)) },
       { id: 'prime-hcflcm', name: 'HCF & LCM by primes', badge: '⭐', stretch: true, generate: () => { const p = pick(HL_BANK); return T.hcfLcmByPrimes(p[0], p[1]); } },
     ] },
-    { id: 'ratio', name: 'Ratio', icon: '⚖️', blurb: 'Not a Year 6 topic — extra practice for later.', levels: [
+    { id: 'ratio', name: 'Ratio (extra)', icon: '⚖️', blurb: 'Not a Year 6 topic — extra practice for later.', levels: [
       { id: 'ratio-simplify', name: 'Simplify', badge: '➗', stretch: true, generate: () => genRatioSimplify() },
       { id: 'ratio-share', name: 'Share an amount', badge: '🤝', stretch: true, generate: () => genRatioShare() },
       { id: 'ratio-hard', name: 'Three-way & backwards', badge: '⭐', stretch: true, generate: () => genRatioHard() },
     ] },
-    { id: 'decimals', name: 'Decimals', icon: '🔟', blurb: '× and ÷ by powers of ten, add, subtract, then × and ÷ decimals.', levels: [
+    { id: 'decimals', name: 'Calculating with Decimals', icon: '🔟', blurb: '× and ÷ by powers of ten, add, subtract, then × and ÷ decimals.', levels: [
       { id: 'dec-power', name: '× and ÷ by 10, 100, 1000', badge: '📍', generate: () => genDecPower() },
       { id: 'dec-addsub', name: 'Add & subtract', badge: '➕', generate: () => genDecAddSub() },
       { id: 'dec-muldiv', name: '× and ÷ decimals', badge: '🏆', generate: () => genDecMulDiv() },
@@ -662,14 +665,18 @@
       { id: 'frac-ofwhat', name: 'What fraction of…?', badge: '❓', generate: () => genFractionOf() },
       { id: 'frac-muldiv', name: 'Multiply & divide', badge: '🏆', generate: () => genFracMulDiv() },
     ] },
-    { id: 'integers', name: 'Integers (negatives)', icon: '±', blurb: 'Add, subtract, multiply, divide — then two moves at once.', levels: [
+    { id: 'integers', name: 'Integers', icon: '±', blurb: 'Place value, ordering, negatives in real life, then calculating with them.', levels: [
+      { id: 'num-pv', name: 'Place value', badge: '🔢', generate: () => genPlaceValue() },
+      { id: 'num-order', name: 'Ordering integers', badge: '🔽', generate: () => genOrdering() },
+      { id: 'num-hard', name: 'Ordering decimals & negatives', badge: '🔀', generate: () => genNumHard() },
+      { id: 'int-context', name: 'Negatives in real life', badge: '🌡️', generate: () => T.directedContext() },
       { id: 'int-addsub', name: 'Add & subtract', badge: '±', generate: () => genNegAddSub() },
       { id: 'int-muldiv', name: 'Multiply & divide', badge: '✖️', generate: () => genNegMulDiv() },
       { id: 'int-hard', name: 'Two steps with negatives', badge: '🏆', generate: () => genNegHard() },
     ] },
     // Order of operations used to be one thin level under Integers (a + b × c, and
     // nothing else). It's the hard part of school Topic 2, so it's its own ladder now.
-    { id: 'bidmas', name: 'BIDMAS — order of operations', icon: '🧮', blurb: 'Which part of the sum do you do first?', levels: [
+    { id: 'bidmas', name: 'Order of Operations (BIDMAS)', icon: '🧮', blurb: 'Topic 2\u2019s last objective, on its own tile. Which part of the sum comes first?', levels: [
       { id: 'bid-spot', name: 'Which part first?', badge: '🔍', generate: () => T.bidmasSpot() },
       { id: 'bid-md', name: '× and ÷ before + and −', badge: '✖️', generate: () => T.bidmasMD() },
       { id: 'bid-brackets', name: 'Brackets first', badge: '🔵', generate: () => T.bidmasBrackets() },
@@ -677,27 +684,30 @@
       { id: 'bid-indices', name: 'Powers (indices)', badge: '²', generate: () => T.bidmasIndices() },
       { id: 'bid-mix', name: 'Full BIDMAS 🏆', badge: '🏆', generate: () => T.bidmasMix() },
     ] },
-    { id: 'rounding', name: 'Rounding', icon: '≈', blurb: 'Round to the nearest 10, 100, 1000 and to decimal places.', levels: [
+    { id: 'rounding', name: 'Degrees of Accuracy', icon: '≈', blurb: 'Round to the nearest 10, 100, 1000 and to decimal places.', levels: [
       { id: 'round-nearest', name: 'Nearest 10 / 100 / 1000', badge: '🎯', generate: () => genRoundNearest() },
       { id: 'round-dp', name: 'Decimal places', badge: '📍', generate: () => genRoundDP() },
       { id: 'round-sf', name: 'Significant figures & estimating', badge: '⭐', stretch: true, generate: () => genRoundHard() },
     ] },
-    { id: 'stats', name: 'Statistics', icon: '📊', blurb: 'Mode, range, mean and median, then comparing two sets.', levels: [
+    { id: 'stats', name: 'Statistical Measures', icon: '📊', blurb: 'Mode, range, mean and median, then comparing two sets.', levels: [
       { id: 'stat-modrange', name: 'Mode & range', badge: '📊', generate: () => Math.random() < 0.5 ? genStatMode() : genStatRange() },
       { id: 'stat-mean', name: 'Mean', badge: '➗', generate: () => genStatMean() },
       { id: 'stat-median', name: 'Median', badge: '🔽', generate: () => genStatMedian() },
+      { id: 'stat-graphs', name: 'Reading graphs', badge: '📉', generate: () => T.lineGraph() },
       { id: 'stat-compare', name: 'Compare two sets', badge: '⚖️', generate: () => T.compareSets() },
       { id: 'stat-hard', name: 'Missing values & negatives', badge: '⭐', stretch: true, generate: () => genStatHard() },
     ] },
-    { id: 'fdp', name: 'Fractions, Decimals & %', icon: '🔗', blurb: 'Convert between them, then compare and order a mixed set.', levels: [
+    { id: 'fdp', name: 'Fractions, Decimals & Percentages', icon: '🔗', blurb: 'Convert between them, then compare and order a mixed set.', levels: [
       { id: 'fdp-fd', name: 'Fraction → decimal → %', badge: '➡️', generate: () => genFdpFromFraction() },
       { id: 'fdp-pf', name: '% → fraction', badge: '½', generate: () => genFdpPercentToFraction() },
       { id: 'fdp-order', name: 'Order a mixed set', badge: '🏆', generate: () => genFdpOrder() },
     ] },
-    { id: 'numeracy', name: 'Place value & ordering', icon: '#️⃣', blurb: 'Digit values and ordering — up to decimals and negatives.', levels: [
-      { id: 'num-pv', name: 'Place value', badge: '🔢', generate: () => genPlaceValue() },
-      { id: 'num-order', name: 'Ordering numbers', badge: '🔽', generate: () => genOrdering() },
-      { id: 'num-hard', name: 'Decimals & negatives', badge: '🏆', generate: () => genNumHard() },
+    { id: 'numeracy', name: 'Numeracy', icon: '#️⃣', blurb: 'Times tables, adding and subtracting big numbers, multiplying, and short division.', levels: [
+      { id: 'num-tables', name: 'Times tables', badge: '✖️', generate: () => T.timesTable() },
+      { id: 'num-addsub', name: 'Add & subtract large numbers', badge: '➕', generate: () => T.addSubLarge(Math.random() < 0.5) },
+      { id: 'num-multiply', name: 'Multiply integers', badge: '✳️', generate: () => T.multiplyIntegers() },
+      { id: 'num-divide', name: 'Short division', badge: '➗', generate: () => T.shortDivision(false) },
+      { id: 'num-divdec', name: 'Short division with decimals', badge: '📍', generate: () => T.shortDivision(true) },
     ] },
     { id: 'angles', name: 'Angles', icon: '📐', blurb: 'Name and estimate them, then missing angles in lines, triangles and quadrilaterals.', levels: [
       { id: 'ang-classify', name: 'Name & estimate angles', badge: '🔍', generate: () => genAngleClassify() },
@@ -706,33 +716,35 @@
       { id: 'ang-quad', name: 'Quadrilaterals & isosceles', badge: '🔷', generate: () => Math.random() < 0.5 ? T.angleQuadrilateral() : T.angleIsosceles() },
       { id: 'ang-hard', name: 'Parallel lines & polygons', badge: '⭐', stretch: true, generate: () => Math.random() < 0.5 ? T.angleParallel() : T.anglePolygon() },
     ] },
-    { id: 'area', name: 'Perimeter & Area', icon: '🟩', blurb: 'Perimeter and area of rectangles, triangles and compound shapes.', levels: [
+    { id: 'area', name: 'Mensuration of 2D Shapes', icon: '🟩', blurb: 'Perimeter and area of rectangles, triangles and compound shapes.', levels: [
       { id: 'area-rect', name: 'Rectangles', badge: '🟩', generate: () => genRect() },
       { id: 'area-tri', name: 'Triangle area', badge: '🔺', generate: () => genTri() },
       { id: 'area-comp', name: 'Compound shapes & backwards', badge: '🧩', generate: () => { const r = rand(1, 3); return r === 1 ? T.compoundArea() : r === 2 ? T.parallelogramArea(rand(4, 14), rand(3, 11)) : T.missingSide(rand(4, 12), rand(3, 11)); } },
       { id: 'area-trap', name: 'Trapezium area', badge: '⭐', stretch: true, generate: () => { let a = rand(3, 10), b = rand(4, 14); if (a === b) b += 1; let h = rand(3, 10); if (((a + b) * h) % 2 !== 0) h += 1; return T.trapeziumArea(a, b, h); } },
     ] },
-    { id: 'volume', name: '3D Shapes & Volume', icon: '🧊', blurb: 'Name solids and their nets; faces, edges and vertices; volume of cuboids and prisms.', levels: [
-      { id: 'vol-name', name: 'Name the solid & its net', badge: '🔺', generate: () => genSolidsNets() },
+    { id: 'volume', name: '3D Shape & Volume', icon: '🧊', blurb: 'Name solids and their nets; faces, edges and vertices; volume of cuboids and prisms.', levels: [
+      { id: 'vol-name', name: 'Name the solid', badge: '🔺', generate: () => T.nameSolid() },
+      { id: 'vol-nets', name: 'Nets of solids', badge: '📐', generate: () => T.netOfSolid() },
       { id: 'vol-cuboid', name: 'Volume of a cuboid', badge: '🧊', generate: () => genCuboid() },
       { id: 'vol-fev', name: 'Faces, edges & vertices', badge: '🔷', generate: () => genSolidCount() },
       { id: 'vol-prism', name: 'Prisms & missing sides', badge: '📦', generate: () => genPrismOrMissing() },
       { id: 'vol-hard', name: 'Surface area', badge: '⭐', stretch: true, generate: () => T.surfaceArea(rand(3, 9), rand(2, 7), rand(2, 8)) },
     ] },
-    { id: 'coords', name: 'Coordinates', icon: '📍', blurb: 'Read and plot in all four quadrants, reflect, and complete shapes.', levels: [
+    { id: 'coords', name: 'Symmetry & Co-ordinates', icon: '📍', blurb: 'Lines of symmetry and rotational order, then reading, plotting and completing shapes.', levels: [
+      { id: 'geo-sym', name: 'Lines of symmetry & rotation', badge: '🪞', generate: () => genSymmetry() },
       { id: 'co-read', name: 'Read coordinates', badge: '📍', generate: () => genReadCoord() },
       { id: 'co-read-neg', name: 'Read (with negatives)', badge: '➖', generate: () => genReadCoordNeg() },
       { id: 'co-reflect', name: 'Reflect a point', badge: '🪞', generate: () => genReflect() },
       { id: 'co-complete', name: 'Complete the figure', badge: '⬜', generate: () => genComplete() },
       { id: 'co-mid', name: 'Midpoint of a line', badge: '⭐', stretch: true, generate: () => genMidpoint() },
     ] },
-    { id: 'geometry', name: 'Shape Facts', icon: '🔷', blurb: 'Shape facts and properties, polygons and circle parts, and symmetry.', levels: [
-      { id: 'geo-facts', name: 'Shape facts', badge: '🔷', generate: () => genGeomFact() },
-      { id: 'geo-props', name: 'Properties of shapes', badge: '🔍', generate: () => genShapeProp() },
-      { id: 'geo-poly', name: 'Polygons & circles', badge: '⭕', generate: () => genCircleShapes() },
-      { id: 'geo-sym', name: 'Symmetry', badge: '🪞', generate: () => genSymmetry() },
+    { id: 'geometry', name: 'Geometric Properties', icon: '🔷', blurb: 'Naming polygons, regular vs irregular, and the parts of a circle.', levels: [
+      { id: 'geo-poly', name: 'Naming polygons', badge: '🔷', generate: () => T.namePolygon() },
+      { id: 'geo-circle', name: 'Parts of a circle', badge: '⭕', generate: () => T.circlePart() },
+      { id: 'geo-facts', name: 'Shape facts', badge: '⭐', stretch: true, generate: () => genGeomFact() },
+      { id: 'geo-props', name: 'Properties of quadrilaterals', badge: '⭐', stretch: true, generate: () => genShapeProp() },
     ] },
-    { id: 'graphs', name: 'Data & Graphs', icon: '📈', blurb: 'Bar charts, pictograms, pie charts, line graphs, tables and Venn diagrams.', levels: [
+    { id: 'graphs', name: 'Graphical Representation of Data', icon: '📈', blurb: 'Bar charts, pictograms, pie charts, line graphs, tables and Venn diagrams.', levels: [
       { id: 'gr-bar', name: 'Bar charts', badge: '📊', generate: () => genBar() },
       { id: 'gr-scale', name: 'Mind the scale', badge: '📏', generate: () => genBarScaled() },
       { id: 'gr-pict', name: 'Pictograms & means', badge: '🖼️', generate: () => Math.random() < 0.5 ? T.pictogram() : genBarMean() },
@@ -740,11 +752,12 @@
       { id: 'gr-venn', name: 'Venn diagrams', badge: '🔵', generate: () => T.vennDiagram() },
       { id: 'gr-hard', name: 'Two-way tables', badge: '⭐', stretch: true, generate: () => T.twoWayTable() },
     ] },
-    { id: 'algebra1', name: 'Algebra Basics', icon: '🔤', blurb: 'What the letters mean, writing expressions, substituting and simplifying.', levels: [
+    { id: 'algebra1', name: 'Introduction to Algebra', icon: '🔤', blurb: 'What the letters mean, writing expressions, substituting and simplifying.', levels: [
       { id: 'alg1-notation', name: 'Notation & writing expressions', badge: '🔤', generate: () => genAlgNotation() },
       { id: 'alg1-sub', name: 'Substituting numbers in', badge: '🔢', generate: () => genAlgSub() },
       { id: 'alg1-subneg', name: 'Substituting negatives', badge: '±', generate: () => genAlgSubNeg() },
-      { id: 'alg1-collect', name: 'Collecting like terms', badge: '🧲', generate: () => genAlgCollect() },
+      { id: 'alg1-collect', name: 'Collecting like terms', badge: '🧲', generate: () => genAlgCollect(true) },
+      { id: 'alg1-collect2', name: 'Like terms with numbers & squares', badge: '🧮', generate: () => genAlgCollect(false) },
       { id: 'alg1-perim', name: 'Expressions for perimeter', badge: '🟩', generate: () => genAlgPerimeter() },
     ] },
     { id: 'measures', name: 'Units & Measures', icon: '📏', blurb: 'Convert between metric units — length, mass, then area and volume.', levels: [

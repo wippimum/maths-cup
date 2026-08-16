@@ -5,9 +5,11 @@
   const $ = (id) => document.getElementById(id);
   const MATCH_LEN = 10;
 
-  const SUBJ_SHORT = { algebra1: 'Algebra basics', measures: 'Units & measures', algebra: 'Equations', hcf: 'HCF', lcm: 'LCM', primes: 'Primes', ratio: 'Ratio', decimals: 'Decimals', percent: 'Percentages', solve: 'Problem solving', fractions: 'Fractions', integers: 'Integers', bidmas: 'BIDMAS', rounding: 'Rounding', stats: 'Statistics', fdp: 'Fractions↔%', numeracy: 'Numeracy', angles: 'Angles', area: 'Perimeter & area', volume: 'Volume', coords: 'Coordinates', geometry: 'Shape facts', graphs: 'Data & graphs' };
-  // School (Toddle) topic numbers. Some app tiles share a topic (Number Properties = T3),
-  // and Ratio / Problem solving aren't a single Toddle Year-6 topic, so they're left blank.
+  const SUBJ_SHORT = { numeracy: 'Numeracy', integers: 'Integers', bidmas: 'Order of operations', hcf: 'HCF', lcm: 'LCM', primes: 'Primes', fractions: 'Fractions', algebra1: 'Intro to algebra', coords: 'Symmetry & co-ordinates', rounding: 'Degrees of accuracy', decimals: 'Decimals', algebra: 'Linear equations', angles: 'Angles', fdp: 'Fractions, decimals & %', area: 'Mensuration 2D', measures: 'Units & measures', stats: 'Statistical measures', graphs: 'Graphs & data', percent: 'Percentages', geometry: 'Geometric properties', volume: '3D shape & volume', ratio: 'Ratio (extra)', solve: 'Problem solving' };
+  // School (Toddle) topic numbers, straight from the unit-plan folder names. A few topics
+  // are split across more than one tile so no single tile ends up with a dozen levels:
+  // T2 is Integers + Order of operations, T3 is HCF + LCM + Primes, T12 is Mensuration +
+  // Units. Ratio and Problem solving are not Toddle Year-6 topics, so they carry no number.
   const TOPIC_NO = {
     numeracy: 1, integers: 2, bidmas: 2, hcf: 3, lcm: 3, primes: 3, fractions: 4, algebra1: 5,
     coords: 6, rounding: 7, decimals: 8, algebra: 9, angles: 10, fdp: 11, area: 12, measures: 12,
