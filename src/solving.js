@@ -95,12 +95,12 @@
 
   // ---------------- TIER 9 — four steps ----------------
   const T9 = [
-    () => { const b1 = rand(3, 4), p1 = rand(10, 12), b2 = rand(3, 4), p2 = rand(8, 10), sold = rand(10, 20), i1 = b1 * p1, i2 = b2 * p2, tot = i1 + i2, s = tot - sold; return P(9, `A shop has ${b1} boxes of ${p1} pens and ${b2} boxes of ${p2} pencils. It sells ${sold} items. How many items are left?`, [
+    () => { const b1 = rand(3, 4), p1 = rand(10, 12), b2 = rand(3, 4), p2 = rand(8, 10), sold = rand(10, 20), i1 = b1 * p1, i2 = b2 * p2, tot = i1 + i2, s = tot - sold; return P(10, `A shop has ${b1} boxes of ${p1} pens and ${b2} boxes of ${p2} pencils. It sells ${sold} items. How many items are left?`, [
       step('a', `First, the pens: ${b1} × ${p1} = ?`, `${b1} × ${p1}.`, `Pens = boxes × pens per box.`, `${i1} pens`, i1, `${b1} × ${p1}`),
       step('b', `Now the pencils: ${b2} × ${p2} = ?`, `${b2} × ${p2}.`, `Pencils = boxes × pencils per box.`, `${i2} pencils`, i2, `${b2} × ${p2}`),
       step('c', `How many items altogether? ${i1} + ${i2} = ?`, `${i1} + ${i2}.`, `Total = pens + pencils.`, `${tot} items`, tot, `${i1} + ${i2}`),
       step('d', `Now take away the ${sold} sold: ${tot} − ${sold} = ?`, `${tot} − ${sold}.`, `Left = total − sold.`, `${s} items`, s, `${tot} − ${sold}`, true)], s); },
-    () => { const na = 2, pa = rand(14, 16), nc = rand(3, 4), pc = rand(7, 9), vch = pick([15, 20]), av = na * pa, cv = nc * pc, tot = av + cv, s = tot - vch; return P(9, `${na} adults (${dh(pa)} each) and ${nc} children (${dh(pc)} each) buy tickets, then use a ${dh(vch)} voucher. How much do they pay in the end?`, [
+    () => { const na = 2, pa = rand(14, 16), nc = rand(3, 4), pc = rand(7, 9), vch = pick([15, 20]), av = na * pa, cv = nc * pc, tot = av + cv, s = tot - vch; return P(10, `${na} adults (${dh(pa)} each) and ${nc} children (${dh(pc)} each) buy tickets, then use a ${dh(vch)} voucher. How much do they pay in the end?`, [
       step('a', `First, the adults: ${na} × ${pa} = ?`, `${na} × ${pa}.`, `Adults = number × price.`, `${av} dh`, av, `${na} × ${pa}`),
       step('b', `Now the children: ${nc} × ${pc} = ?`, `${nc} × ${pc}.`, `Children = number × price.`, `${cv} dh`, cv, `${nc} × ${pc}`),
       step('c', `Total before the voucher: ${av} + ${cv} = ?`, `${av} + ${cv}.`, `Total = adults + children.`, `${tot} dh`, tot, `${av} + ${cv}`),
@@ -109,16 +109,16 @@
 
   // ---------------- TIER 10 — the hardest, four+ steps ----------------
   const T10 = [
-    () => { const boxes = rand(4, 6), per = rand(15, 20), cost = 2, sell = 3, bars = boxes * per, c = bars * cost, sales = bars * sell, s = sales - c; return P(10, `A shop buys ${boxes} boxes of ${per} chocolate bars. Each bar costs ${dh(cost)} to buy and sells for ${dh(sell)}. What is the total profit?`, [
+    () => { const boxes = rand(4, 6), per = rand(15, 20), cost = 2, sell = 3, bars = boxes * per, c = bars * cost, sales = bars * sell, s = sales - c; return P(9, `A shop buys ${boxes} boxes of ${per} chocolate bars. Each bar costs ${dh(cost)} to buy and sells for ${dh(sell)}. What is the total profit?`, [
       step('a', `First, how many bars altogether? ${boxes} × ${per} = ?`, `${boxes} × ${per}.`, `Bars = boxes × bars per box.`, `${bars} bars`, bars, `${boxes} × ${per}`),
       step('b', `What did they cost to buy? ${bars} × ${cost} = ?`, `${bars} × ${cost}.`, `Cost = bars × buy price.`, `${c} dh`, c, `${bars} × ${cost}`),
       step('c', `How much money from selling them? ${bars} × ${sell} = ?`, `${bars} × ${sell}.`, `Sales = bars × sell price.`, `${sales} dh`, sales, `${bars} × ${sell}`),
       step('d', `Profit = money in − money out: ${sales} − ${c} = ?`, `${sales} − ${c}.`, `Profit = what you get − what you paid.`, `${s} dh profit`, s, `${sales} − ${c}`, true)], s); },
-    () => { const size = pick([6, 8]), boxes = rand(5, 7), free = rand(1, 2), price = rand(12, 16), total = size * boxes, left = boxes - free, s = left * price; return P(10, `${total} cupcakes are packed into boxes of ${size}. ${free} box${free > 1 ? 'es are' : ' is'} given away free, and the rest are sold for ${dh(price)} each. How much money is made?`, [
+    () => { const size = pick([6, 8]), boxes = rand(5, 7), free = rand(1, 2), price = rand(12, 16), total = size * boxes, left = boxes - free, s = left * price; return P(9, `${total} cupcakes are packed into boxes of ${size}. ${free} box${free > 1 ? 'es are' : ' is'} given away free, and the rest are sold for ${dh(price)} each. How much money is made?`, [
       step('a', `First, how many boxes are there? ${total} ÷ ${size} = ?`, `${total} ÷ ${size}.`, `Boxes = cupcakes ÷ box size.`, `${boxes} boxes`, boxes, `${total} ÷ ${size}`),
       step('b', `How many boxes are sold? ${boxes} − ${free} = ?`, `${boxes} − ${free}.`, `Sold = total boxes − free boxes.`, `${left} boxes`, left, `${boxes} − ${free}`),
       step('c', `Money made: ${left} × ${price} = ?`, `${left} × ${price}.`, `Money = boxes sold × price each.`, `${s} dh`, s, `${left} × ${price}`, true)], s); },
-    () => { const seats = 15, buses = rand(4, 5), players = rand(40, 50), adults = rand(4, 8), total = seats * buses, people = players + adults, s = total - people; return P(10, `A coach books ${buses} minibuses with ${seats} seats each for ${players} players and ${adults} adults. How many seats are empty?`, [
+    () => { const seats = 15, buses = rand(4, 5), players = rand(40, 50), adults = rand(4, 8), total = seats * buses, people = players + adults, s = total - people; return P(9, `A coach books ${buses} minibuses with ${seats} seats each for ${players} players and ${adults} adults. How many seats are empty?`, [
       step('a', `First, how many seats in total? ${buses} × ${seats} = ?`, `${buses} × ${seats}.`, `Seats = buses × seats each.`, `${total} seats`, total, `${buses} × ${seats}`),
       step('b', `How many people are going? ${players} + ${adults} = ?`, `${players} + ${adults}.`, `People = players + adults.`, `${people} people`, people, `${players} + ${adults}`),
       step('c', `Empty seats: ${total} − ${people} = ?`, `${total} − ${people}.`, `Empty = seats − people.`, `${s} empty`, s, `${total} − ${people}`, true)], s); },
@@ -160,14 +160,14 @@
   }
 
   // ---------------- TIER 11 — two decimal costs, then a total ----------------
-  const T11 = [
+  const T_MONEY = [
     () => {
       // prices land on a 5 or a 0, the way real ones do — 4.02 dh reads like a bug
       const p1 = rand(43, 139) * 5, n1 = rand(3, 6), p2 = rand(150, 299) * 5, n2 = rand(2, 4);
       const a = p1 * n1, b = p2 * n2, s = a + b;
       const it1 = pick(['a box of dates', 'a box of chocolates', 'a tub of ice cream']);
       const it2 = pick(['a bunch of flowers', 'a cake', 'a bag of pistachios']);
-      return P(11, `${it1[0].toUpperCase()}${it1.slice(1)} costs ${dhm(p1)} and ${it2} costs ${dhm(p2)}. Mum buys ${n1} of the first and ${n2} of the second. How much does she spend altogether?`, [
+      return P(15, `${it1[0].toUpperCase()}${it1.slice(1)} costs ${dhm(p1)} and ${it2} costs ${dhm(p2)}. Mum buys ${n1} of the first and ${n2} of the second. How much does she spend altogether?`, [
         sstep('a', `First, the ${n1} at ${dhm(p1)} each: ${n1} × ${money(p1)} = ?`, `${n1} × ${money(p1)} = ${money(a)}.`,
           `Work out one kind at a time. Multiply the price by how many — the decimal point does not change that.`,
           `${dhm(a)}`, money(a), [money(a + 100), money(a - 100), money(p1 + n1)], `${n1} × ${money(p1)}`),
@@ -181,11 +181,11 @@
   ];
 
   // ---------------- TIER 12 — unit rate: divide to find one, multiply back ----------------
-  const T12 = [
+  const T_RATE = [
     () => {
       const unit = rand(31, 179) * 5, n = rand(6, 9), m = rand(3, 12), total = unit * n, s = unit * m;
       const thing = pick(['identical books', 'identical mugs', 'identical footballs', 'identical notebooks']);
-      return P(12, `It costs ${dhm(total)} to buy ${n} ${thing}. How much would ${m} of them cost?`, [
+      return P(13, `It costs ${dhm(total)} to buy ${n} ${thing}. How much would ${m} of them cost?`, [
         sstep('a', `First find the cost of ONE: ${money(total)} ÷ ${n} = ?`, `${money(total)} ÷ ${n} = ${money(unit)}.`,
           `You cannot get from ${n} to ${m} in one jump. Find what ONE costs first — that single value is the bridge between any two quantities.`,
           `one costs ${dhm(unit)}`, money(unit), [money(unit + 100), money(unit - 100), money(total - unit)], `${money(total)} ÷ ${n}`),
@@ -196,19 +196,19 @@
   ];
 
   // ---------------- TIER 13 — "the rest are…" as a percentage ----------------
-  const T13 = [
+  const T_REST = [
     () => {
       const total = pick([20, 25, 40, 50, 80, 200]);
       const restPct = pick([20, 25, 40, 60, 75]);
       const rest = total * restPct / 100;
-      if (!Number.isInteger(rest) || rest === total) return T13[0]();
+      if (!Number.isInteger(rest) || rest === total) return T_REST[0]();
       const part = total - rest, partPct = 100 - restPct;
       const c = pick([
         { s: `There are ${total} chocolates in a tin. ${part} of them are milk chocolate. The rest are dark.`, q: 'are dark' },
         { s: `A book club has ${total} members. ${part} of them have read the new book. The rest have not.`, q: 'have NOT read it' },
         { s: `A car park has ${total} spaces. ${part} of them are taken. The rest are free.`, q: 'are free' },
       ]);
-      return P(13, `${c.s} What percentage ${c.q}?`, [
+      return P(11, `${c.s} What percentage ${c.q}?`, [
         step('a', `The question is about the REST. How many is that? ${total} − ${part} = ?`, `${total} − ${part} = ${rest}.`,
           `The number you want is not written down — you have to make it first. "The rest" always means the total take away the part you were given.`,
           `${rest}`, rest, `${total} − ${part}`),
@@ -219,7 +219,7 @@
   ];
 
   // ---------------- TIER 14 — convert the units, THEN calculate ----------------
-  const T14 = [
+  const T_UNITS = [
     () => {
       const kind = pick(['mass', 'volume', 'length']);
       const big = kind === 'mass' ? 'kg' : kind === 'volume' ? 'litres' : 'm';
@@ -228,7 +228,7 @@
       const tenths = rand(15, 95), whole = tenths * (k / 10);          // e.g. 4.6 kg = 4600 g
       // a chunk worth subtracting: 200-900 g / ml, or 100-450 cm
       const used = kind === 'length' ? rand(2, 9) * 50 : rand(2, 9) * (k / 10);
-      if (used >= whole) return T14[0]();
+      if (used >= whole) return T_UNITS[0]();
       const left = whole - used;
       const shown = `${Math.floor(tenths / 10)}.${tenths % 10}`;
       const c = kind === 'mass'
@@ -236,7 +236,7 @@
         : kind === 'volume'
           ? { s: `A jug holds ${shown} ${big} of juice. ${used} ${small} is poured out.`, q: 'is left in the jug' }
           : { s: `A roll of ribbon is ${shown} ${big} long. A piece ${used} ${small} long is cut off.`, q: 'is left' };
-      return P(14, `${c.s} What amount ${c.q}? Give your answer in ${small}.`, [
+      return P(12, `${c.s} What amount ${c.q}? Give your answer in ${small}.`, [
         step('a', `The two amounts are in different units, so they cannot be subtracted yet. Change ${shown} ${big} into ${small}: ${shown} × ${k} = ?`,
           `1 ${big.replace(/s$/, '')} = ${k} ${small}, so ${shown} × ${k} = ${whole}.`,
           `You can only add or subtract measurements that are in the SAME unit — ${shown} − ${used} would be nonsense here. Convert to the smaller unit first, because that keeps everything a whole number.`,
@@ -248,7 +248,7 @@
   ];
 
   // ---------------- TIER 15 — divide, then interpret the remainder ----------------
-  const T15 = [
+  const T_REMAIN = [
     () => {
       const per = pick([6, 8, 12, 15]), full = rand(9, 40), rem = rand(1, per - 1);
       const total = per * full + rem, need = full + 1;
@@ -257,7 +257,7 @@
         { s: `Chairs are carried on trolleys that hold ${per} chairs each.`, thing: 'chairs', box: 'trolleys' },
         { s: `Children travel in minibuses that hold ${per} children each.`, thing: 'children', box: 'minibuses' },
       ]);
-      return P(15, `${c.s} How many ${c.box} are NEEDED for ${total} ${c.thing}?`, [
+      return P(16, `${c.s} How many ${c.box} are NEEDED for ${total} ${c.thing}?`, [
         step('a', `First divide: how many FULL ${c.box} is that? ${total} ÷ ${per} = ? (just the whole part)`,
           `${per} × ${full} = ${per * full}, which is ${rem} short of ${total}. So ${full} full ${c.box}.`,
           `Divide to see how many complete ${c.box} you can fill.`,
@@ -272,7 +272,7 @@
   ];
 
   // ---------------- TIER 16 — percentage on top, by 10% and 1% ----------------
-  const T16 = [
+  const T_PCTUP = [
     () => {
       // 11-19%: a service charge anyone would recognise. 25% would be arithmetic
       // dressed up as a restaurant.
@@ -284,7 +284,7 @@
         { s: `A family eat at a restaurant. The bill is ${bill} dh, and the restaurant adds a ${pct}% service charge.`, q: 'How much do they pay in total?' },
         { s: `A bike costs ${bill} dh, and delivery adds ${pct}% to the price.`, q: 'How much is it with delivery?' },
       ]);
-      return P(16, `${c.s} ${c.q}`, [
+      return P(17, `${c.s} ${c.q}`, [
         sstep('a', `Start with the easy one: what is 10% of ${bill} dh?`, `10% of ${bill} = ${money(ten)}.`,
           `10% means one tenth, so divide by 10 — just move the digits one place. Building a percentage out of 10% and 1% is how this is done without a calculator.`,
           `10% = ${dhm(ten)}`, money(ten), [money(ten * 10), money(one), money(ten + 100)], `${bill} ÷ 10`),
@@ -302,17 +302,17 @@
   ];
 
   // ---------------- TIER 17 — mixed forms: decimal, percentage, and the rest ----------------
-  const T17 = [
+  const T_FORMS = [
     () => {
       const dec = rand(15, 45), pctB = pick([10, 12, 15, 20, 24, 25]);
       const yellow = 100 - dec - pctB;
-      if (yellow < 10) return T17[0]();
+      if (yellow < 10) return T_FORMS[0]();
       const shown = `0.${String(dec).padStart(2, '0')}`;
       const c = pick([
         { a: 'green', b: 'pink', r: 'yellow', s: 'counters in a bag' },
         { a: 'blue', b: 'red', r: 'white', s: 'beads on a string' },
       ]);
-      return P(17, `Of the ${c.s}, ${shown} are ${c.a}, ${pctB}% are ${c.b}, and the rest are ${c.r}. What percentage are ${c.r}?`, [
+      return P(14, `Of the ${c.s}, ${shown} are ${c.a}, ${pctB}% are ${c.b}, and the rest are ${c.r}. What percentage are ${c.r}?`, [
         step('a', `The two amounts are written in different forms. Change ${shown} into a percentage.`,
           `${shown} = ${dec}%.`,
           `A decimal and a percentage cannot be added as they stand. Multiply the decimal by 100 to make it a percentage — ${shown} of something is ${dec} out of every 100 of them.`,
@@ -326,15 +326,30 @@
     },
   ];
 
-  const TIERS = [T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17];
+  // Ordered by what the child has to DO, not by the topic it borrows from.
+  // Step count rises with it: 2, 2, 2, 3, 3, 3, 4.
+  //
+  // Tier 11 has fewer STEPS than tier 10 and is still harder: it is where the ladder
+  // stops being whole-number arithmetic and starts asking for decimals, percentages
+  // and interpretation. Two steps carrying a percentage beat three steps of adding up.
+  const TIERS = [T1, T2, T3, T4, T5, T6, T7, T8, T10, T9,   // T10 is the 3-step set, T9 the 4-step one
+    T_REST,    // 11 · find "the rest", then say it as a percentage      2 steps
+    T_UNITS,   // 12 · convert the units before you can subtract          2 steps
+    T_RATE,    // 13 · divide to find one, multiply back — with decimals  2 steps
+    T_FORMS,   // 14 · a decimal and a percentage in the same question    3 steps
+    T_MONEY,   // 15 · two decimal prices, two quantities, one total      3 steps
+    T_REMAIN,  // 16 · divide, then decide what the remainder MEANS       3 steps
+    T_PCTUP];  // 17 · build a percentage from 10% and 1%, then add it on 4 steps
   // Each level is a RAMP, not a difficulty band: the first problem should be one he
   // can do standing up, the last one should make him think. Every ladder now finishes
   // above where the old one did.
+  // Every plan must be NON-DECREASING — a lesson that gets easier half way through
+  // tells the child they have gone backwards. test-truth enforces this.
   const PLANS = {
     'solve-easy': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    'solve-lesson': [4, 5, 6, 7, 8, 9, 10, 11, 13, 15],
+    'solve-lesson': [4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
     'solve-hard': [8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
-    'solve-exam': [11, 12, 13, 14, 15, 16, 17, 12, 16, 17],
+    'solve-exam': [11, 12, 13, 13, 14, 15, 15, 16, 17, 17],
   };
 
   // Build one ramped lesson: for each slot in the plan, pick a fresh template of that tier.

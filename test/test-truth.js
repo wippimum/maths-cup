@@ -183,6 +183,37 @@ const CASES = {
     const truth = C / A - B;
     const got = Number(String(p.answer));
     if (Math.abs(got - truth) > 1e-9) bad(`brackets: ${p.given} claims x = ${p.answer}, truth ${truth}`); else ok(); },
+  // ---- the Problem Solving ladder actually climbs ----
+  // A lesson that gets easier half way through tells the child they have gone
+  // backwards. Two separate properties, both easy to break by accident:
+  //   1. every plan is non-decreasing in tier;
+  //   2. step count never falls as the tier rises — except at 10 → 11, where the
+  //      ladder deliberately changes kind (whole-number arithmetic gives way to
+  //      decimals, percentages and interpretation, which are harder in fewer steps).
+  'solveRamp': () => {
+    for (const lvl of ['solve-easy', 'solve-lesson', 'solve-hard', 'solve-exam']) {
+      const tiers = W.buildSolveLesson(lvl, 10).map((p) => p.tier);
+      if (tiers.length !== 10) { bad(`${lvl}: ${tiers.length} problems, expected 10`); continue; }
+      let fell = false;
+      for (let i = 1; i < tiers.length; i++) if (tiers[i] < tiers[i - 1]) fell = true;
+      if (fell) bad(`${lvl} goes backwards: ${tiers.join(', ')}`); else ok();
+      if (tiers[9] > tiers[0]) ok(); else bad(`${lvl} does not climb: starts at ${tiers[0]}, ends at ${tiers[9]}`);
+    }
+    // Measured, not assumed. Compare the step-count RANGE per tier, not the sampled
+    // mean: tiers 7 and 8 both span 2-3 steps, so their means cross each other purely
+    // by chance and a mean-based check would fail at random.
+    const acc = {};
+    for (const lvl of ['solve-easy', 'solve-lesson', 'solve-hard', 'solve-exam']) {
+      for (let i = 0; i < 40; i++) W.buildSolveLesson(lvl, 10).forEach((p) => { (acc[p.tier] = acc[p.tier] || []).push(p.steps.length); });
+    }
+    const lo = (t) => Math.min(...acc[t]), hi = (t) => Math.max(...acc[t]);
+    const seen = Object.keys(acc).map(Number).sort((a, b) => a - b);
+    for (let i = 1; i < seen.length; i++) {
+      const t = seen[i], prev = seen[i - 1];
+      if (t === 11 && prev === 10) { ok(); continue; }        // the deliberate change of kind
+      if (lo(t) >= lo(prev) && hi(t) >= hi(prev)) ok();
+      else bad(`tier ${t} is ${lo(t)}-${hi(t)} steps, below tier ${prev}'s ${lo(prev)}-${hi(prev)} — the ladder dips`);
+    } },
   // ---- Problem Solving, tiers 11-17 ----
   // These carry decimals, percentages and unit conversions, so a wrong answer here is
   // far easier to ship than in the whole-number tiers. Each one is re-derived from the
