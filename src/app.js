@@ -10,11 +10,9 @@
   // are split across more than one tile so no single tile ends up with a dozen levels:
   // T2 is Integers + Order of operations, T3 is HCF + LCM + Primes, T12 is Mensuration +
   // Units. Ratio and Problem solving are not Toddle Year-6 topics, so they carry no number.
-  const TOPIC_NO = {
-    numeracy: 1, integers: 2, bidmas: 2, hcf: 3, lcm: 3, primes: 3, fractions: 4, algebra1: 5,
-    coords: 6, rounding: 7, decimals: 8, algebra: 9, angles: 10, fdp: 11, area: 12, measures: 12,
-    stats: 13, graphs: 14, percent: 15, geometry: 16, volume: 17,
-  };
+  // The school's topic number now lives on the subject itself (see SUBJECTS in
+  // problems.js), so the tiles can be listed in course order T1 → T17 and the
+  // number can never drift away from the tile it labels.
   const TASK_WORD = { algebra1: 'ALGEBRA', measures: 'CONVERT', algebra: 'SOLVE', hcf: 'FIND THE HCF', lcm: 'FIND THE LCM', primes: 'PRIMES', ratio: 'RATIO', decimals: 'WORK OUT', percent: 'WORK OUT', solve: 'PROBLEM', fractions: 'FRACTIONS', integers: 'WORK OUT', bidmas: 'WORK IT OUT IN ORDER', rounding: 'ROUND', stats: 'STATISTICS', fdp: 'CONVERT', numeracy: 'WORK OUT', angles: 'FIND THE ANGLE', area: 'WORK OUT', volume: 'VOLUME', coords: 'COORDINATES', geometry: 'SHAPE FACTS', graphs: 'READ THE CHART' };
 
   // ---------------- persistent save ----------------
@@ -99,7 +97,7 @@
     SUBJECTS.forEach((s, i) => {
       const card = document.createElement('button');
       card.className = 'subject-card' + (s.id === pendingSubject ? ' sel' : '');
-      const tnum = TOPIC_NO[s.id] ? `<span class="subj-num">T${TOPIC_NO[s.id]}</span>` : '';
+      const tnum = s.topic ? `<span class="subj-num">T${s.topic}</span>` : '<span class="subj-num extra">extra</span>';
       card.innerHTML = `${tnum}<div class="subj-icon">${s.icon}</div><div class="subj-name">${SUBJ_SHORT[s.id]}</div><div class="subj-blurb">${s.blurb}</div>`;
       card.onclick = () => { pendingSubject = s.id; pendingLevel = (save.progress[s.id] && save.progress[s.id].levelId) || s.levels[0].id; renderMenu(); };
       grid.appendChild(card);

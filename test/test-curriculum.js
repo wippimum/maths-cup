@@ -201,5 +201,25 @@ for (const id of NEEDS_FIGURE) {
   if (without) bad(`${id}: ${without}/8 problems have no diagram, but this objective needs one`); else ok();
 }
 
+// 5. the tiles are listed in school topic order, T1 → T17, extras last.
+//    A child looking for "Topic 7" should find it seventh, not hunt the grid.
+{
+  const nums = W.SUBJECTS.map((s) => s.topic);
+  const firstExtra = nums.indexOf(undefined);
+  const topiced = firstExtra === -1 ? nums : nums.slice(0, firstExtra);
+  if (firstExtra !== -1 && topiced.includes(undefined)) {
+    bad('subjects with no topic number must all sit at the end of the list');
+  } else ok();
+  for (let i = 1; i < topiced.length; i++) {
+    if (topiced[i] < topiced[i - 1]) {
+      bad(`subject order goes backwards: T${topiced[i - 1]} (${W.SUBJECTS[i - 1].id}) before T${topiced[i]} (${W.SUBJECTS[i].id})`);
+    } else ok();
+  }
+  // every Toddle topic 1–17 has at least one tile
+  for (let t = 1; t <= 17; t++) {
+    if (!nums.includes(t)) bad(`no subject tile is labelled Topic ${t}`); else ok();
+  }
+}
+
 console.log(`\n${checks} checks, ${fails} failure(s)`);
 process.exit(fails ? 1 : 0);

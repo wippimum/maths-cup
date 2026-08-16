@@ -279,6 +279,9 @@ footer { text-align: center; color: #9fb0bf; font-size: .78rem; padding: 10px 0 
   opacity: .4; font-variant-numeric: tabular-nums; letter-spacing: .5px;
 }
 .subject-card.sel .subj-num { opacity: .55; }
+/* Ratio and Problem Solving aren't on the Year 6 course, so they say so rather
+   than borrowing a topic number they don't have. */
+.subj-num.extra { font-size: .62rem; opacity: .32; text-transform: uppercase; }
 .subject-card:hover { border-color: rgba(255,255,255,.6); }
 .subject-card.sel { background: var(--team1); color: #10231a; border-color: #fff; box-shadow: 0 0 0 3px rgba(244,196,48,.4); }
 .subj-icon { font-size: 1.8rem; line-height: 1; }

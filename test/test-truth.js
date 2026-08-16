@@ -171,7 +171,8 @@ const CASES = {
   // ---- algebra with brackets ----
   'brackets': () => { const a = rnd(2, 8), b = rnd(-9, 9) || 1, x = rnd(-8, 12) || 1;
     const c = a * (x + b);
-    const p = W.SUBJECTS[0].levels[5].generate();
+    // by id, not by position — the subject tiles are listed in school topic order
+    const p = W.levelOf('algebra', 'sf').generate();
     // the round mixes bracket and two-sided problems; only re-derive the bracket ones
     const m = String(p.given).match(/^(\d+)\((.+)\)\s*=\s*(.+)$/);
     if (!m) { ok(); return; }
