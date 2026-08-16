@@ -36,8 +36,14 @@ const cache = (sw.match(/CACHE\s*=\s*'wac-v(\d+)'/) || [])[1];
 if (cache !== v) bad(`sw.js CACHE is wac-v${cache} but the assets are ?v=${v} — bump them together`);
 else ok();
 
-const build = (html.match(/class="build">build (\d+)</) || [])[1];
+const build = (html.match(/class="build"[^>]*>build (\d+)</) || [])[1];
 if (build !== v) bad(`the footer says build ${build} but the assets are ?v=${v} — the stamp is how we tell a stale iPad from a real bug`);
+else ok();
+
+// 2b. version.json is what the running app compares itself against, so it must agree
+// with the footer stamp — otherwise the app either nags forever or never notices a release
+const vj = JSON.parse(fs.readFileSync(path.join(ROOT, 'version.json'), 'utf8'));
+if (String(vj.build) !== v) bad(`version.json says build ${vj.build} but the assets are ?v=${v} — the in-app update check compares these two`);
 else ok();
 
 // 3. the load ORDER has to respect what each file reads off window.WAC at define time

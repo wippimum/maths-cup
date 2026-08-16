@@ -507,6 +507,60 @@
   function playAgain() { $('summaryModal').classList.add('hidden'); pendingSubject = save.subject; pendingLevel = save.level; startMatch(); }
   function endMatch() { $('gameScreen').classList.add('hidden'); $('startScreen').classList.remove('hidden'); pendingSubject = save.subject; pendingLevel = save.level; renderMenu(); refreshHeader(); }
 
+  // ---------------- "am I running the latest?" ----------------
+  // The footer build number answers this, but only if you already know what the newest
+  // number IS. So the app asks the server itself: version.json is fetched with no-store
+  // (bypassing every cache, including the service worker's), and its build is compared
+  // with the one stamped into this page. Offline, the fetch simply fails and nothing is
+  // shown — being offline is normal here, not a problem to report.
+  function runningBuild() {
+    const m = ($('buildStamp') && $('buildStamp').textContent || '').match(/(\d+)/);
+    return m ? Number(m[1]) : null;
+  }
+  async function latestBuild() {
+    const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('no version file');
+    return Number((await r.json()).build);
+  }
+  async function checkForUpdate(loud) {
+    const mine = runningBuild();
+    let latest;
+    try { latest = await latestBuild(); }
+    catch (e) {
+      if (loud) showBuildNote(navigator.onLine ? "Couldn't check just now — try again in a moment." : 'Offline, so nothing to check. The app works fine like this.');
+      return;
+    }
+    if (!mine || !latest) return;
+    if (latest > mine) {
+      $('updateMsg').textContent = `A newer version is ready (build ${latest} — you have ${mine}).`;
+      $('updateBar').classList.remove('hidden');
+    } else if (loud) {
+      showBuildNote(`Up to date — this is build ${mine}, the newest there is. ✓`);
+    }
+  }
+  function showBuildNote(text) {
+    $('updateMsg').textContent = text;
+    $('updateBar').classList.remove('hidden');
+    $('updateBtn').classList.add('hidden');
+    setTimeout(() => { $('updateBar').classList.add('hidden'); $('updateBtn').classList.remove('hidden'); }, 6000);
+  }
+  // Clears the code caches and reloads. Scores and history live in localStorage, which
+  // this deliberately does NOT touch.
+  async function applyUpdate() {
+    $('updateMsg').textContent = 'Updating…';
+    try {
+      if (navigator.serviceWorker) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        for (const r of regs) await r.unregister();
+      }
+      if (window.caches) {
+        const keys = await caches.keys();
+        for (const k of keys) await caches.delete(k);
+      }
+    } catch (e) { /* clearing is best-effort; the reload below still helps */ }
+    location.reload();
+  }
+
   // ---------------- confetti ----------------
   const cv = $('confettiCanvas'); const ctx2 = cv.getContext('2d');
   let parts = [], rafOn = false;
@@ -530,6 +584,10 @@
     applyTeam(); renderMenu(); refreshHeader();
     $('kickoffBtn').onclick = startMatch;
     $('historyBtn').onclick = showHistory;
+    $('buildStamp').onclick = () => checkForUpdate(true);
+    $('updateBtn').onclick = applyUpdate;
+    $('updateLater').onclick = () => $('updateBar').classList.add('hidden');
+    checkForUpdate(false);          // quiet check on every open
     $('historyBackBtn').onclick = hideHistory;
     $('emailWeekBtn').onclick = emailWeek;
     $('copyBackupBtn').onclick = copyBackup;

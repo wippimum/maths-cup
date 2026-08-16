@@ -70,11 +70,24 @@ iPad's Home Screen. After one visit on Wi-Fi it caches itself and runs with **no
 **It's already online:** **https://wippimum.github.io/maths-cup/**
 
 That's GitHub Pages serving this folder's `main` branch, so `git push` publishes an update
-(live in about 30 seconds). Two rules when you change anything:
-- bump `CACHE = 'wac-vN'` in `sw.js`, every `?v=N` in `index.html`, and the `build N` in the
-  footer — all to the same number, or a device may keep showing the old version;
-- the footer's build number tells you what a device is actually running, which is the quickest
-  way to tell a real bug from a stale copy.
+(live in about 30 seconds). When you change anything, bump `CACHE = 'wac-vN'` in `sw.js`,
+every `?v=N` in `index.html`, the `build N` in the footer, **and `version.json`** — all to
+the same number. `node test/test-build.js` fails if they disagree.
+
+### Am I running the latest? 🔄
+
+**Tap the `build N` stamp in the footer.** The app asks the server directly (it fetches
+`version.json` with caching switched off) and tells you one of two things:
+
+- *"Up to date — this is build N, the newest there is. ✓"*
+- *"A newer version is ready (build N — you have M)."* with an **Update now** button.
+
+It also checks quietly every time the app opens, and only says anything when there really
+is something newer. Offline it stays silent, because being offline is normal here.
+
+**Update now** clears the service worker and its caches and reloads. It does **not** touch
+`localStorage`, so streaks, progress and match history all survive — that is the whole
+reason for the button rather than telling you to clear site data, which would wipe them.
 
 **Step 2 — Add to each iPad's Home Screen (~1 minute each).**
 1. On the iPad, open the link in **Safari** (must be Safari for this to work like an app).
