@@ -78,18 +78,47 @@ eq(H.bests(tie.slice().reverse(), rank).hcf.l, 'hcf-pro', 'ties go to the harder
 // ---------- range ----------
 eq(H.inRange(log, '2026-08-11', '2026-08-13').length, 2, 'inRange is inclusive at both ends');
 
-// ---------- calendar ----------
-const cal = H.calendar(log, '2026-08-16', 5);
-eq(cal.length, 5, 'five weeks');
-ok(cal.every((r) => r.length === 7), 'seven days per week');
-const flat = cal.flat();
-eq(flat[flat.length - 1].day, '2026-08-16', 'the grid ends on the Sunday of this week');
-ok(flat.filter((c) => c.today).length === 1, 'exactly one cell is today');
-eq(flat.find((c) => c.day === '2026-08-10').n, 2, 'a two-match day counts 2');
-eq(flat.find((c) => c.day === '2026-08-12').n, 0, 'a day off counts 0');
-ok(flat.every((c) => !c.future), 'nothing after today is in a grid ending today');
-const calMid = H.calendar(log, '2026-08-13', 5).flat();
-ok(calMid.some((c) => c.future), 'the rest of the current week is marked future');
+// ---------- month calendar ----------
+eq(H.monthKey('2026-08-16'), '2026-08', 'monthKey');
+eq(H.shiftMonth('2026-08', 1), '2026-09', 'shiftMonth forward');
+eq(H.shiftMonth('2026-01', -1), '2025-12', 'shiftMonth across a year');
+eq(H.shiftMonth('2026-12', 1), '2027-01', 'shiftMonth into a new year');
+
+const aug = H.monthGrid(log, '2026-08', '2026-08-16');
+eq(aug.title, 'August 2026', 'the month is named');
+ok(aug.weeks.every((w) => w.length === 7), 'seven cells per row');
+const cells = aug.weeks.flat().filter((c) => !c.pad);
+eq(cells.length, 31, 'August has 31 day cells');
+eq(cells[0].date, 1, 'the first cell is the 1st');
+// 1 Aug 2026 is a Saturday, so five blanks lead the first row
+eq(aug.weeks[0].filter((c) => c.pad).length, 5, 'the first week is padded to the right weekday');
+ok(aug.weeks[aug.weeks.length - 1].some((c) => c.pad), 'the last week is padded too');
+eq(cells.find((c) => c.day === '2026-08-10').n, 2, 'a two-match day counts 2');
+eq(cells.find((c) => c.day === '2026-08-12').n, 0, 'a day off counts 0');
+ok(cells.filter((c) => c.today).length === 1, 'exactly one cell is today');
+ok(cells.filter((c) => c.future).length === 15, 'the rest of the month is marked future');
+// every match in `log` falls in August 2026, on four distinct days
+eq(aug.matches, 6, 'the month counts its own matches');
+eq(aug.days, 4, 'and its own distinct days');
+
+// navigation must stop at both ends rather than wander into empty years
+eq(aug.next, null, 'cannot go forward past the month containing today');
+eq(aug.prev, null, 'cannot go back past the first ever match');
+// with an older match on the log there IS somewhere to go back to
+const spread = [m('2026-06-14', 'hcf', 'x', 70, 2)].concat(log);
+eq(H.monthGrid(spread, '2026-08', '2026-08-16').prev, '2026-07', 'can step back while older matches exist');
+eq(H.monthGrid(spread, '2026-07', '2026-08-16').prev, '2026-06', 'and back again through an empty month');
+eq(H.monthGrid(spread, '2026-06', '2026-08-16').prev, null, 'but stops at the first ever match');
+eq(H.monthGrid(spread, '2026-07', '2026-08-16').next, '2026-08', 'can come forward again');
+// an empty month is still a valid, navigable grid
+const empty = H.monthGrid(spread, '2026-07', '2026-08-16');
+eq(empty.matches, 0, 'a month with no matches reports none');
+ok(empty.weeks.flat().filter((c) => !c.pad).length === 31, 'July still has all 31 days');
+eq(H.monthGrid(log, null, '2026-08-16').title, 'August 2026', 'a missing month falls back to the current one');
+eq(H.monthGrid([], '2026-08', '2026-08-16').prev, null, 'an empty log has nowhere to go back to');
+// February, and a leap February
+eq(H.monthGrid([], '2026-02', '2026-08-16').weeks.flat().filter((c) => !c.pad).length, 28, 'February 2026 has 28 days');
+eq(H.monthGrid([], '2028-02', '2028-08-16').weeks.flat().filter((c) => !c.pad).length, 29, 'February 2028 has 29 days');
 
 // ---------- play streak ----------
 eq(H.playStreak(log, '2026-08-16'), 1, 'streak of one');

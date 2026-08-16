@@ -148,8 +148,11 @@ Every finished match is recorded — date, topic, level, score %, mistakes fixed
 long it took. Tap **📈 My scores & history** on the menu to see:
 
 - **totals** — matches played, average score, day streak, and total time practising;
-- **a streak calendar** — the last five weeks, with the days they played shaded (darker
-  green for more than one match that day);
+- **a month calendar** — one month at a time, laid out Monday to Sunday like a wall
+  calendar, with the days they played shaded (darker green for more than one match).
+  The **‹ ›** arrows step through the months; they stop at the month of the very first
+  match and at the current month, so you can never wander into an empty year. Under it
+  sits a line for that month: days played and matches;
 - **a personal best for every topic**, showing which level the best score was set on;
 - **the last 30 matches**, newest first, with a 🏆 on any perfect one.
 

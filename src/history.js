@@ -1,5 +1,5 @@
 /* history.js — the match log: every finished match is recorded, and this file
-   turns that log into the History screen (bests, streak calendar, recent matches)
+   turns that log into the History screen (bests, month calendar, recent matches)
    and into the plain-text weekly summary that gets emailed home.
 
    Everything here is pure: it takes the saved log and returns data or HTML strings.
@@ -95,23 +95,48 @@
     return `${hrs}h ${String(rm).padStart(2, '0')}m`;
   }
 
-  // A 5-week grid ending on the week that contains `today`, aligned Monday → Sunday.
-  function calendar(list, today, weeks) {
-    const n = weeks || 5;
+  // ---------- the month calendar ----------
+  // One named month, Monday → Sunday, with blank cells padding the first and last
+  // weeks so the columns line up the way a wall calendar does. `prev`/`next` are the
+  // months either side, or null where there is nothing to go to: next stops at the
+  // month containing today, prev stops at the month of the very first match, so the
+  // arrows can never wander into empty years.
+  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'];
+  function monthKey(day) { return String(day).slice(0, 7); }
+  function shiftMonth(key, n) {
+    const [y, m] = key.split('-').map(Number);
+    const d = new Date(y, m - 1 + n, 1);
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+  }
+  function monthGrid(list, key, today) {
+    key = key || monthKey(today);              // never blow up on a missing month
+    const all = list || [];
     const perDay = {};
-    (list || []).forEach((e) => { perDay[e.d] = (perDay[e.d] || 0) + 1; });
-    const monday = addDays(today, -weekdayIndex(today));
-    const start = addDays(monday, -7 * (n - 1));
-    const grid = [];
-    for (let w = 0; w < n; w++) {
-      const row = [];
-      for (let i = 0; i < 7; i++) {
-        const day = addDays(start, w * 7 + i);
-        row.push({ day, n: perDay[day] || 0, future: day > today, today: day === today });
-      }
-      grid.push(row);
+    all.forEach((e) => { perDay[e.d] = (perDay[e.d] || 0) + 1; });
+    const [y, m] = key.split('-').map(Number);
+    const days = new Date(y, m, 0).getDate();                 // day 0 of next month
+    const first = `${key}-01`;
+    const lead = weekdayIndex(first);                          // blanks before the 1st
+    const cells = [];
+    for (let i = 0; i < lead; i++) cells.push({ pad: true });
+    for (let d = 1; d <= days; d++) {
+      const day = `${key}-${pad(d)}`;
+      cells.push({ day, date: d, n: perDay[day] || 0, future: day > today, today: day === today });
     }
-    return grid;
+    while (cells.length % 7) cells.push({ pad: true });
+    const weeks = [];
+    for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+    const earliest = all.length ? all.reduce((a, e) => (e.d < a ? e.d : a), all[0].d) : today;
+    const played = all.filter((e) => e.d.slice(0, 7) === key);
+    return {
+      key, weeks,
+      title: `${MONTHS[m - 1]} ${y}`,
+      prev: key > monthKey(earliest) ? shiftMonth(key, -1) : null,
+      next: key < monthKey(today) ? shiftMonth(key, 1) : null,
+      matches: played.length,
+      days: new Set(played.map((e) => e.d)).size,
+    };
   }
 
   // How many days in a row, ending today (or yesterday), have at least one match?
@@ -226,18 +251,28 @@
         + ` towards time practising and the day streak.</p>`;
     }
 
-    // --- streak calendar ---
-    const grid = calendar(all, today, 5);
-    html += `<h4 class="h-head">Days you played</h4><div class="h-cal">`;
+    // --- the month calendar ---
+    // o.month is the month being shown; app.js swaps it when the arrows are tapped.
+    const mg = monthGrid(all, o.month || monthKey(today), today);
+    html += `<h4 class="h-head">Days you played</h4>`
+      + `<div class="h-cal">`
+      + `<div class="h-cal-nav">`
+      + `<button class="h-cal-arrow" data-month="${mg.prev || ''}"${mg.prev ? '' : ' disabled'} aria-label="Previous month">‹</button>`
+      + `<span class="h-cal-title">${esc(mg.title)}</span>`
+      + `<button class="h-cal-arrow" data-month="${mg.next || ''}"${mg.next ? '' : ' disabled'} aria-label="Next month">›</button>`
+      + `</div>`;
     html += `<div class="h-cal-row h-cal-days">` + ['M', 'T', 'W', 'T', 'F', 'S', 'S']
       .map((d) => `<span class="h-cal-lbl">${d}</span>`).join('') + `</div>`;
-    grid.forEach((row) => {
+    mg.weeks.forEach((row) => {
       html += `<div class="h-cal-row">` + row.map((c) => {
+        if (c.pad) return `<span class="h-cell pad"></span>`;
         const cls = c.future ? 'fut' : c.n >= 3 ? 'hot' : c.n === 2 ? 'mid' : c.n === 1 ? 'on' : 'off';
-        const d = parseDay(c.day);
-        return `<span class="h-cell ${cls}${c.today ? ' now' : ''}" title="${c.day}: ${c.n} match${c.n === 1 ? '' : 'es'}">${d.getDate()}</span>`;
+        return `<span class="h-cell ${cls}${c.today ? ' now' : ''}" title="${c.day}: ${c.n} match${c.n === 1 ? '' : 'es'}">${c.date}</span>`;
       }).join('') + `</div>`;
     });
+    html += `<p class="h-cal-sum">${mg.matches
+      ? `${mg.days} day${mg.days === 1 ? '' : 's'} played this month · ${mg.matches} match${mg.matches === 1 ? '' : 'es'}`
+      : 'No matches this month.'}</p>`;
     html += `</div>`;
 
     // --- personal bests ---
@@ -272,7 +307,7 @@
   const api = {
     HISTORY_CAP: CAP,
     dayKey, addDays, daysBetween, weekdayIndex,
-    addMatch, isPartial, inRange, bests, totals, calendar, playStreak, fmtDur,
+    addMatch, isPartial, inRange, bests, totals, monthGrid, monthKey, shiftMonth, playStreak, fmtDur,
     weeklySummary, panelHTML,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

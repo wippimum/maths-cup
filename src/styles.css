@@ -368,6 +368,16 @@ footer { text-align: center; color: #9fb0bf; font-size: .78rem; padding: 10px 0 
 .h-cell.hot { background: #1f9d55; color: #fff; }
 .h-cell.fut { background: #f2f5f7; color: #cdd8e0; }
 .h-cell.now { outline: 2.5px solid var(--team1); outline-offset: 1px; }
+/* Days from the month either side: keep the column alignment, show nothing. */
+.h-cell.pad { background: transparent; box-shadow: none; }
+.h-cal-nav { display: flex; align-items: center; justify-content: space-between; margin: 0 2px 8px; }
+.h-cal-title { font-weight: 800; color: #12324a; font-size: 1rem; }
+/* 44px is the smallest thing a child reliably hits on an iPad. */
+.h-cal-arrow { min-width: 44px; min-height: 44px; border: 0; border-radius: 10px; background: #e7edf2;
+  color: #12324a; font-size: 1.4rem; font-weight: 800; line-height: 1; cursor: pointer; }
+.h-cal-arrow:disabled { opacity: .3; cursor: default; }
+.h-cal-arrow:not(:disabled):active { background: #cfdae3; }
+.h-cal-sum { margin: 8px 2px 0; font-size: .82rem; color: #12324a; opacity: .7; text-align: center; }
 
 .h-bests { display: grid; gap: 6px; }
 .h-best { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 10px;

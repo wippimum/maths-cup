@@ -506,10 +506,29 @@
     const s = ownerOf(subjectId, levelId);
     return s ? s.levels.findIndex((x) => x.id === levelId) : -1;
   }
-  function showHistory() {
-    $('historyBody').innerHTML = WAC.panelHTML(save.history, todayStr(), {
-      names: SUBJ_SHORT, levelName: levelNameOf, levelRank: levelRankOf,
+  // Which month the calendar is showing. Reset to the current one each time the screen
+  // is opened, so it never reopens stranded in March.
+  let historyMonth = null;
+  function renderHistoryPanel() {
+    const today = todayStr();
+    historyMonth = historyMonth || WAC.monthKey(today);
+    $('historyBody').innerHTML = WAC.panelHTML(save.history, today, {
+      names: SUBJ_SHORT, levelName: levelNameOf, levelRank: levelRankOf, month: historyMonth,
     });
+    // The panel is rebuilt as a string, so the arrows have to be re-bound after every
+    // render. A disabled arrow carries no month and simply does nothing.
+    $('historyBody').querySelectorAll('.h-cal-arrow').forEach((btn) => {
+      btn.onclick = () => {
+        const m = btn.getAttribute('data-month');
+        if (!m) return;
+        historyMonth = m;
+        renderHistoryPanel();
+      };
+    });
+  }
+  function showHistory() {
+    historyMonth = null;                       // always open on this month
+    renderHistoryPanel();
     $('startScreen').classList.add('hidden');
     $('historyScreen').classList.remove('hidden');
     window.scrollTo(0, 0);
