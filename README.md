@@ -153,6 +153,14 @@ long it took. Tap **📈 My scores & history** on the menu to see:
 - **a personal best for every topic**, showing which level the best score was set on;
 - **the last 30 matches**, newest first, with a 🏆 on any perfect one.
 
+**Unfinished matches are recorded too.** If they stop part-way — End match, closing the
+tab, reloading — the match is logged with how far they got and marked ⏸️ `stopped after
+N of 10`. The work counts towards **time practising** and the **day streak**, so an
+afternoon of real practice never reads as "did nothing". It deliberately does *not*
+count as a match played, does not move the average, and can never take a personal best:
+100% off two problems is not a 100% match. Stopping before finishing a single problem
+records nothing, so a mis-tap leaves no row.
+
 **Time is practice time, not wall-clock.** The clock adds up the gaps between one action
 and the next and throws away any gap longer than two minutes, and it stops entirely while
 the app is in the background — so putting the iPad down mid-match doesn't inflate the total.

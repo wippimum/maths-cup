@@ -110,7 +110,7 @@ ok(/6 matches on 4 days/.test(H.weeklySummary(older, '2026-08-16', names)), 'old
 ok(!/undefined|NaN/.test(wk), 'email has no undefined or NaN');
 ok(/Percentages/.test(wk) && /HCF/.test(wk), 'email uses readable topic names');
 ok(/Time practising: 30m in total/.test(wk), 'email reports total practice time');
-ok(/5m per match/.test(wk), 'email reports time per match');
+ok(/5m per finished match/.test(wk), 'email reports time per finished match');
 // an untimed log must simply omit the time line rather than print "0s"
 const untimed = log.map((e) => { const c = Object.assign({}, e); delete c.sec; return c; });
 ok(!/Time practising/.test(H.weeklySummary(untimed, '2026-08-16', names)), 'no time line when nothing is timed');
@@ -129,6 +129,44 @@ ok(H.panelHTML([], '2026-08-16', {}).includes('No matches yet'), 'empty panel re
 const nasty = [m('2026-08-16', 'x', 'y', 50, 1)];
 const nastyHtml = H.panelHTML(nasty, '2026-08-16', { names: { x: '<img src=q onerror=alert(1)>' }, levelName: () => 'lvl' });
 ok(!/<img/.test(nastyHtml), 'topic names are escaped, not injected');
+
+// ---------- unfinished matches ----------
+// A match he walked away from is logged with `n` = how many of the ten he finished.
+// It must count as effort without ever being counted as a result.
+const part = (d, s, l, p, mis, n, sec) => ({ d, t: new Date(d + 'T09:00:00').getTime(), s, l, p, m: mis, c: 0, n, sec: sec == null ? 300 : sec });
+ok(H.isPartial(part('2026-08-16', 'hcf', 'x', 100, 0, 3)), 'a record with n is partial');
+ok(!H.isPartial(m('2026-08-16', 'hcf', 'x', 100, 0)), 'a completed record is not partial');
+
+const mixedLog = log.concat([part('2026-08-16', 'fractions', 'frac-order', 100, 0, 3, 120)]);
+const tm = H.totals(mixedLog);
+eq(tm.matches, 6, 'partials are not counted as matches played');
+eq(tm.partials, 1, 'partials are counted separately');
+eq(tm.partialSolved, 3, 'problems solved inside partials are counted');
+eq(tm.avg, H.totals(log).avg, 'a 100% partial does not move the average');
+eq(tm.secs, H.totals(log).secs + 120, 'partial time still counts as practice');
+eq(tm.avgSecs, H.totals(log).avgSecs, 'time per finished match ignores partials');
+eq(tm.days, H.totals(log).days, 'a partial on a day already played adds no new day');
+// the day streak and the calendar must treat a partial as "he played"
+eq(H.playStreak([part('2026-08-16', 'hcf', 'x', 50, 1, 2)], '2026-08-16'), 1, 'a partial keeps the day streak alive');
+// and it must never take a personal best
+const bestPart = H.bests(log.concat([part('2026-08-11', 'hcf', 'hcf-pro', 100, 0, 1)]), rank);
+eq(bestPart.hcf.l, 'hcf-pro', 'best is still the completed 100% match');
+ok(!H.isPartial(bestPart.hcf), 'a partial is never a personal best');
+
+const pHtml = H.panelHTML(mixedLog, '2026-08-16', { names, levelName: (s, l) => l, levelRank: rank });
+ok(/stopped after 3 of 10/.test(pHtml), 'the panel says how far he got');
+ok(/started but not finished/i.test(pHtml), 'the panel explains the partials separately');
+ok(!/undefined|NaN|\[object/.test(pHtml), 'panel with partials is clean');
+
+const pWk = H.weeklySummary(mixedLog, '2026-08-16', names);
+ok(/Started but not finished: 1/.test(pWk), 'the email reports partials');
+ok(!/undefined|NaN/.test(pWk), 'email with partials is clean');
+// a week with ONLY partials must not read as "he did nothing"
+const onlyPart = [part('2026-08-16', 'hcf', 'x', 50, 1, 4, 200)];
+const opWk = H.weeklySummary(onlyPart, '2026-08-16', names);
+ok(!/No matches played this week/.test(opWk), 'a partials-only week is not reported as nothing');
+ok(/4 problems solved/.test(opWk), 'a partials-only week reports the work done');
+ok(!/undefined|NaN/.test(opWk), 'partials-only email is clean');
 
 console.log(`\n${checks} checks, ${fails} failure(s)`);
 process.exit(fails ? 1 : 0);

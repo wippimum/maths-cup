@@ -147,8 +147,8 @@
     persist(); applyTeam(); refreshHeader();
 
     game = { subject: save.subject, level: save.level, match: buildMatchFor(save.subject, save.level, MATCH_LEN),
-      matchIndex: 0, matchStats: { firstTry: 0, mistakes: {}, totalMistakes: 0 }, earnedPromotion: false,
-      timeMs: 0, tick: Date.now() };
+      matchIndex: 0, matchStats: { firstTry: 0, solved: 0, mistakes: {}, totalMistakes: 0 }, earnedPromotion: false,
+      timeMs: 0, tick: Date.now(), logged: false };
     $('startScreen').classList.add('hidden');
     $('gameScreen').classList.remove('hidden');
     renderDots(); loadProblem();
@@ -180,6 +180,10 @@
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) clockTick(); else clockResume();
   });
+  // Closing the tab, swiping the app away or reloading mid-match. pagehide is the one
+  // event iOS Safari fires reliably here; beforeunload is not called when an iPad
+  // discards a backgrounded tab, so an unfinished match would otherwise vanish.
+  window.addEventListener('pagehide', () => { if (game && !$('gameScreen').classList.contains('hidden')) recordPartial(); });
 
   // ---------------- load a problem ----------------
   function loadProblem() {
@@ -360,6 +364,7 @@
   function finishProblem() {
     save.goalsScored++;
     const p = prog();
+    game.matchStats.solved++;
     if (game.firstTry) { game.matchStats.firstTry++; p.consec = (p.consec || 0) + 1; } else { p.consec = 0; }
     const levels = subjectById(save.subject).levels;
     const idx = levels.findIndex((l) => l.id === save.level);
@@ -413,8 +418,32 @@
     'share-per': 'Find one part first (amount ÷ total parts), then scale.',
   };
 
+  // Work he actually did should show up even if he never reached the full-time whistle.
+  // Called on every way out of a match that isn't fullTime: End match, closing the tab,
+  // reloading. `logged` guards against recording the same match twice, because leaving
+  // the screen can fire more than one of these.
+  function recordPartial() {
+    if (!game || game.logged) return;
+    clockTick();
+    const st = game.matchStats;
+    // Nothing finished means nothing to show — an accidental tap shouldn't leave a row.
+    if (st.solved < 1) return;
+    game.logged = true;
+    const today = todayStr();
+    if (save.lastPlayedDate !== today) { save.streak = isYesterday(save.lastPlayedDate) ? save.streak + 1 : 1; save.lastPlayedDate = today; }
+    save.history = WAC.addMatch(save.history, {
+      d: today, t: Date.now(), s: save.subject, l: save.level,
+      // scored over what he ATTEMPTED, not out of ten — a 3-problem stint isn't 30%
+      p: Math.round((st.firstTry / st.solved) * 100),
+      m: st.totalMistakes, c: 0, sec: Math.round(game.timeMs / 1000),
+      n: st.solved,                                // n present ⇒ unfinished match
+    });
+    persist(); refreshHeader();
+  }
+
   function fullTime() {
     const today = todayStr();
+    if (game) game.logged = true;
     if (save.lastPlayedDate !== today) { save.streak = isYesterday(save.lastPlayedDate) ? save.streak + 1 : 1; save.lastPlayedDate = today; }
 
     // Log the match BEFORE promotion changes save.level, so the record says which
@@ -522,7 +551,7 @@
   }
 
   function playAgain() { $('summaryModal').classList.add('hidden'); pendingSubject = save.subject; pendingLevel = save.level; startMatch(); }
-  function endMatch() { $('gameScreen').classList.add('hidden'); $('startScreen').classList.remove('hidden'); pendingSubject = save.subject; pendingLevel = save.level; renderMenu(); refreshHeader(); }
+  function endMatch() { recordPartial(); game = null; $('gameScreen').classList.add('hidden'); $('startScreen').classList.remove('hidden'); pendingSubject = save.subject; pendingLevel = save.level; renderMenu(); refreshHeader(); }
 
   // ---------------- "am I running the latest?" ----------------
   // The footer build number answers this, but only if you already know what the newest

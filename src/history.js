@@ -26,6 +26,11 @@
   function weekdayIndex(s) { return (parseDay(s).getDay() + 6) % 7; }
 
   // ---------- the log ----------
+  // An unfinished match carries `n` (how many of the ten were solved); a completed one
+  // never does. One predicate, so "is this a real match?" is answered the same way
+  // everywhere — totals, bests and the screen must not disagree about it.
+  function isPartial(e) { return e && e.n != null; }
+
   function addMatch(list, entry) {
     const out = (list || []).concat([entry]);
     return out.length > CAP ? out.slice(out.length - CAP) : out;
@@ -37,7 +42,7 @@
   // Best score per subject — ties go to the harder level reached, then the newer match.
   function bests(list, levelRank) {
     const out = {};
-    (list || []).forEach((e) => {
+    (list || []).filter((e) => !isPartial(e)).forEach((e) => {
       const cur = out[e.s];
       if (!cur) { out[e.s] = e; return; }
       if (e.p > cur.p) { out[e.s] = e; return; }
@@ -52,21 +57,31 @@
 
   function totals(list) {
     const l = list || [];
-    if (!l.length) return { matches: 0, avg: 0, clean: 0, mistakes: 0, topics: 0, days: 0, secs: 0, avgSecs: 0 };
-    const sum = l.reduce((a, e) => a + e.p, 0);
+    if (!l.length) return { matches: 0, partials: 0, partialSolved: 0, avg: 0, clean: 0, mistakes: 0, topics: 0, days: 0, secs: 0, avgSecs: 0 };
+    // A match he walked away from is logged too (see recordPartial in app.js), marked
+    // by `n` = how many of the ten he finished. It counts as effort — time, mistakes
+    // fixed, topics touched, days played — but NOT as a match, and it stays out of the
+    // average and the personal bests: 100% off two problems is not a 100% match.
+    const done = l.filter((e) => !isPartial(e));
+    const part = l.filter(isPartial);
+    const sum = done.reduce((a, e) => a + e.p, 0);
     // Matches recorded before time tracking existed have no `sec`; average over the
     // ones that DO, so an old log doesn't drag the average down to nothing.
     const timed = l.filter((e) => e.sec > 0);
     const secs = timed.reduce((a, e) => a + e.sec, 0);
+    const timedDone = done.filter((e) => e.sec > 0);
     return {
-      matches: l.length,
-      avg: Math.round(sum / l.length),
-      clean: l.filter((e) => e.c).length,
+      matches: done.length,
+      partials: part.length,
+      partialSolved: part.reduce((a, e) => a + (e.n || 0), 0),
+      avg: done.length ? Math.round(sum / done.length) : 0,
+      clean: done.filter((e) => e.c).length,
       mistakes: l.reduce((a, e) => a + (e.m || 0), 0),
       topics: new Set(l.map((e) => e.s)).size,
       days: new Set(l.map((e) => e.d)).size,
       secs,
-      avgSecs: timed.length ? Math.round(secs / timed.length) : 0,
+      // per COMPLETED match, so the figure stays comparable as partials accumulate
+      avgSecs: timedDone.length ? Math.round(timedDone.reduce((a, e) => a + e.sec, 0) / timedDone.length) : 0,
     };
   }
 
@@ -119,26 +134,45 @@
     const lines = [];
     lines.push(`World Maths Cup — week to ${today}`);
     lines.push('');
-    if (!t.matches) {
+    if (!t.matches && !t.partials) {
       lines.push('No matches played this week.');
+      return lines.join('\n');
+    }
+    if (!t.matches) {
+      // Practice happened, just none of it finished. Saying "no matches" would read as
+      // "he did nothing", which is the opposite of what the log shows.
+      lines.push(`No matches finished this week, but ${t.partials} were started`
+        + ` on ${t.days} day${t.days === 1 ? '' : 's'} — ${t.partialSolved} problem${t.partialSolved === 1 ? '' : 's'} solved.`);
+      if (t.secs) lines.push(`Time practising: ${fmtDur(t.secs)}`);
       return lines.join('\n');
     }
     lines.push(`${t.matches} match${t.matches === 1 ? '' : 'es'} on ${t.days} day${t.days === 1 ? '' : 's'}, across ${t.topics} topic${t.topics === 1 ? '' : 's'}.`);
     lines.push(`Average score: ${t.avg}%   ·   perfect matches: ${t.clean}   ·   mistakes fixed: ${t.mistakes}`);
-    if (t.secs) lines.push(`Time practising: ${fmtDur(t.secs)} in total   ·   ${fmtDur(t.avgSecs)} per match`);
+    if (t.partials) lines.push(`Started but not finished: ${t.partials}   ·   ${t.partialSolved} problem${t.partialSolved === 1 ? '' : 's'} solved in them (not counted in the average).`);
+    if (t.secs) lines.push(`Time practising: ${fmtDur(t.secs)} in total   ·   ${fmtDur(t.avgSecs)} per finished match`);
     lines.push('');
     lines.push('By topic:');
     const bySubject = {};
     week.forEach((e) => { (bySubject[e.s] = bySubject[e.s] || []).push(e); });
     Object.keys(bySubject).sort().forEach((s) => {
       const es = bySubject[s], st = totals(es);
-      const best = es.reduce((a, e) => (e.p > a.p ? e : a), es[0]);
+      const finished = es.filter((e) => !isPartial(e));
+      if (!finished.length) {
+        lines.push(`  ${nameOf(s)} — started but not finished (${st.partialSolved} problem${st.partialSolved === 1 ? '' : 's'} solved)`
+          + (st.secs ? `, ${fmtDur(st.secs)}` : ''));
+        return;
+      }
+      const best = finished.reduce((a, e) => (e.p > a.p ? e : a), finished[0]);
       lines.push(`  ${nameOf(s)} — ${st.matches} match${st.matches === 1 ? '' : 'es'}, average ${st.avg}%, best ${best.p}%`
+        + (st.partials ? ` (+${st.partials} unfinished)` : '')
         + (st.secs ? `, ${fmtDur(st.secs)}` : ''));
     });
-    // Where the week actually went wrong is the useful bit for a parent.
+    // Where the week actually went wrong is the useful bit for a parent. Judge that on
+    // finished matches only — an abandoned run says nothing reliable about the topic.
     const weakest = Object.keys(bySubject)
-      .map((s) => ({ s, avg: totals(bySubject[s]).avg }))
+      .map((s) => ({ s, t: totals(bySubject[s]) }))
+      .filter((x) => x.t.matches > 0)
+      .map((x) => ({ s: x.s, avg: x.t.avg }))
       .sort((a, b) => a.avg - b.avg)[0];
     if (weakest && weakest.avg < 80) {
       lines.push('');
@@ -184,6 +218,13 @@
       + tile(week.matches, 'matches this week')
       + tile(week.secs ? fmtDur(week.secs) : '—', 'time this week')
       + `</div>`;
+    // Say it plainly rather than folding it into "matches played", which would make the
+    // count mean two different things.
+    if (t.partials) {
+      html += `<p class="h-part-note">Also ${t.partials} match${t.partials === 1 ? '' : 'es'} started but not finished`
+        + ` — ${t.partialSolved} problem${t.partialSolved === 1 ? '' : 's'} solved in them. That work still counts`
+        + ` towards time practising and the day streak.</p>`;
+    }
 
     // --- streak calendar ---
     const grid = calendar(all, today, 5);
@@ -215,11 +256,13 @@
     const recent = all.slice().reverse().slice(0, 30);
     html += `<h4 class="h-head">Recent matches</h4><table class="h-log"><tbody>`;
     recent.forEach((e) => {
-      html += `<tr><td class="h-when">${esc(niceDay(e.d, today))}`
+      const part = isPartial(e);
+      html += `<tr${part ? ' class="h-part"' : ''}><td class="h-when">${esc(niceDay(e.d, today))}`
         + (e.sec ? `<span class="h-dur">${esc(fmtDur(e.sec))}</span>` : '') + `</td>`
-        + `<td class="h-what">${esc(nameOf(e.s))}<span class="h-lvl">${esc(levelName(e.s, e.l))}</span></td>`
-        + `<td class="h-pct${e.p >= 80 ? ' good' : e.p < 50 ? ' low' : ''}">${e.p}%</td>`
-        + `<td class="h-clean">${e.c ? '🏆' : ''}</td></tr>`;
+        + `<td class="h-what">${esc(nameOf(e.s))}<span class="h-lvl">${esc(levelName(e.s, e.l))}`
+        + (part ? ` · stopped after ${e.n} of 10` : '') + `</span></td>`
+        + `<td class="h-pct${part ? '' : e.p >= 80 ? ' good' : e.p < 50 ? ' low' : ''}">${e.p}%</td>`
+        + `<td class="h-clean">${part ? '⏸️' : e.c ? '🏆' : ''}</td></tr>`;
     });
     html += `</tbody></table>`;
     if (all.length > 30) html += `<p class="h-more">Showing the last 30 of ${all.length} matches.</p>`;
@@ -229,7 +272,7 @@
   const api = {
     HISTORY_CAP: CAP,
     dayKey, addDays, daysBetween, weekdayIndex,
-    addMatch, inRange, bests, totals, calendar, playStreak, fmtDur,
+    addMatch, isPartial, inRange, bests, totals, calendar, playStreak, fmtDur,
     weeklySummary, panelHTML,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

@@ -390,6 +390,10 @@ footer { text-align: center; color: #9fb0bf; font-size: .78rem; padding: 10px 0 
 .h-pct.low { color: #c0392b; }
 .h-clean { width: 1.6em; text-align: center; }
 .h-more { color: #cfe0d6; font-size: .82rem; text-align: center; margin: 8px 0 0; }
+/* A match he stopped part-way. Recorded so the effort shows, but muted so it never
+   reads as a result — its % is out of what he attempted, not out of ten. */
+.h-log tr.h-part td { background: #f4f7f9; font-style: italic; opacity: .78; }
+.h-part-note { color: #cfe0d6; font-size: .82rem; margin: 8px 0 0; line-height: 1.45; }
 
 .h-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
 .h-actions .btn { flex: 1 1 auto; }
