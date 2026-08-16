@@ -168,18 +168,34 @@
     const g = gcd(part, whole), sn = part / g, sd = whole / g;
     const cf = common(factors(part), factors(whole));
     const ctx = pick([
-      { s: `${part} of the ${whole} pupils in a year group wear glasses.`, q: 'wear glasses' },
-      { s: `A team played ${whole} matches and won ${part} of them.`, q: 'were wins' },
-      { s: `${part} of the ${whole} seats on a bus are taken.`, q: 'are taken' },
-      { s: `A quiz had ${whole} questions and Ali got ${part} right.`, q: 'were right' },
+      { s: `${part} of the ${whole} pupils in a year group wear glasses.`, q: 'wear glasses', noun: 'pupils' },
+      { s: `A team played ${whole} matches and won ${part} of them.`, q: 'were wins', noun: 'matches' },
+      { s: `${part} of the ${whole} seats on a bus are taken.`, q: 'are taken', noun: 'seats' },
+      { s: `A quiz had ${whole} questions and Ali got ${part} right.`, q: 'were right', noun: 'questions' },
     ]);
+    const rest = whole - part;
     const steps = [
-      sStep({ key: 'frac', prompt: `Write it as a fraction first: what goes on TOP, and what goes on the BOTTOM?`,
-        hint: `The part (${part}) goes on top, the whole (${whole}) on the bottom: ${part}/${whole}.`,
-        why: `"What fraction of ${whole} is ${part}" means ${part} out of ${whole}. The TOTAL always goes on the bottom — swapping them is the usual mistake.`,
-        resultText: `${part}/${whole}`, answer: `${part}/${whole}`,
-        pool: shuffle([`${part}/${whole}`, `${whole}/${part}`, `${part}/${whole - part}`, `${whole - part}/${whole}`]),
-        expr: `${part} out of ${whole}` }),
+      // Find the WHOLE before writing anything down. Without this step the next question
+      // ("what goes on top?") is unanswerable for a child who does not yet know the rule.
+      pickStep({ key: 'whole', prompt: `Start with the WHOLE. How many ${ctx.noun} altogether?`,
+        hint: `The whole is the total you started with — all ${whole} ${ctx.noun}.`,
+        why: `Every fraction compares a PART with a WHOLE, so always find the whole first. The whole is the total you started with — every one of the ${ctx.noun}, not just the ones being asked about. Here that is ${whole}. Once you know the whole, you know the bottom of the fraction, because the whole always goes underneath.`,
+        resultText: `the whole is ${whole}`, expected: [whole],
+        pool: uniqSort([whole, part, rest, part + whole]),
+        diagnose: (v) => (String(v) === String(part)
+          ? { correct: false, id: 'frac-whole-is-part', ctx: { part, whole, noun: ctx.noun } }
+          : { correct: false, id: 'num-wrong', ctx: { answer: whole, expr: `the total number of ${ctx.noun}` } }) }),
+      pickStep({ key: 'frac', prompt: `The whole is ${whole}, and ${part} ${ctx.q}. Put the PART on top and the WHOLE on the bottom — which fraction is it?`,
+        hint: `Top = the part = ${part}. Bottom = the whole = ${whole}. So ${part}/${whole}.`,
+        why: `A fraction is always PART over WHOLE, so "${part} out of ${whole}" is written ${part}/${whole}.\n\nThe BOTTOM number is called the denominator. It says how many equal pieces the whole was split into — so the total always goes underneath.\n\nThe TOP number is called the numerator. It counts how many of those pieces you are talking about — here, the ${part} that ${ctx.q}.\n\nThat is why flipping them is wrong: ${whole}/${part} would mean ${whole} out of ${part}, which is more than everything there is.`,
+        resultText: `${part}/${whole}`, expected: [`${part}/${whole}`],
+        pool: shuffle([`${part}/${whole}`, `${whole}/${part}`, `${part}/${rest}`, `${rest}/${whole}`]),
+        diagnose: (v) => {
+          if (v === `${whole}/${part}`) return { correct: false, id: 'frac-flip', ctx: { sn: part, sd: whole } };
+          if (v === `${part}/${rest}`) return { correct: false, id: 'frac-vs-rest', ctx: { sn: part, sd: whole, rest, noun: ctx.noun } };
+          if (v === `${rest}/${whole}`) return { correct: false, id: 'frac-complement', ctx: { sn: part, sd: whole, rest, q: ctx.q } };
+          return { correct: false, id: 'num-wrong', ctx: { answer: `${part}/${whole}`, expr: `${part} out of ${whole}` } };
+        } }),
       nStep({ key: 'hcf', prompt: `Simplify ${part}/${whole}. What is the HCF of ${part} and ${whole}?`,
         hint: `Common factors: ${list(cf)} — the biggest is ${g}.`,
         why: `Divide top and bottom by their highest common factor to get the simplest form.`,

@@ -177,7 +177,10 @@
 
     // ---------- Fractions ----------
     'frac-form': (c) => `Write it as top / bottom, like ${c.sn}/${c.sd}.`,
-    'frac-flip': (c) => `Right numbers, upside down — the top goes first: ${c.sn}/${c.sd}.`,
+    'frac-flip': (c) => `Right numbers, upside down. The part goes on TOP and the whole on the BOTTOM, so it's ${c.sn}/${c.sd}. ${c.sd}/${c.sn} would mean ${c.sd} out of ${c.sn} — more than there is.`,
+    'frac-whole-is-part': (c) => `That's the PART, not the whole. The whole means ALL the ${c.noun} you started with — ${c.whole}, not just the ${c.part} being asked about.`,
+    'frac-vs-rest': (c) => `That compares the ${c.sn} with the ${c.rest} left over. A fraction compares with the WHOLE instead, so the bottom is ${c.sd}: ${c.sn}/${c.sd}.`,
+    'frac-complement': (c) => `Careful — ${c.rest} is how many did NOT. The question asks how many ${c.q}, and that's ${c.sn}: ${c.sn}/${c.sd}.`,
     'lcd': (c) => `The common denominator is the LCM of ${c.d1} and ${c.d2} = ${c.L} (the smallest number both go into).`,
     'not-simplified-frac': (c) => `That's the right value ✅ but it can be simplified. Divide top and bottom by their HCF → ${c.res}.`,
 

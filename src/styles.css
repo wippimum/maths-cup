@@ -216,7 +216,10 @@ main { max-width: 720px; margin: 18px auto; padding: 0 14px 60px; }
 .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
 .btn-row .btn { padding: 9px 13px; font-size: .88rem; }
 
-.feedback { margin-top: 12px; padding: 12px 14px; border-radius: 12px; line-height: 1.5; font-size: 1rem; }
+/* pre-line so a hint or "why" can use blank lines to break a long explanation into
+   short paragraphs — a wall of text is exactly what loses a struggling reader.
+   The <pre> below sets its own white-space, so "the long way" is unaffected. */
+.feedback { margin-top: 12px; padding: 12px 14px; border-radius: 12px; line-height: 1.5; font-size: 1rem; white-space: pre-line; }
 .feedback.good { background: #e7f9ee; border-left: 5px solid var(--green-flash); }
 .feedback.bad { background: var(--amber-bg); border-left: 5px solid var(--amber); }
 .feedback.info { background: #eef4ff; border-left: 5px solid #5b8def; }
