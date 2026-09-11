@@ -117,6 +117,31 @@
     pendingSubject = save.subject; pendingLevel = save.level;
     persist();
   }
+  // The crest is a home button: back to THIS year's menu, never to the year chooser.
+  // Mid-match it behaves like "End match", which records how far he got — but it asks
+  // first, because the crest sits at the top of the screen and is easy to catch by
+  // accident, and losing a match to a stray tap would be miserable.
+  function goHome() {
+    // Nobody has picked a year yet (a brand-new save): the chooser IS the menu.
+    if (!save.year) { showYearScreen(); return; }
+    const inMatch = game && !$('gameScreen').classList.contains('hidden');
+    if (inMatch) {
+      const solved = game.matchStats.solved;
+      const msg = solved
+        ? `Leave this match and go back to the menu?\nYou have solved ${solved} of ${MATCH_LEN} — that is kept in your history.`
+        : 'Leave this match and go back to the menu?';
+      if (!confirm(msg)) return;
+      endMatch();
+      return;
+    }
+    $('historyScreen').classList.add('hidden');
+    $('yearScreen').classList.add('hidden');
+    $('startScreen').classList.remove('hidden');
+    pendingSubject = save.subject; pendingLevel = save.level;
+    renderMenu(); refreshHeader();
+    window.scrollTo(0, 0);
+  }
+
   function showYearScreen() {
     $('startScreen').classList.add('hidden');
     $('historyScreen').classList.add('hidden');
@@ -694,6 +719,7 @@
       btn.onclick = () => enterYear(Number(btn.getAttribute('data-year')));
     });
     $('yearBtn').onclick = showYearScreen;
+    $('homeBtn').onclick = goHome;
     // A save that already knows its year goes straight to the menu; only a brand-new
     // one (or someone who tapped "change year") is asked the question.
     if (save.year) enterYear(save.year); else { renderMenu(); showYearScreen(); }

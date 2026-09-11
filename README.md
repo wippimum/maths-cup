@@ -6,6 +6,12 @@ Made by **the Al Falasi brothers** (Year 6 → Year 7).
 
 ## Choosing a year
 
+**The crest is the home button.** Tapping ⚽ **WORLD MATHS CUP** at the top left goes
+back to the menu **for the year you are already in** — never to the year chooser. From
+inside a match it asks first, because the crest is easy to catch by accident; saying yes
+ends the match the same way the "End match" button does, so how far he got is still
+recorded in his history.
+
 The app opens on a **year chooser**: Year 6 or Year 7. The choice is remembered, so it
 is only asked once — after that it goes straight to the menu, and **🎓 change year** on
 the menu brings the chooser back.
