@@ -779,13 +779,17 @@
     // First Year 7 topic. Built from Section 5 of the CGP Foundation book while the
     // school's Year 7 Toddle unit plan is still to come — the objectives and the
     // wording here must be reconciled against that plan once it arrives.
-    { id: 'y7frac', year: 7, name: 'Fractions & Mixed Numbers', icon: '½', blurb: 'KS3: lowest terms, adding and subtracting mixed numbers, multiplying, reciprocals and dividing.', levels: [
+    { id: 'y7frac', year: 7, name: 'Fractions & Mixed Numbers', icon: '½', blurb: 'KS3: adding and subtracting mixed numbers — carrying, borrowing, and always in its simplest form.', levels: [
       { id: 'y7-mixed', name: 'Mixed ↔ improper', badge: '🔄', generate: () => (Math.random() < 0.5 ? T.mixedToImproper() : T.improperToMixed()) },
-      { id: 'y7-lowest', name: 'Improper → mixed, lowest terms', badge: '➗', generate: () => T.improperLowestTerms() },
-      { id: 'y7-addsub', name: 'Add & subtract mixed numbers', badge: '➕', generate: () => T.addSubMixed() },
+      { id: 'y7-lowest', name: 'Improper → mixed, simplest form', badge: '➗', generate: () => T.improperLowestTerms() },
+      { id: 'y7-same', name: 'Same denominator (top-heavy)', badge: '🧱', generate: () => T.sameDenTopHeavy() },
+      { id: 'y7-mixed-same', name: 'Mixed numbers, same denominator', badge: '➕', generate: () => T.sameDenMixed() },
+      { id: 'y7-carry', name: 'Adding with carrying', badge: '🎒', generate: () => T.carryMixed() },
+      { id: 'y7-borrow', name: 'Subtracting with borrowing', badge: '🔻', generate: () => T.borrowMixed() },
+      { id: 'y7-diffden', name: 'Different denominators', badge: '🏆', generate: () => T.mixedPlusFraction() },
+      { id: 'y7-odd', name: 'Spot the odd one out', badge: '🔍', generate: () => T.oddOneOut() },
       { id: 'y7-mult', name: 'Multiply mixed numbers', badge: '✖️', generate: () => T.multMixed() },
       { id: 'y7-div', name: 'Reciprocals & dividing', badge: '🔁', generate: () => T.divideFractions() },
-      { id: 'y7-odd', name: 'Spot the odd one out', badge: '🔍', generate: () => T.oddOneOut() },
     ] },
   ];
   function subjectById(id) { return SUBJECTS.find((s) => s.id === id) || SUBJECTS[0]; }

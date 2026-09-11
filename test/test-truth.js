@@ -195,7 +195,7 @@ const CASES = {
       if (m) return Number(m[1]) / Number(m[2]);
       return Number(t);
     };
-    for (const lvl of ['y7-lowest', 'y7-addsub', 'y7-mult', 'y7-div', 'y7-odd']) {
+    for (const lvl of ['y7-lowest', 'y7-same', 'y7-mixed-same', 'y7-carry', 'y7-borrow', 'y7-diffden', 'y7-mult', 'y7-div', 'y7-odd']) {
       const p = W.buildMatchFor('y7frac', lvl, 1)[0];
       const g = p.given;
       let truth = null, m;

@@ -14,17 +14,36 @@ Only the chosen year's tiles are shown. **Scores, streaks and history are delibe
 NOT split by year** — it is the same child, and moving up a year should not wipe his
 record.
 
-### Year 7 (KS3) — just started
+### Year 7 (KS3) — Adding & Subtracting Mixed Numbers
 
-| | Topic | Levels |
-| --- | --- | --- |
-| KS3 | **Fractions & Mixed Numbers** | mixed ↔ improper · improper → mixed in lowest terms · add & subtract mixed numbers · multiply mixed numbers · reciprocals & dividing · spot the odd one out |
+Built from the homework itself: a Dr Frost exercise, *"Adding and Subtracting Mixed
+Numbers with the Same Denominator"*, plus the online questions set alongside it.
 
-⚠️ **Provisional.** These levels are built from Section 5 of the CGP Foundation book,
-because the school's **Year 7 Toddle unit plans are not in the repo yet**. The objectives
-and the wording must be reconciled against those plans when they arrive — until then
-`test/test-curriculum.js` prints Year 7 under **NOT CHECKED** rather than pretending to
-verify it, and `test/test-vocab.js` has no Year 7 terms to enforce.
+| Level | What it drills |
+| --- | --- |
+| Mixed ↔ improper | the conversion both ways |
+| Improper → mixed, simplest form | `42/16 = 2 5/8` — simplify, then split off the wholes |
+| Same denominator (top-heavy) | `62/12 − 49/12` |
+| Mixed numbers, same denominator | `1 2/9 + 2 3/9`, `4 7/9 − 2 4/9` |
+| Adding with carrying | `8 5/12 + 4 11/12` — the fractions make another whole |
+| Subtracting with borrowing | `9 3/7 − 2 6/7`, and `1 − 7/10` |
+| Different denominators | `3 2/15 + 6/5`, `3 15/22 − 5/2` |
+| Multiply · Reciprocals & dividing | the rest of the KS3 fractions unit |
+
+**Every level ends on "in its simplest form", and offers the unsimplified answer as a
+choice.** That is deliberate: asked for `3 2/15 + 6/5`, he picked `4 5/15` from a list
+that also held `4 1/3`. The value was right and it was still marked wrong. Choosing the
+unsimplified form gets its own explanation — *"the value is right, but it is not
+finished"* — rather than a generic "wrong".
+
+The **borrowing** and **carrying** levels follow the class's method (keep the whole
+numbers, borrow or carry one), **not** the CGP book's method of converting everything to
+improper fractions. Where the two disagreed, the class's method won, so the app and the
+exercise book do not teach two different routines.
+
+⚠️ Still no Year 7 **Toddle unit plan** in the repo, so `test/test-curriculum.js` prints
+Year 7 under **NOT CHECKED** rather than pretending to verify it, and `test-vocab.js` has
+no Year 7 terms to enforce yet.
 
 ## Topics — the actual Year 6 course
 
