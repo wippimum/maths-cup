@@ -17,7 +17,7 @@ require('../src/figures.js');
 require('../src/steps.js');
 require('../src/topics.js');
 ['topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'numeracy1', 'algebra1',
-  'curriculum1', 'curriculum2', 'harder', 'harder2', 'bidmas', 'solving'].forEach((m) => require(`../src/${m}.js`));
+  'curriculum1', 'curriculum2', 'year7', 'harder', 'harder2', 'bidmas', 'solving'].forEach((m) => require(`../src/${m}.js`));
 const W = require('../src/problems.js');
 
 let checks = 0, fails = 0;

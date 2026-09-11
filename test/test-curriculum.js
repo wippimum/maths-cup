@@ -14,7 +14,7 @@
 const path = '../src/';
 const W = {};
 for (const f of ['numbers', 'format', 'fraction', 'parser', 'explanations', 'figures', 'steps', 'topics',
-  'topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'numeracy1', 'algebra1', 'curriculum1', 'curriculum2',
+  'topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'numeracy1', 'algebra1', 'curriculum1', 'curriculum2', 'year7',
   'harder', 'harder2', 'bidmas', 'solving', 'problems']) {
   Object.assign(W, require(path + f + '.js'));
 }
@@ -152,8 +152,14 @@ const EXPECTED_STRETCH = new Set([
   'ratio-simplify', 'ratio-share', 'ratio-hard',   // ratio is not a Y6 Toddle topic at all
 ]);
 
+// This file checks the YEAR 6 course only. Year 7 tiles are excluded because the
+// school's Year 7 Toddle unit plans are not available yet — so there is nothing to
+// check them against. They are listed below rather than skipped quietly, so the gap
+// stays visible until the plans arrive and a COVERAGE block is written for them.
+const YEAR6 = W.SUBJECTS.filter((s) => (s.year || 6) === 6);
+const LATER = W.SUBJECTS.filter((s) => (s.year || 6) !== 6);
 const allLevels = new Map();
-for (const s of W.SUBJECTS) for (const l of s.levels) allLevels.set(l.id, { subject: s.id, level: l });
+for (const s of YEAR6) for (const l of s.levels) allLevels.set(l.id, { subject: s.id, level: l });
 
 console.log('Checking the app against the Toddle Year 6 course…\n');
 
@@ -206,7 +212,7 @@ for (const id of NEEDS_FIGURE) {
 // 5. the tiles are listed in school topic order, T1 → T17, extras last.
 //    A child looking for "Topic 7" should find it seventh, not hunt the grid.
 {
-  const nums = W.SUBJECTS.map((s) => s.topic);
+  const nums = YEAR6.map((s) => s.topic);
   const firstExtra = nums.indexOf(undefined);
   const topiced = firstExtra === -1 ? nums : nums.slice(0, firstExtra);
   if (firstExtra !== -1 && topiced.includes(undefined)) {
@@ -214,12 +220,19 @@ for (const id of NEEDS_FIGURE) {
   } else ok();
   for (let i = 1; i < topiced.length; i++) {
     if (topiced[i] < topiced[i - 1]) {
-      bad(`subject order goes backwards: T${topiced[i - 1]} (${W.SUBJECTS[i - 1].id}) before T${topiced[i]} (${W.SUBJECTS[i].id})`);
+      bad(`subject order goes backwards: T${topiced[i - 1]} (${YEAR6[i - 1].id}) before T${topiced[i]} (${YEAR6[i].id})`);
     } else ok();
   }
   // every Toddle topic 1–17 has at least one tile
   for (let t = 1; t <= 17; t++) {
     if (!nums.includes(t)) bad(`no subject tile is labelled Topic ${t}`); else ok();
+  }
+}
+
+if (LATER.length) {
+  console.log('\nNOT CHECKED — no unit plan in the repo for these yet:');
+  for (const s2 of LATER) {
+    console.log(`  · Year ${s2.year} ${s2.name} (${s2.levels.length} levels) — add a COVERAGE block once the Toddle plan is available`);
   }
 }
 

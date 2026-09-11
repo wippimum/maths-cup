@@ -5,7 +5,7 @@
   const $ = (id) => document.getElementById(id);
   const MATCH_LEN = 10;
 
-  const SUBJ_SHORT = { numeracy: 'Numeracy', integers: 'Integers', bidmas: 'Order of operations', hcf: 'HCF', lcm: 'LCM', primes: 'Primes', fractions: 'Fractions', algebra1: 'Intro to algebra', coords: 'Symmetry & co-ordinates', rounding: 'Degrees of accuracy', decimals: 'Decimals', algebra: 'Linear equations', angles: 'Angles', fdp: 'Fractions, decimals & %', area: 'Mensuration 2D', measures: 'Units & measures', stats: 'Statistical measures', graphs: 'Graphs & data', percent: 'Percentages', geometry: 'Geometric properties', volume: '3D shape & volume', ratio: 'Ratio (extra)', solve: 'Problem solving' };
+  const SUBJ_SHORT = { numeracy: 'Numeracy', integers: 'Integers', bidmas: 'Order of operations', hcf: 'HCF', lcm: 'LCM', primes: 'Primes', fractions: 'Fractions', algebra1: 'Intro to algebra', coords: 'Symmetry & co-ordinates', rounding: 'Degrees of accuracy', decimals: 'Decimals', algebra: 'Linear equations', angles: 'Angles', fdp: 'Fractions, decimals & %', area: 'Mensuration 2D', measures: 'Units & measures', stats: 'Statistical measures', graphs: 'Graphs & data', percent: 'Percentages', geometry: 'Geometric properties', volume: '3D shape & volume', ratio: 'Ratio (extra)', solve: 'Problem solving', y7frac: 'Fractions & mixed numbers' };
   // School (Toddle) topic numbers, straight from the unit-plan folder names. A few topics
   // are split across more than one tile so no single tile ends up with a dozen levels:
   // T2 is Integers + Order of operations, T3 is HCF + LCM + Primes, T12 is Mensuration +
@@ -20,7 +20,7 @@
   const defaults = {
     streak: 0, lastPlayedDate: null, goalsScored: 0, muted: false, longWay: false,
     team: { name: '', c1: '#f4c430', c2: '#1f9d55' },
-    mistakeTotals: {}, subject: 'algebra', level: 'group', progress: {},
+    mistakeTotals: {}, year: null, subject: 'algebra', level: 'group', progress: {},
     // One record per finished match (see history.js), plus where the weekly summary
     // gets emailed. The address is typed in on the device and never leaves it —
     // it must not be committed, because this repo is public.
@@ -98,14 +98,50 @@
   }
 
   // ---------------- menu tree ----------------
+  // ---------------- year groups ----------------
+  // Every tile carries the year it belongs to. The menu only ever shows one year's
+  // tiles; history and streaks are deliberately NOT split, because it is the same
+  // child and a year boundary should not wipe his record.
+  function yearOf(subjectId) { const s = SUBJECTS.find((x) => x.id === subjectId); return (s && s.year) || 6; }
+  function subjectsForYear(y) { return SUBJECTS.filter((s) => (s.year || 6) === y); }
+  function currentYear() { return save.year || 6; }
+  function setYear(y) {
+    save.year = y;
+    // If the selected subject belongs to the other year, move to that year's first tile
+    // rather than leaving the menu showing a level from a year that is not on screen.
+    const mine = subjectsForYear(y);
+    if (!mine.some((s) => s.id === save.subject)) {
+      save.subject = mine[0].id;
+      save.level = (save.progress[save.subject] && save.progress[save.subject].levelId) || mine[0].levels[0].id;
+    }
+    pendingSubject = save.subject; pendingLevel = save.level;
+    persist();
+  }
+  function showYearScreen() {
+    $('startScreen').classList.add('hidden');
+    $('historyScreen').classList.add('hidden');
+    $('yearScreen').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
+  function enterYear(y) {
+    setYear(y);
+    $('yearScreen').classList.add('hidden');
+    $('startScreen').classList.remove('hidden');
+    const lbl = $('yearBtnLabel'); if (lbl) lbl.textContent = `Year ${y}`;
+    renderMenu(); refreshHeader();
+    window.scrollTo(0, 0);
+  }
+
   function renderMenu() {
     pendingSubject = pendingSubject || save.subject;
     pendingLevel = pendingLevel || save.level;
     const grid = $('subjectGrid'); grid.innerHTML = '';
-    SUBJECTS.forEach((s, i) => {
+    subjectsForYear(currentYear()).forEach((s, i) => {
       const card = document.createElement('button');
       card.className = 'subject-card' + (s.id === pendingSubject ? ' sel' : '');
-      const tnum = s.topic ? `<span class="subj-num">T${s.topic}</span>` : '<span class="subj-num extra">extra</span>';
+      const tnum = s.topic ? `<span class="subj-num">T${s.topic}</span>`
+        : s.year === 7 ? '<span class="subj-num extra">KS3</span>'
+        : '<span class="subj-num extra">extra</span>';
       card.innerHTML = `${tnum}<div class="subj-icon">${s.icon}</div><div class="subj-name">${SUBJ_SHORT[s.id]}</div><div class="subj-blurb">${s.blurb}</div>`;
       card.onclick = () => { pendingSubject = s.id; pendingLevel = (save.progress[s.id] && save.progress[s.id].levelId) || s.levels[0].id; renderMenu(); };
       grid.appendChild(card);
@@ -646,7 +682,15 @@
 
   // ---------------- wire up ----------------
   function init() {
-    applyTeam(); renderMenu(); refreshHeader();
+    applyTeam(); refreshHeader();
+    // The year buttons on the landing screen, and the way back to it.
+    document.querySelectorAll('.year-card').forEach((btn) => {
+      btn.onclick = () => enterYear(Number(btn.getAttribute('data-year')));
+    });
+    $('yearBtn').onclick = showYearScreen;
+    // A save that already knows its year goes straight to the menu; only a brand-new
+    // one (or someone who tapped "change year") is asked the question.
+    if (save.year) enterYear(save.year); else { renderMenu(); showYearScreen(); }
     $('kickoffBtn').onclick = startMatch;
     $('historyBtn').onclick = showHistory;
     $('buildStamp').onclick = () => checkForUpdate(true);

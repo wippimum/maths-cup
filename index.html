@@ -16,7 +16,7 @@
   <meta name="apple-mobile-web-app-title" content="Maths Cup" />
   <link rel="apple-touch-icon" href="icon-180.png" />
 
-  <link rel="stylesheet" href="src/styles.css?v=34" />
+  <link rel="stylesheet" href="src/styles.css?v=35" />
 </head>
 <body>
   <!-- If any script fails (a silent failure looks exactly like "tapping does nothing"),
@@ -63,8 +63,26 @@
   </header>
 
   <main>
+    <!-- YEAR SCREEN — the first thing you see -->
+    <section id="yearScreen" class="pitch card">
+      <h2 class="kick-title">Which year are you in? 🎓</h2>
+      <p class="lead">Pick your year group. You can change it any time from the menu.</p>
+      <div class="year-grid">
+        <button class="year-card" data-year="6">
+          <span class="year-num">Year 6</span>
+          <span class="year-sub">17 topics · the whole course</span>
+          <span class="year-note">Numeracy, fractions, algebra, angles, data, volume and more</span>
+        </button>
+        <button class="year-card" data-year="7">
+          <span class="year-num">Year 7</span>
+          <span class="year-sub">KS3 · just started</span>
+          <span class="year-note">Fractions &amp; mixed numbers — more topics coming</span>
+        </button>
+      </div>
+    </section>
+
     <!-- START SCREEN (menu tree) -->
-    <section id="startScreen" class="pitch card">
+    <section id="startScreen" class="pitch card hidden">
       <h2 class="kick-title">Ready for kick-off? ⚽</h2>
       <p class="lead">Choose what to practise, then play a match of <strong>10</strong>.
         Every answer is checked step by step, with hints and the "long way" if you're stuck.</p>
@@ -90,6 +108,7 @@
 
       <button id="kickoffBtn" class="btn btn-primary big">KICK OFF ⚽</button>
       <button id="historyBtn" class="btn btn-ghost wide">📈 My scores &amp; history</button>
+      <button id="yearBtn" class="btn btn-ghost wide">🎓 <span id="yearBtnLabel">Year 6</span> — change year</button>
     </section>
 
     <!-- HISTORY SCREEN -->
@@ -171,33 +190,34 @@
   </div>
 
   <footer>Made by the Al Falasi brothers • solve it step by step • your progress is saved on this device
-    <button id="buildStamp" class="build" title="Tap to check for an update">build 34</button></footer>
+    <button id="buildStamp" class="build" title="Tap to check for an update">build 35</button></footer>
 
-  <script src="src/fraction.js?v=34"></script>
-  <script src="src/format.js?v=34"></script>
-  <script src="src/parser.js?v=34"></script>
-  <script src="src/numbers.js?v=34"></script>
-  <script src="src/explanations.js?v=34"></script>
-  <script src="src/figures.js?v=34"></script>
-  <script src="src/steps.js?v=34"></script>
-  <script src="src/topics.js?v=34"></script>
-  <script src="src/topics2.js?v=34"></script>
-  <script src="src/topics3.js?v=34"></script>
-  <script src="src/topics4.js?v=34"></script>
-  <script src="src/topics5.js?v=34"></script>
-  <script src="src/primes.js?v=34"></script>
-  <script src="src/coords.js?v=34"></script>
-  <script src="src/history.js?v=34"></script>
-  <script src="src/numeracy1.js?v=34"></script>
-  <script src="src/algebra1.js?v=34"></script>
-  <script src="src/curriculum1.js?v=34"></script>
-  <script src="src/curriculum2.js?v=34"></script>
-  <script src="src/harder.js?v=34"></script>
-  <script src="src/harder2.js?v=34"></script>
-  <script src="src/bidmas.js?v=34"></script>
-  <script src="src/solving.js?v=34"></script>
-  <script src="src/problems.js?v=34"></script>
-  <script src="src/app.js?v=34"></script>
+  <script src="src/fraction.js?v=35"></script>
+  <script src="src/format.js?v=35"></script>
+  <script src="src/parser.js?v=35"></script>
+  <script src="src/numbers.js?v=35"></script>
+  <script src="src/explanations.js?v=35"></script>
+  <script src="src/figures.js?v=35"></script>
+  <script src="src/steps.js?v=35"></script>
+  <script src="src/topics.js?v=35"></script>
+  <script src="src/topics2.js?v=35"></script>
+  <script src="src/topics3.js?v=35"></script>
+  <script src="src/topics4.js?v=35"></script>
+  <script src="src/topics5.js?v=35"></script>
+  <script src="src/primes.js?v=35"></script>
+  <script src="src/coords.js?v=35"></script>
+  <script src="src/history.js?v=35"></script>
+  <script src="src/numeracy1.js?v=35"></script>
+  <script src="src/algebra1.js?v=35"></script>
+  <script src="src/curriculum1.js?v=35"></script>
+  <script src="src/curriculum2.js?v=35"></script>
+  <script src="src/year7.js?v=35"></script>
+  <script src="src/harder.js?v=35"></script>
+  <script src="src/harder2.js?v=35"></script>
+  <script src="src/bidmas.js?v=35"></script>
+  <script src="src/solving.js?v=35"></script>
+  <script src="src/problems.js?v=35"></script>
+  <script src="src/app.js?v=35"></script>
 
   <!-- Register the offline worker so the app keeps working with no internet -->
   <script>

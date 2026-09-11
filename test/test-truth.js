@@ -6,7 +6,7 @@
 const path = '../src/';
 const W = {};
 for (const f of ['numbers', 'format', 'fraction', 'parser', 'explanations', 'figures', 'steps', 'topics',
-  'topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'numeracy1', 'algebra1', 'curriculum1', 'curriculum2', 'harder', 'harder2',
+  'topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'numeracy1', 'algebra1', 'curriculum1', 'curriculum2', 'year7', 'harder', 'harder2',
   'bidmas', 'solving', 'problems']) {
   Object.assign(W, require(path + f + '.js'));
 }
@@ -183,6 +183,41 @@ const CASES = {
     const truth = C / A - B;
     const got = Number(String(p.answer));
     if (Math.abs(got - truth) > 1e-9) bad(`brackets: ${p.given} claims x = ${p.answer}, truth ${truth}`); else ok(); },
+  // ---- Year 7 (KS3) fractions and mixed numbers ----
+  // Every answer is re-derived from the QUESTION TEXT as a plain value, and must also
+  // be fully finished: lowest terms, and never left as an improper fraction.
+  'year7Fractions': () => {
+    const val = (x) => {
+      const t = String(x).trim();
+      let m = t.match(/^(\d+) (\d+)\/(\d+)$/);        // "2 3/4"
+      if (m) return Number(m[1]) + Number(m[2]) / Number(m[3]);
+      m = t.match(/^(\d+)\/(\d+)$/);                    // "7/4"
+      if (m) return Number(m[1]) / Number(m[2]);
+      return Number(t);
+    };
+    for (const lvl of ['y7-lowest', 'y7-addsub', 'y7-mult', 'y7-div', 'y7-odd']) {
+      const p = W.buildMatchFor('y7frac', lvl, 1)[0];
+      const g = p.given;
+      let truth = null, m;
+      if ((m = g.match(/Write\s+(\d+)\/(\d+)\s+as a mixed/))) truth = Number(m[1]) / Number(m[2]);
+      else if ((m = g.match(/Work out\s+(.+?)\s+([+\u2212\u00d7\u00f7])\s+(.+?)\s+\(give/))) {
+        const a = val(m[1]), b = val(m[3]);
+        truth = m[2] === '+' ? a + b : m[2] === '\u2212' ? a - b : m[2] === '\u00d7' ? a * b : a / b;
+      } else if (!/odd one out|NOT equal/.test(g)) { bad(`year7: no independent check matched "${g}"`); continue; }
+      if (truth !== null) {
+        if (Math.abs(val(p.answer) - truth) > 1e-9) { bad(`year7 ${lvl}: "${g}" claims ${p.answer}, truth ${truth}`); continue; }
+        ok();
+        const f = String(p.answer).match(/(\d+)\/(\d+)/);
+        if (f && gcd(Number(f[1]), Number(f[2])) !== 1) bad(`year7 ${lvl}: ${p.answer} is not in its lowest terms`); else ok();
+        if (f && Number(f[1]) >= Number(f[2])) bad(`year7 ${lvl}: ${p.answer} is still an improper fraction`); else ok();
+      }
+      // and every pick step must offer exactly one right answer
+      for (const st of p.steps) {
+        if (!st.pool) continue;
+        const c = st.pool.filter((v) => st.check(v).correct).length;
+        if (c === 1) ok(); else bad(`year7 ${lvl}/${st.key}: ${c} correct options in [${st.pool.join(' ')}]`);
+      }
+    } },
   // ---- the Problem Solving ladder actually climbs ----
   // A lesson that gets easier half way through tells the child they have gone
   // backwards. Two separate properties, both easy to break by accident:

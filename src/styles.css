@@ -443,3 +443,14 @@ button.build {
   opacity: .45; margin-left: 6px; cursor: pointer; text-decoration: underline dotted;
 }
 button.build:hover { opacity: .85; }
+
+/* ---------- year chooser (the landing screen) ---------- */
+.year-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin: 18px 0 6px; }
+.year-card { display: flex; flex-direction: column; gap: 4px; padding: 20px 18px; text-align: left;
+  border: 2px solid rgba(255,255,255,.35); border-radius: 16px; background: rgba(255,255,255,.10);
+  color: #fff; cursor: pointer; font: inherit; min-height: 132px; }
+.year-card:hover { border-color: rgba(255,255,255,.75); background: rgba(255,255,255,.16); }
+.year-card:active { transform: scale(.985); }
+.year-num { font-size: 1.7rem; font-weight: 900; letter-spacing: .5px; }
+.year-sub { font-weight: 700; font-size: .92rem; color: var(--team1); }
+.year-note { font-size: .84rem; opacity: .75; line-height: 1.35; }

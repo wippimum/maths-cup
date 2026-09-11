@@ -4,6 +4,28 @@ A friendly football-themed maths trainer that works **one small step at a time**
 hints, a "why does this work?" explanation, and the "long way" whenever you're stuck.
 Made by **the Al Falasi brothers** (Year 6 → Year 7).
 
+## Choosing a year
+
+The app opens on a **year chooser**: Year 6 or Year 7. The choice is remembered, so it
+is only asked once — after that it goes straight to the menu, and **🎓 change year** on
+the menu brings the chooser back.
+
+Only the chosen year's tiles are shown. **Scores, streaks and history are deliberately
+NOT split by year** — it is the same child, and moving up a year should not wipe his
+record.
+
+### Year 7 (KS3) — just started
+
+| | Topic | Levels |
+| --- | --- | --- |
+| KS3 | **Fractions & Mixed Numbers** | mixed ↔ improper · improper → mixed in lowest terms · add & subtract mixed numbers · multiply mixed numbers · reciprocals & dividing · spot the odd one out |
+
+⚠️ **Provisional.** These levels are built from Section 5 of the CGP Foundation book,
+because the school's **Year 7 Toddle unit plans are not in the repo yet**. The objectives
+and the wording must be reconciled against those plans when they arrive — until then
+`test/test-curriculum.js` prints Year 7 under **NOT CHECKED** rather than pretending to
+verify it, and `test/test-vocab.js` has no Year 7 terms to enforce.
+
 ## Topics — the actual Year 6 course
 
 The menu follows the school's **Toddle unit plans**, topic by topic. Every
