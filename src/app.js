@@ -1,7 +1,7 @@
 /* app.js — World Maths Cup: menu, game loop, card/chip input, stats, celebrations. */
 (function () {
   const WAC = window.WAC;
-  const { SUBJECTS, subjectById, levelOf, buildMatchFor, explain } = WAC;
+  const { SUBJECTS, subjectById, levelOf, buildMatchFor, explain, mathHTML } = WAC;
   const $ = (id) => document.getElementById(id);
   const MATCH_LEN = 10;
 
@@ -235,10 +235,16 @@
   function renderProblemHeader(prob) {
     const solveLike = prob.subject === 'solve' || prob.given.length > 46;
     const storyText = prob.story || (solveLike ? prob.given : '');
-    if (storyText) { $('problemStory').textContent = storyText; $('problemStory').classList.remove('hidden'); }
+    if (storyText) { $('problemStory').innerHTML = mathHTML(storyText); $('problemStory').classList.remove('hidden'); }
     else $('problemStory').classList.add('hidden');
     const headline = prob.story ? prob.given : (solveLike ? 'Work it out step by step 🧩' : prob.given);
-    $('problemGiven').innerHTML = headline;
+    $('problemGiven').innerHTML = mathHTML(headline);
+    // A wording note ("give your answer in its simplest form") belongs UNDER the
+    // calculation, not inside it — kept in `given` it made the string long enough to be
+    // mistaken for a word problem, which shunted the equation into the little story box.
+    const note = $('problemNote');
+    if (prob.note) { note.innerHTML = mathHTML(prob.note); note.classList.remove('hidden'); }
+    else { note.innerHTML = ''; note.classList.add('hidden'); }
     const dia = $('problemDiagram');
     if (prob.diagram) { dia.innerHTML = prob.diagram; dia.classList.remove('hidden'); } else { dia.innerHTML = ''; dia.classList.add('hidden'); }
     const lab = document.querySelector('.solve-label'); if (lab) lab.textContent = TASK_WORD[prob.subject] || 'SOLVE';
@@ -262,8 +268,8 @@
     const row = document.createElement('div'); row.className = 'step-row ' + cls;
     let inner; const i = typeof eq === 'string' ? eq.indexOf('=') : -1;
     if (i !== -1) {
-      inner = `<span class="lhs">${eq.slice(0, i).trim()}</span><span class="eqs">=</span><span class="rhs">${eq.slice(i + 1).trim()}</span>`;
-    } else { inner = `<span class="mid">${eq}</span>`; }
+      inner = `<span class="lhs">${mathHTML(eq.slice(0, i).trim())}</span><span class="eqs">=</span><span class="rhs">${mathHTML(eq.slice(i + 1).trim())}</span>`;
+    } else { inner = `<span class="mid">${mathHTML(eq)}</span>`; }
     row.innerHTML = `<div class="minute">${minute}</div><div class="line-eq">${inner}</div><div class="tick">${tick}</div>`;
     return row;
   }
@@ -280,7 +286,7 @@
   function renderActive() {
     const step = curStep();
     if (!step) return;
-    $('stepPrompt').textContent = step.prompt;
+    $('stepPrompt').innerHTML = mathHTML(step.prompt);
     $('feedback').classList.add('hidden');
     $('btnLong').classList.toggle('hidden', !step.longWay);
     const tray = $('cardTray'); tray.innerHTML = '';
@@ -290,7 +296,7 @@
       $('buildRow').classList.add('hidden');
       step.pool.forEach((val) => {
         const c = document.createElement('button');
-        c.className = 'chip'; c.textContent = val; c.dataset.val = val;
+        c.className = 'chip'; c.innerHTML = mathHTML(val); c.dataset.val = val;
         c.onclick = () => {
           if (mode === 'pick') { tray.querySelectorAll('.chip').forEach((x) => x.classList.remove('sel')); c.classList.add('sel'); }
           else c.classList.toggle('sel');
@@ -302,7 +308,7 @@
       const { pool } = buildPool(step);
       pool.forEach((tok) => {
         const c = document.createElement('button');
-        c.className = 'piece'; c.textContent = tok;
+        c.className = 'piece'; c.innerHTML = mathHTML(tok);
         c.onclick = () => { appendToken(tok); };
         tray.appendChild(c);
       });
@@ -715,9 +721,9 @@
       const step = curStep();
       if (step && stepMode(step) !== 'build') checkStep();
     });
-    $('btnHint').onclick = () => { const step = curStep(); if (step) showFeedback('info', 'Hint 💡', step.hint); };
-    $('btnWhy').onclick = () => { const step = curStep(); if (!step) return; let body = step.why; if (save.longWay && step.longWay) body += `<pre>${step.longWay}</pre>`; showFeedback('info', 'Why does this work? 🤔', body); };
-    $('btnLong').onclick = () => { const step = curStep(); if (!step) return; save.longWay = true; persist(); showFeedback('info', 'The long way 🧮', `<pre>${step.longWay || step.hint}</pre>`); };
+    $('btnHint').onclick = () => { const step = curStep(); if (step) showFeedback('info', 'Hint 💡', mathHTML(step.hint)); };
+    $('btnWhy').onclick = () => { const step = curStep(); if (!step) return; let body = mathHTML(step.why); if (save.longWay && step.longWay) body += `<pre>${mathHTML(step.longWay)}</pre>`; showFeedback('info', 'Why does this work? 🤔', body); };
+    $('btnLong').onclick = () => { const step = curStep(); if (!step) return; save.longWay = true; persist(); showFeedback('info', 'The long way 🧮', `<pre>${mathHTML(step.longWay || step.hint)}</pre>`); };
     $('nextBtn').onclick = nextProblem;
     $('quitBtn').onclick = endMatch;
     $('playAgainBtn').onclick = playAgain;

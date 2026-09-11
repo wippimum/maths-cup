@@ -200,7 +200,7 @@ const CASES = {
       const g = p.given;
       let truth = null, m;
       if ((m = g.match(/Write\s+(\d+)\/(\d+)\s+as a mixed/))) truth = Number(m[1]) / Number(m[2]);
-      else if ((m = g.match(/Work out\s+(.+?)\s+([+\u2212\u00d7\u00f7])\s+(.+?)\s+\(give/))) {
+      else if ((m = g.match(/^Work out\s+(.+?)\s+([+\u2212\u00d7\u00f7])\s+(.+?)\s*$/))) {
         const a = val(m[1]), b = val(m[3]);
         truth = m[2] === '+' ? a + b : m[2] === '\u2212' ? a - b : m[2] === '\u00d7' ? a * b : a / b;
       } else if (!/odd one out|NOT equal/.test(g)) { bad(`year7: no independent check matched "${g}"`); continue; }

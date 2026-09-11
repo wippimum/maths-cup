@@ -454,3 +454,48 @@ button.build:hover { opacity: .85; }
 .year-num { font-size: 1.7rem; font-weight: 900; letter-spacing: .5px; }
 .year-sub { font-weight: 700; font-size: .92rem; color: var(--team1); }
 .year-note { font-size: .84rem; opacity: .75; line-height: 1.35; }
+
+/* ---------- stacked fractions (see mathfmt.js) ---------- */
+/* A fraction is a two-row inline block: numerator, a rule, denominator. Shifting it
+   down by roughly half its height puts the RULE on the text baseline, which is what
+   makes "3 15/22 − 5/2" line up the way it does on paper. */
+.fr {
+  display: inline-flex; flex-direction: column; align-items: center;
+  /* Measured, not guessed. An inline-flex column takes its baseline from its FIRST
+     item, so the numerator's baseline is what vertical-align moves. 0.75em was found
+     by measuring in the browser, not guessed: it is the value that puts the RULE level
+     with the middle of the digits beside it, so the whole number of a mixed number,
+     the + or − between terms, and every other rule on the line all agree — which is
+     what makes "3 15/22 − 5/2" readable at a glance instead of decoded. */
+  vertical-align: 0.75em; margin: 0 .1em;
+  font-size: .82em; line-height: 1.06; font-variant-numeric: tabular-nums;
+}
+.fr-n { display: block; padding: 0 .22em .04em; border-bottom: .08em solid currentColor; }
+.fr-d { display: block; padding: .04em .22em 0; }
+/* A mixed number: the whole number sits beside the stack.
+   Deliberately NOT a flex container. As inline-flex with align-items:center it became
+   its own alignment context, so the fraction inside a mixed number sat at a different
+   height from a plain fraction next to it — "3 11/21 + 18/7" came out with the two
+   rules on different lines. Left as ordinary inline text, the whole number sits on the
+   baseline and the .fr inside is positioned by the same vertical-align as every other
+   fraction, so every rule on a line agrees. */
+.mx { white-space: nowrap; }
+.mx-w { font-variant-numeric: tabular-nums; margin-right: .1em; }
+
+/* The question is the biggest thing on the screen, so give its fractions more room. */
+.given-eq { line-height: 1.9; }
+.given-eq .fr { font-size: .78em; }
+/* Options and cards are tap targets: a stacked fraction makes them taller, so keep
+   the two rows from crushing the padding. */
+.chip .fr, .piece .fr { font-size: .8em; }
+.chip, .piece { line-height: 1.15; }
+/* Inside the solved-steps timeline the rows are tight; a slightly smaller stack keeps
+   each line one row high. */
+.step-row .fr { font-size: .74em; }
+.step-row .line-eq { line-height: 1.85; }
+/* "The long way" is pre-formatted, but a stacked fraction is a flex box, so let the
+   lines breathe or the rules collide with the line above. */
+.feedback pre { line-height: 2.1; }
+/* The wording that goes with the question — "in its simplest form" — sits under the
+   calculation so the maths stays the biggest thing on the screen. */
+.given-note { position: relative; z-index: 1; font-size: .85rem; opacity: .9; margin: 2px 0 4px; }

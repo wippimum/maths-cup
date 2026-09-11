@@ -106,7 +106,7 @@
     const m = toMixed(num, den);
     return {
       subject: 'y7frac', sig: `mm:${w1}_${n1}_${d1}x${w2}_${n2}_${d2}`,
-      given: `Work out  ${mixStr(w1, n1, d1)} × ${mixStr(w2, n2, d2)}   (give your answer in its simplest form)`,
+      given: `Work out  ${mixStr(w1, n1, d1)} × ${mixStr(w2, n2, d2)}`, note: 'Give your answer in its simplest form.',
       answer: mixStr(m.w, m.n, m.d),
       steps: [
         sStep({ key: 'i1', prompt: `Write ${mixStr(w1, n1, d1)} as an improper fraction.`,
@@ -197,7 +197,7 @@
       } }));
     return {
       subject: 'y7frac', sig: `df:${leftStr}/${n2}_${d2}`,
-      given: `Work out  ${leftStr} ÷ ${n2}/${d2}   (give your answer in its simplest form)`,
+      given: `Work out  ${leftStr} ÷ ${n2}/${d2}`, note: 'Give your answer in its simplest form.',
       answer: mixStr(m.w, m.n, m.d), steps,
     };
   }
@@ -253,6 +253,7 @@
   // its own explanation rather than a generic "wrong".
 
   // is n/d already as simple as it goes?
+  const SIMPLEST_NOTE = 'Give your answer as a mixed number in its simplest form.';
   const inLowest = (n, d) => gcd(n, d) === 1;
   // the finishing step, shared by every level: pick the answer IN ITS SIMPLEST FORM
   function finishStep(w, rawN, d, longWay) {
@@ -284,7 +285,7 @@
     const op = add ? '+' : '−';
     return {
       subject: 'y7frac', sig: `sd:${a}${op}${b}/${d}`,
-      given: `Work out  ${a}/${d} ${op} ${b}/${d}   (give your answer as a mixed number in its simplest form)`,
+      given: `Work out  ${a}/${d} ${op} ${b}/${d}`, note: SIMPLEST_NOTE,
       answer: mixStr(w, rem / gcd(rem, d), d / gcd(rem, d)),
       steps: [
         nStep({ key: 'top', prompt: `The denominators already match, so work on the numerators: ${a} ${op} ${b} = ?`,
@@ -295,6 +296,10 @@
           hint: `${d} × ${w} = ${w * d}, which leaves ${rem}. So ${w} whole ones.`,
           why: `${d} pieces make one whole, so divide to see how many whole ones ${tot} pieces make. The ${rem} left over stay as the fraction part.`,
           resultText: `${w} whole ones, ${rem} left over`, answer: w, lo: 1, hi: w + 8, expr: `${tot} ÷ ${d}, whole part` }),
+        nStep({ key: 'rem', prompt: `And how many ${d}ths are left over? ${tot} − ${w * d} = ?`,
+          hint: `${tot} − ${w * d} = ${rem}.`,
+          why: `${w} whole ones use up ${w} × ${d} = ${w * d} of the ${tot} pieces. What is left is the fraction part: ${rem}/${d}.`,
+          resultText: `${rem}/${d} left over`, answer: rem, lo: 1, hi: d, expr: `${tot} − ${w * d}` }),
         finishStep(w, rem, d, `${a}/${d} ${op} ${b}/${d} = ${tot}/${d}\n${tot} ÷ ${d} = ${w} remainder ${rem}\n= ${mixStr(w, rem, d)}${gcd(rem, d) > 1 ? `\n= ${mixStr(w, rem / gcd(rem, d), d / gcd(rem, d))}` : ''}`),
       ],
     };
@@ -314,7 +319,7 @@
     const g = gcd(n, d);
     return {
       subject: 'y7frac', sig: `sm:${w1}_${n1}${op}${w2}_${n2}/${d}`,
-      given: `Work out  ${mixStr(w1, n1, d)} ${op} ${mixStr(w2, n2, d)}   (give your answer as a mixed number in its simplest form)`,
+      given: `Work out  ${mixStr(w1, n1, d)} ${op} ${mixStr(w2, n2, d)}`, note: SIMPLEST_NOTE,
       answer: mixStr(w, n / g, d / g),
       steps: [
         nStep({ key: 'wholes', prompt: `Deal with the whole numbers first: ${w1} ${op} ${w2} = ?`,
@@ -341,7 +346,7 @@
     const g = gcd(rem, d);
     return {
       subject: 'y7frac', sig: `cy:${w1}_${n1}+${w2}_${n2}/${d}`,
-      given: `Work out  ${mixStr(w1, n1, d)} + ${mixStr(w2, n2, d)}   (give your answer as a mixed number in its simplest form)`,
+      given: `Work out  ${mixStr(w1, n1, d)} + ${mixStr(w2, n2, d)}`, note: SIMPLEST_NOTE,
       answer: mixStr(w, rem / g, d / g),
       steps: [
         nStep({ key: 'wholes', prompt: `Start with the whole numbers: ${w1} + ${w2} = ?`,
@@ -370,7 +375,7 @@
       if (rem < 1) return borrowMixed();
       return {
         subject: 'y7frac', sig: `wf:${whole}-${n}/${d}`,
-        given: `Work out  ${whole} − ${n}/${d}   (give your answer ${w === 0 ? 'in its simplest form' : 'as a mixed number in its simplest form'})`,
+        given: `Work out  ${whole} − ${n}/${d}`, note: w === 0 ? 'Give your answer in its simplest form.' : SIMPLEST_NOTE,
         answer: w === 0 ? `${rem / g}/${d / g}` : mixStr(w, rem / g, d / g),
         steps: [
           nStep({ key: 'split', prompt: `There is no fraction to take ${n}/${d} from yet. Split one whole off the ${whole}: how many ${d}ths is that one whole?`,
@@ -400,7 +405,8 @@
     const g = gcd(rem, d);
     return {
       subject: 'y7frac', sig: `bw:${w1}_${n1}-${w2}_${n2}/${d}`,
-      given: `Work out  ${mixStr(w1, n1, d)} − ${mixStr(w2, n2, d)}   (give your answer as a mixed number in its simplest form)`,
+      given: `Work out  ${mixStr(w1, n1, d)} − ${mixStr(w2, n2, d)}`,
+      note: w === 0 ? 'Give your answer in its simplest form.' : SIMPLEST_NOTE,
       answer: w === 0 ? `${rem / g}/${d / g}` : mixStr(w, rem / g, d / g),
       steps: [
         sStep({ key: 'spot', prompt: `Look at the fractions first: can you do ${n1}/${d} − ${n2}/${d}?`,
@@ -413,10 +419,14 @@
           hint: `${n1} + ${d} = ${n1 + d}, so ${mixStr(w1, n1, d)} = ${w1 - 1} ${n1 + d}/${d}.`,
           why: `The one whole you borrowed is ${d}/${d}, so add ${d} to the numerator: ${n1} + ${d} = ${n1 + d}. The number has not changed — ${mixStr(w1, n1, d)} and ${w1 - 1} ${n1 + d}/${d} are the same amount, just rearranged so the subtraction can be done.`,
           resultText: `${w1 - 1} ${n1 + d}/${d}`, answer: n1 + d, lo: d, hi: n1 + d + 8, expr: `${n1} + ${d}` }),
-        nStep({ key: 'sub', prompt: `Now subtract. Wholes: ${w1 - 1} − ${w2} = ${w}. Fractions: ${n1 + d} − ${n2} = ?`,
-          hint: `${n1 + d} − ${n2} = ${rem}.`,
-          why: `With the borrow done, both parts subtract normally and the denominator stays ${d}.`,
-          resultText: `${w} and ${rem}/${d}`, answer: rem, lo: 1, hi: d, expr: `${n1 + d} − ${n2}` }),
+        nStep({ key: 'subw', prompt: `Now subtract the whole numbers. Remember the ${w1} became ${w1 - 1}: ${w1 - 1} − ${w2} = ?`,
+          hint: `${w1 - 1} − ${w2} = ${w}.`,
+          why: `Use ${w1 - 1}, not ${w1} — one whole was borrowed and is now sitting in the fraction. Forgetting that is the commonest slip in the whole method.`,
+          resultText: `${w} whole`, answer: w, lo: 0, hi: w + 8, expr: `${w1 - 1} − ${w2}` }),
+        nStep({ key: 'subf', prompt: `And now the fractions: ${n1 + d} − ${n2} = ?`,
+          hint: `${n1 + d} − ${n2} = ${rem}, so ${rem}/${d}.`,
+          why: `Both are ${d}ths, so subtract the numerators and keep the denominator ${d}. This works now only because of the borrow — before it, ${n1} − ${n2} would have gone below zero.`,
+          resultText: `${rem}/${d}`, answer: rem, lo: 1, hi: d, expr: `${n1 + d} − ${n2}` }),
         w === 0
           ? sStep({ key: 'simplest', prompt: `Give the answer in its simplest form.`,
             hint: g > 1 ? `${rem}/${d} simplifies by ${g} to ${rem / g}/${d / g}.` : `${rem}/${d} is already in its simplest form.`,
@@ -438,6 +448,7 @@
     const k = d / d2;
     const n1 = rand(1, d - 1);
     const n2 = rand(1, d2 * 3);                 // may itself be top-heavy, as 6/5 is
+    if (n2 % d2 === 0) return mixedPlusFraction();   // 6/6 is just 1 dressed up
     const conv = n2 * k;
     const w1 = rand(2, 6);
     const totN = add ? n1 + conv : n1 - conv;
@@ -454,7 +465,7 @@
     const carried = w - w1;
     return {
       subject: 'y7frac', sig: `mf:${w1}_${n1}/${d}${op}${n2}/${d2}`,
-      given: `Work out  ${mixStr(w1, n1, d)} ${op} ${n2}/${d2}   (give your answer as a mixed number in its simplest form)`,
+      given: `Work out  ${mixStr(w1, n1, d)} ${op} ${n2}/${d2}`, note: SIMPLEST_NOTE,
       answer: mixStr(w, rem / g, d / g),
       steps: [
         nStep({ key: 'lcd', prompt: `The bottoms are different (${d} and ${d2}). What denominator will they both go into?`,
@@ -471,6 +482,15 @@
           hint: `${n1} ${op} ${conv} = ${totN}, so ${totN}/${d}.`,
           why: `Both are ${d}ths now, so ${add ? 'add' : 'subtract'} the numerators. ${totN >= d ? `Notice ${totN} is bigger than ${d} — that is more than a whole one, and it will have to carry.` : totN < 0 ? `Notice it has gone below zero — a whole one will have to be borrowed from the ${w1}.` : `It stays under ${d}, so the whole number is unchanged.`}`,
           resultText: `${totN}/${d}`, answer: totN, lo: totN - 10, hi: totN + 10, expr: `${n1} ${op} ${conv}` }),
+        ...(carried === 0 ? [] : [carried > 0
+          ? nStep({ key: 'adjust', prompt: `${totN}/${d} is more than one whole. Take ${carried === 1 ? 'one whole' : `${carried} wholes`} out of it: ${totN} − ${carried * d} = ?`,
+            hint: `${totN} − ${carried * d} = ${rem}, so ${totN}/${d} = ${carried} ${rem}/${d}.`,
+            why: `${d}/${d} is exactly one whole, so every ${d} pieces make another one. ${totN}/${d} holds ${carried} whole one${carried === 1 ? '' : 's'} with ${rem}/${d} left over. Those whole ones have to be carried across to the whole-number part — the fraction part of a finished mixed number is always less than 1.`,
+            resultText: `${carried} whole and ${rem}/${d} left`, answer: rem, lo: 1, hi: d, expr: `${totN} − ${carried * d}` })
+          : nStep({ key: 'adjust', prompt: `${totN} is below zero, so borrow ${-carried === 1 ? 'one whole' : `${-carried} wholes`} from the ${w1}: ${totN} + ${-carried * d} = ?`,
+            hint: `${totN} + ${-carried * d} = ${rem}, so the fraction part is ${rem}/${d}.`,
+            why: `You cannot leave a negative fraction part. Each whole you borrow is ${d}/${d}, so borrowing ${-carried} adds ${-carried * d} to the numerator and takes ${-carried} off the whole number. The value has not changed — it has just been rearranged so the fraction part sits between 0 and 1.`,
+            resultText: `fraction part = ${rem}/${d}`, answer: rem, lo: 1, hi: d, expr: `${totN} + ${-carried * d}` })]),
         nStep({ key: 'whole', prompt: `So what is the whole-number part of the answer?`,
           hint: `${carried === 0 ? `It stays ${w1}.` : carried > 0 ? `${totN}/${d} holds ${carried} extra whole one${carried === 1 ? '' : 's'}, so ${w1} + ${carried} = ${w}.` : `One whole is borrowed, so ${w1} − 1 = ${w}.`}`,
           why: `${carried === 0 ? `${totN}/${d} is less than one whole, so the ${w1} is untouched.` : carried > 0 ? `${totN}/${d} is more than one whole: ${d}/${d} makes 1, leaving ${rem}/${d}. That whole one carries across, so ${w1} becomes ${w}.` : `The fraction part went negative, so borrow one whole from the ${w1} — it becomes ${w}, and the fraction part becomes ${rem}/${d}.`}`,

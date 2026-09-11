@@ -41,6 +41,19 @@ numbers, borrow or carry one), **not** the CGP book's method of converting every
 improper fractions. Where the two disagreed, the class's method won, so the app and the
 exercise book do not teach two different routines.
 
+**Fractions are drawn, not typed.** `src/mathfmt.js` turns "3 15/22" into a real stacked
+fraction — numerator over denominator on a rule — everywhere it appears: the question,
+every step prompt, every answer option, the solved-steps timeline, the hints and "the
+long way". The vertical offset was measured in a browser rather than guessed, so the
+rule lands level with the digits beside it and every rule on a line agrees, the way it
+does in the exercise book.
+
+Generators keep writing plain `3 15/22`; nothing else changed. The renderer escapes
+first and only then converts digit/digit runs, so the `/` card in build steps and words
+like "above/below" are untouched, and no generated string can inject markup.
+`test/test-mathfmt.js` strips the markup back off ~40,000 strings from every level and
+fails if any of them reads differently than before.
+
 ⚠️ Still no Year 7 **Toddle unit plan** in the repo, so `test/test-curriculum.js` prints
 Year 7 under **NOT CHECKED** rather than pretending to verify it, and `test-vocab.js` has
 no Year 7 terms to enforce yet.
