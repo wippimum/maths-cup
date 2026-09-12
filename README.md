@@ -55,7 +55,18 @@ the two below it"), and the **three-term** questions from the phone photos
 | Adding with carrying | `8 5/12 + 4 11/12` — the fractions make another whole |
 | Subtracting with borrowing | `9 3/7 − 2 6/7`, and `1 − 7/10` |
 | Different denominators | `3 2/15 + 6/5`, `3 15/22 − 5/2` |
+| **No steps — just the answer** 🔥 | the same questions with the scaffolding removed |
 | Multiply · Reciprocals & dividing | the rest of the KS3 fractions unit |
+
+**The unguided level.** Every other level walks through the method — find the common
+denominator, rewrite, carry, simplify. That is how the method is learnt, but it is not
+how he is asked in class, where a question arrives on its own and the first move has to
+come out of his own head. A child can look fluent all the way down a guided ladder and
+still stall on a bare question, because choosing where to start was never his job.
+**No steps — just the answer** gives the question and asks only for the finished answer,
+built from cards rather than picked from a list, so there is nothing to recognise
+between. The full worked solution stays behind the **Hint** and **Why?** buttons: help
+on request, not help by default.
 
 **Every level ends on "in its simplest form", and offers the unsimplified answer as a
 choice.** That is deliberate: asked for `3 2/15 + 6/5`, he picked `4 5/15` from a list

@@ -218,6 +218,48 @@ const CASES = {
         if (c === 1) ok(); else bad(`year7 ${lvl}/${st.key}: ${c} correct options in [${st.pool.join(' ')}]`);
       }
     } },
+  // ---- the unguided Year 7 level ----
+  // Same questions, scaffolding removed. Three things must hold: it really is ONE step,
+  // the answer is still right and still finished, and a nearly-right build is refused —
+  // with no options to pick from, a lenient check would let a wrong answer through.
+  'year7Unaided': () => {
+    const val = (x) => {
+      const t = String(x).trim();
+      let m = t.match(/^(\d+) (\d+)\/(\d+)$/);
+      if (m) return Number(m[1]) + Number(m[2]) / Number(m[3]);
+      m = t.match(/^(\d+)\/(\d+)$/);
+      if (m) return Number(m[1]) / Number(m[2]);
+      return Number(t);
+    };
+    const p = W.buildSolveLesson ? W.buildMatchFor('y7frac', 'y7-solo', 1)[0] : null;
+    if (!p) { bad('y7-solo did not build'); return; }
+    if (p.steps.length === 1) ok(); else bad(`y7-solo: ${p.steps.length} steps — the whole point is that there is one`);
+    const st = p.steps[0];
+    if (st.check(String(p.answer).replace('/', ' / ')).correct) ok();
+    else bad(`y7-solo: rejects its own answer ${p.answer} for "${p.given}"`);
+    // finished: lowest terms, and never left top-heavy
+    const f = String(p.answer).match(/(\d+)\/(\d+)/);
+    if (f && gcd(Number(f[1]), Number(f[2])) !== 1) bad(`y7-solo: ${p.answer} is not in its lowest terms`); else ok();
+    if (f && Number(f[1]) >= Number(f[2])) bad(`y7-solo: ${p.answer} is still improper`); else ok();
+    // a near miss must NOT be accepted
+    const a = String(p.answer).match(/^(\d+) (\d+)\/(\d+)$/);
+    if (a) {
+      if (!st.check(`${Number(a[1]) + 1} ${a[2]} / ${a[3]}`).correct) ok();
+      else bad(`y7-solo: accepts a wrong whole number for ${p.answer}`);
+      if (a[2] === a[3] || !st.check(`${a[1]} ${a[3]} / ${a[2]}`).correct) ok();
+      else bad(`y7-solo: accepts the fraction upside down for ${p.answer}`);
+    }
+    // the maths, re-derived from the question text
+    const gv = String(p.given).replace(/^Work out\s+/, '').trim();
+    const parts = gv.split(/\s([+\u2212])\s/);
+    if (parts.length === 3) {
+      const truth = parts[1] === '+' ? val(parts[0]) + val(parts[2]) : val(parts[0]) - val(parts[2]);
+      if (Math.abs(val(p.answer) - truth) > 1e-9) bad(`y7-solo: "${gv}" claims ${p.answer}, truth ${truth}`); else ok();
+    }
+    // help on request: the full working must still be behind Hint / why
+    if (/=/.test(st.longWay || '')) ok(); else bad(`y7-solo: no worked chain behind the hint for "${p.given}"`);
+    if ((st.hint || '').includes(String(p.answer))) ok(); else bad('y7-solo: the hint does not give the answer');
+  },
   // ---- the Problem Solving ladder actually climbs ----
   // A lesson that gets easier half way through tells the child they have gone
   // backwards. Two separate properties, both easy to break by accident:

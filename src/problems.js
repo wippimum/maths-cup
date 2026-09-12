@@ -787,6 +787,7 @@
       { id: 'y7-carry', name: 'Adding with carrying', badge: '🎒', generate: () => T.carryMixed() },
       { id: 'y7-borrow', name: 'Subtracting with borrowing', badge: '🔻', generate: () => T.borrowMixed() },
       { id: 'y7-diffden', name: 'Different denominators', badge: '🏆', generate: () => T.mixedPlusFraction() },
+      { id: 'y7-solo', name: 'No steps — just the answer', badge: '🔥', generate: () => T.unaided() },
       { id: 'y7-odd', name: 'Spot the odd one out', badge: '🔍', generate: () => T.oddOneOut() },
       { id: 'y7-mult', name: 'Multiply mixed numbers', badge: '✖️', generate: () => T.multMixed() },
       { id: 'y7-div', name: 'Reciprocals & dividing', badge: '🔁', generate: () => T.divideFractions() },

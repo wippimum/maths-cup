@@ -390,6 +390,7 @@
             ? sStep({ key: 'simplest', prompt: `Give the answer in its simplest form.`,
               hint: g > 1 ? `${rem}/${d} simplifies by ${g} to ${rem / g}/${d / g}.` : `${rem}/${d} is already in its simplest form.`,
               why: g > 1 ? `${rem} and ${d} both divide by ${g}, so ${rem}/${d} = ${rem / g}/${d / g}. The question asks for the simplest form, so the unsimplified version would be marked wrong.` : `${rem} and ${d} share no common factor, so this is already finished.`,
+              longWay: `${whole} − ${n}/${d}\n= ${d}/${d} − ${n}/${d}\n= ${rem}/${d}${g > 1 ? `\n= ${rem / g}/${d / g}` : ''}`,
               resultText: `${rem / g}/${d / g}`, answer: `${rem / g}/${d / g}`,
               pool: shuffle([...new Set([`${rem / g}/${d / g}`, `${rem}/${d}`, `${d / g}/${rem / g}`, `${n}/${d}`])]),
               expr: `${rem}/${d} simplified`, isAnswer: true })
@@ -431,6 +432,7 @@
           ? sStep({ key: 'simplest', prompt: `Give the answer in its simplest form.`,
             hint: g > 1 ? `${rem}/${d} simplifies by ${g} to ${rem / g}/${d / g}.` : `${rem}/${d} is already in its simplest form.`,
             why: g > 1 ? `${rem} and ${d} both divide by ${g}. The question asks for the simplest form.` : `${rem} and ${d} share no common factor, so this is finished.`,
+            longWay: `${mixStr(w1, n1, d)} − ${mixStr(w2, n2, d)}\n= ${w1 - 1} ${n1 + d}/${d} − ${mixStr(w2, n2, d)}\n= ${rem}/${d}${g > 1 ? `\n= ${rem / g}/${d / g}` : ''}`,
             resultText: `${rem / g}/${d / g}`, answer: `${rem / g}/${d / g}`,
             pool: shuffle([...new Set([`${rem / g}/${d / g}`, `${rem}/${d}`, `${d / g}/${rem / g}`, `${n2}/${d}`])]),
             expr: `${rem}/${d} simplified`, isAnswer: true })
@@ -500,8 +502,77 @@
     };
   }
 
+
+  // ============================================================================
+  // NO STEPS — the same questions with the scaffolding taken away.
+  //
+  // Every other level walks him through: find the common denominator, rewrite, add the
+  // numerators, carry, simplify. That is how you LEARN the method, but it is not how he
+  // is asked in class, where a question arrives on its own and the steps have to come
+  // out of his own head. A child can look fluent all the way down a guided ladder and
+  // still stall on a bare question, because choosing the first move was never his job.
+  //
+  // So this level takes a question from the lesson and asks only for the finished
+  // answer. He builds it from cards rather than picking from a list, so there is
+  // nothing to recognise or guess between. The full worked solution is still behind the
+  // Hint and "why" buttons — help on request, not help by default.
+  const UNAIDED_SOURCES = [sameDenTopHeavy, sameDenMixed, carryMixed, borrowMixed,
+    mixedPlusFraction, improperLowestTerms];
+
+  // "2 3/4" -> {w:2,n:3,d:4} · "7/12" -> {n:7,d:12} · "3" -> {w:3}
+  function readAnswer(a) {
+    const t = String(a).trim();
+    let m = t.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+    if (m) return { w: +m[1], n: +m[2], d: +m[3] };
+    m = t.match(/^(\d+)\/(\d+)$/);
+    if (m) return { w: 0, n: +m[1], d: +m[2] };
+    m = t.match(/^(\d+)$/);
+    if (m) return { w: +m[1], n: 0, d: 0 };
+    return null;
+  }
+
+  function unaided() {
+    const src = pick(UNAIDED_SOURCES)();
+    const a = readAnswer(src.answer);
+    if (!a) return unaided();                       // only questions with a clean answer
+    const pieces = a.n === 0 ? [String(a.w)]
+      : a.w === 0 ? [String(a.n), '/', String(a.d)]
+        : [String(a.w), String(a.n), '/', String(a.d)];
+    // Spare cards so the number of them gives nothing away. They must not let a WRONG
+    // answer be built that the check would accept — it only accepts the exact sequence,
+    // so any spare is safe.
+    const spare = [...new Set([String(a.w + 1), String(a.d + 1), String(a.n + 1),
+      String(Math.max(1, a.n - 1)), String(a.d * 2)])].filter((x) => !pieces.includes(x)).slice(0, 4);
+    // The whole method, kept for the Hint and "why" buttons only. The last step of each
+    // guided level already carries a properly laid-out chain of working; use it. Strung
+    // together, the per-step result lines read as disconnected fragments ("1/12",
+    // "5 and 1/12") that help nobody.
+    const last = src.steps[src.steps.length - 1];
+    const working = last.longWay
+      || src.steps.map((st) => st.resultText).filter(Boolean).join('\n');
+    return {
+      subject: 'y7frac', sig: `un:${src.sig}`,
+      given: src.given, note: src.note,
+      answer: src.answer,
+      steps: [buildStep({ key: 'answer',
+        prompt: `Work it out on paper, then build the answer. No steps this time — you choose what to do first.`,
+        hint: `The answer is ${src.answer}. Step by step it goes:\n${working}`,
+        why: `In class the question arrives on its own: nobody tells you to find a common denominator first, or that this one needs a carry. Deciding the first move IS the skill, and it is the only part a guided ladder never makes you practise.\n\nIf you are stuck, the order is always the same — make the bottoms match, deal with the whole numbers and the fractions, carry or borrow if the fraction part spills over or goes below zero, then simplify. Here that gives:\n${working}`,
+        longWay: working,
+        resultText: `${src.answer}`,
+        pieces, distractors: spare, isAnswer: true,
+        check: (raw) => {
+          const q = parseNumberList(String(raw).replace(/\//g, ' '));
+          const wrong = { correct: false, id: 'mixed-form', ctx: { whole: a.w, n: a.n, d: a.d } };
+          if (a.n === 0) return q.length === 1 && q[0] === a.w ? { correct: true } : wrong;
+          if (a.w === 0) return q.length === 2 && q[0] === a.n && q[1] === a.d ? { correct: true } : wrong;
+          return q.length === 3 && q[0] === a.w && q[1] === a.n && q[2] === a.d ? { correct: true } : wrong;
+        } })],
+    };
+  }
+
   const api = { improperLowestTerms, multMixed, divideFractions, oddOneOut,
-    sameDenTopHeavy, sameDenMixed, carryMixed, borrowMixed, mixedPlusFraction };
+    sameDenTopHeavy, sameDenMixed, carryMixed, borrowMixed, mixedPlusFraction, unaided };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.WAC = Object.assign(root.WAC || {}, api);
 })(typeof window !== 'undefined' ? window : globalThis);
