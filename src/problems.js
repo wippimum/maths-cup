@@ -617,6 +617,32 @@
     },
   }));
 
+  // ---------------- "No steps" levels ----------------
+  // One per topic. It draws a question from that topic's OWN levels and removes the
+  // scaffolding (see unaided.js), so what is being tested is whether he can choose the
+  // method himself — not whether he can follow one. Stretch levels are left out: this
+  // asks whether the COURSE stuck. Levels that are already a single step are skipped
+  // too, because there is nothing to strip from them.
+  function soloProblem(subjectId) {
+    const subj = subjectById(subjectId);
+    const levels = subj.levels.filter((l) => !/-solo$/.test(l.id) && !l.stretch);
+    if (!levels.length) return null;
+    let fallback = null;
+    for (let i = 0; i < 50; i++) {
+      const l = levels[Math.floor(Math.random() * levels.length)];
+      let p;
+      try { p = l.generate(); } catch (e) { continue; }
+      if (!p || !p.steps || !p.steps.length) continue;
+      const last = p.steps[p.steps.length - 1];
+      if (!T.unaidedIsSelfContained(last)) continue;      // nothing to answer on its own
+      fallback = fallback || p;
+      if (p.steps.length >= 2) return T.unaidedFrom(p);
+    }
+    return fallback ? T.unaidedFrom(fallback) : null;
+  }
+  const SOLO = (id) => ({ id: `${id}-solo`, name: 'No steps — just the answer', badge: '🔥',
+    generate: () => soloProblem(id) });
+
   const SUBJECTS = [
     { id: 'numeracy', year: 6, topic: 1, name: 'Numeracy', icon: '#️⃣', blurb: 'Times tables, adding and subtracting big numbers, multiplying, and short division.', levels: [
       { id: 'num-tables', name: 'Times tables', badge: '✖️', generate: () => T.timesTable() },
@@ -624,6 +650,7 @@
       { id: 'num-multiply', name: 'Multiply integers', badge: '✳️', generate: () => T.multiplyIntegers() },
       { id: 'num-divide', name: 'Short division', badge: '➗', generate: () => T.shortDivision(false) },
       { id: 'num-divdec', name: 'Short division with decimals', badge: '📍', generate: () => T.shortDivision(true) },
+      SOLO('numeracy'),
     ] },
     { id: 'integers', year: 6, topic: 2, name: 'Integers', icon: '±', blurb: 'Place value, ordering, negatives in real life, then calculating with them.', levels: [
       { id: 'num-pv', name: 'Place value', badge: '🔢', generate: () => genPlaceValue() },
@@ -633,6 +660,7 @@
       { id: 'int-addsub', name: 'Add & subtract', badge: '±', generate: () => genNegAddSub() },
       { id: 'int-muldiv', name: 'Multiply & divide', badge: '✖️', generate: () => genNegMulDiv() },
       { id: 'int-hard', name: 'Two steps with negatives', badge: '🏆', generate: () => genNegHard() },
+      SOLO('integers'),
     ] },
     // Order of operations used to be one thin level under Integers (a + b × c, and
     // nothing else). It's the hard part of school Topic 2, so it's its own ladder now.
@@ -643,6 +671,7 @@
       { id: 'bid-lr', name: 'Left to right', badge: '➡️', generate: () => T.bidmasLR() },
       { id: 'bid-indices', name: 'Powers (indices)', badge: '²', generate: () => T.bidmasIndices() },
       { id: 'bid-mix', name: 'Full BIDMAS 🏆', badge: '🏆', generate: () => T.bidmasMix() },
+      SOLO('bidmas'),
     ] },
     { id: 'primes', year: 6, topic: 3, name: 'Number Properties · Primes', icon: '🔢', blurb: 'Spot primes, factor trees, index form, squares and roots.', levels: [
       { id: 'prime-spot', name: 'Is it prime?', badge: '🕵️', generate: () => T.isItPrime(rand(2, 40)) },
@@ -652,18 +681,21 @@
       { id: 'prime-powers', name: 'Squares, cubes & roots', badge: '²', generate: () => genPowers() },
       { id: 'prime-square', name: 'Make a square', badge: '⭐', stretch: true, generate: () => T.makeSquare(pick(T.SQUARE_BANK)) },
       { id: 'prime-hcflcm', name: 'HCF & LCM by primes', badge: '⭐', stretch: true, generate: () => { const p = pick(HL_BANK); return T.hcfLcmByPrimes(p[0], p[1]); } },
+      SOLO('primes'),
     ] },
     { id: 'hcf', year: 6, topic: 3, name: 'Number Properties · HCF', icon: '🔵', blurb: 'List factors, find the biggest shared one.', levels: [
       { id: 'hcf-warm', name: 'Warm-up', badge: '🤝', generate: () => T.hcfProblem(...pick(HCF_WARM)) },
       { id: 'hcf-main', name: 'Main', badge: '🔵', generate: () => Math.random() < 0.5 ? T.hcfProblem(...pick(HCF_MAIN)) : T.hcfProblem(...genPair(10, 40)) },
       { id: 'hcf-big', name: 'Bigger numbers', badge: '🔴', generate: () => Math.random() < 0.3 ? hcfStory() : T.hcfProblem(...pick(HCF_BIG)) },
       { id: 'hcf-pro', name: 'Three numbers', badge: '⭐', stretch: true, generate: () => genHcf3() },
+      SOLO('hcf'),
     ] },
     { id: 'lcm', year: 6, topic: 3, name: 'Number Properties · LCM', icon: '🟢', blurb: 'List multiples, find the smallest shared one.', levels: [
       { id: 'lcm-warm', name: 'Warm-up', badge: '🤝', generate: () => T.lcmProblem(...pick(LCM_WARM)) },
       { id: 'lcm-main', name: 'Main', badge: '🟢', generate: () => Math.random() < 0.5 ? T.lcmProblem(...pick(LCM_MAIN)) : T.lcmProblem(...genLcmPair(3, 12)) },
       { id: 'lcm-big', name: 'Bigger numbers', badge: '🟡', generate: () => Math.random() < 0.4 ? lcmStory() : T.lcmProblem(...genLcmPair(4, 15)) },
       { id: 'lcm-pro', name: 'Three numbers', badge: '⭐', stretch: true, generate: () => genLcm3() },
+      SOLO('lcm'),
     ] },
     { id: 'fractions', year: 6, topic: 4, name: 'Fractions', icon: '½', blurb: 'Simplify, of an amount, add & subtract, mixed numbers, multiply & divide.', levels: [
       { id: 'frac-simplify', name: 'Simplify', badge: '➗', generate: () => genFracSimplify() },
@@ -680,6 +712,7 @@
       { id: 'ratio-simplify', name: 'Simplify a ratio', badge: '⚖️', stretch: true, generate: () => genRatioSimplify() },
       { id: 'ratio-share', name: 'Share in a ratio', badge: '🤝', stretch: true, generate: () => genRatioShare() },
       { id: 'ratio-hard', name: 'Ratio: three-way & backwards', badge: '⭐', stretch: true, generate: () => genRatioHard() },
+      SOLO('fractions'),
     ] },
     { id: 'algebra1', year: 6, topic: 5, name: 'Introduction to Algebra', icon: '🔤', blurb: 'What the letters mean, writing expressions, substituting and simplifying.', levels: [
       { id: 'alg1-notation', name: 'Notation & writing expressions', badge: '🔤', generate: () => genAlgNotation() },
@@ -688,6 +721,7 @@
       { id: 'alg1-collect', name: 'Collecting like terms', badge: '🧲', generate: () => genAlgCollect(true) },
       { id: 'alg1-collect2', name: 'Like terms with numbers & squares', badge: '🧮', generate: () => genAlgCollect(false) },
       { id: 'alg1-perim', name: 'Expressions for perimeter', badge: '🟩', generate: () => genAlgPerimeter() },
+      SOLO('algebra1'),
     ] },
     { id: 'coords', year: 6, topic: 6, name: 'Symmetry & Co-ordinates', icon: '📍', blurb: 'Lines of symmetry and rotational order, then reading, plotting and completing shapes.', levels: [
       { id: 'geo-sym', name: 'Lines of symmetry & rotation', badge: '🪞', generate: () => genSymmetry() },
@@ -696,40 +730,47 @@
       { id: 'co-reflect', name: 'Reflect a point', badge: '🪞', generate: () => genReflect() },
       { id: 'co-complete', name: 'Complete the figure', badge: '⬜', generate: () => genComplete() },
       { id: 'co-mid', name: 'Midpoint of a line', badge: '⭐', stretch: true, generate: () => genMidpoint() },
+      SOLO('coords'),
     ] },
     { id: 'rounding', year: 6, topic: 7, name: 'Degrees of Accuracy', icon: '≈', blurb: 'Round to the nearest 10, 100, 1000 and to decimal places.', levels: [
       { id: 'round-nearest', name: 'Nearest 10 / 100 / 1000', badge: '🎯', generate: () => genRoundNearest() },
       { id: 'round-dp', name: 'Decimal places', badge: '📍', generate: () => genRoundDP() },
       { id: 'round-sf', name: 'Significant figures & estimating', badge: '⭐', stretch: true, generate: () => genRoundHard() },
+      SOLO('rounding'),
     ] },
     { id: 'decimals', year: 6, topic: 8, name: 'Calculating with Decimals', icon: '🔟', blurb: '× and ÷ by powers of ten, add, subtract, then × and ÷ decimals.', levels: [
       { id: 'dec-power', name: '× and ÷ by 10, 100, 1000', badge: '📍', generate: () => genDecPower() },
       { id: 'dec-addsub', name: 'Add & subtract', badge: '➕', generate: () => genDecAddSub() },
       { id: 'dec-muldiv', name: '× and ÷ decimals', badge: '🏆', generate: () => genDecMulDiv() },
+      SOLO('decimals'),
     ] },
-    { id: 'algebra', year: 6, topic: 9, name: 'Linear Equations', icon: '⚽', blurb: 'One-step, one-step with fractions, then two-step and x on both sides.', levels: [ALG_LEVELS[0], FRAC_EQ_LEVEL].concat(ALG_LEVELS.slice(1)) },
+    { id: 'algebra', year: 6, topic: 9, name: 'Linear Equations', icon: '⚽', blurb: 'One-step, one-step with fractions, then two-step and x on both sides.', levels: [ALG_LEVELS[0], FRAC_EQ_LEVEL].concat(ALG_LEVELS.slice(1), [SOLO('algebra')]) },
     { id: 'angles', year: 6, topic: 10, name: 'Angles', icon: '📐', blurb: 'Name and estimate them, then missing angles in lines, triangles and quadrilaterals.', levels: [
       { id: 'ang-classify', name: 'Name & estimate angles', badge: '🔍', generate: () => genAngleClassify() },
       { id: 'ang-missing', name: 'On a line / around a point', badge: '📏', generate: () => genAngleMissing() },
       { id: 'ang-tri', name: 'Triangles', badge: '🔺', generate: () => T.angleTriangle() },
       { id: 'ang-quad', name: 'Quadrilaterals & isosceles', badge: '🔷', generate: () => Math.random() < 0.5 ? T.angleQuadrilateral() : T.angleIsosceles() },
       { id: 'ang-hard', name: 'Parallel lines & polygons', badge: '⭐', stretch: true, generate: () => Math.random() < 0.5 ? T.angleParallel() : T.anglePolygon() },
+      SOLO('angles'),
     ] },
     { id: 'fdp', year: 6, topic: 11, name: 'Fractions, Decimals & Percentages', icon: '🔗', blurb: 'Convert between them, then compare and order a mixed set.', levels: [
       { id: 'fdp-fd', name: 'Fraction → decimal → %', badge: '➡️', generate: () => genFdpFromFraction() },
       { id: 'fdp-pf', name: '% → fraction', badge: '½', generate: () => genFdpPercentToFraction() },
       { id: 'fdp-order', name: 'Order a mixed set', badge: '🏆', generate: () => genFdpOrder() },
+      SOLO('fdp'),
     ] },
     { id: 'measures', year: 6, topic: 12, name: 'Units & Measures', icon: '📏', blurb: 'Convert between metric units — length, mass, then area and volume.', levels: [
       { id: 'meas-length', name: 'Length & mass', badge: '📏', generate: () => genConvertBasic() },
       { id: 'meas-mixed', name: 'Mixed conversions', badge: '🔄', generate: () => T.convert(pick(['length', 'mass', 'length'])) },
       { id: 'meas-areavol', name: 'Area & volume units 🏆', badge: '🏆', generate: () => genConvertHard() },
+      SOLO('measures'),
     ] },
     { id: 'area', year: 6, topic: 12, name: 'Mensuration of 2D Shapes', icon: '🟩', blurb: 'Perimeter and area of rectangles, triangles and composite shapes.', levels: [
       { id: 'area-rect', name: 'Rectangles', badge: '🟩', generate: () => genRect() },
       { id: 'area-tri', name: 'Triangle area', badge: '🔺', generate: () => genTri() },
       { id: 'area-comp', name: 'Composite shapes & backwards', badge: '🧩', generate: () => { const r = rand(1, 3); return r === 1 ? T.compoundArea() : r === 2 ? T.parallelogramArea(rand(4, 14), rand(3, 11)) : T.missingSide(rand(4, 12), rand(3, 11)); } },
       { id: 'area-trap', name: 'Trapezium area', badge: '⭐', stretch: true, generate: () => { let a = rand(3, 10), b = rand(4, 14); if (a === b) b += 1; let h = rand(3, 10); if (((a + b) * h) % 2 !== 0) h += 1; return T.trapeziumArea(a, b, h); } },
+      SOLO('area'),
     ] },
     { id: 'stats', year: 6, topic: 13, name: 'Statistical Measures', icon: '📊', blurb: 'Mode, range, mean and median, then comparing two sets.', levels: [
       { id: 'stat-modrange', name: 'Mode & range', badge: '📊', generate: () => Math.random() < 0.5 ? genStatMode() : genStatRange() },
@@ -739,6 +780,7 @@
       { id: 'stat-graphs', name: 'Reading graphs', badge: '📉', generate: () => T.lineGraph() },
       { id: 'stat-compare', name: 'Compare two sets', badge: '⚖️', generate: () => T.compareSets() },
       { id: 'stat-hard', name: 'Missing values & negatives', badge: '⭐', stretch: true, generate: () => genStatHard() },
+      SOLO('stats'),
     ] },
     { id: 'graphs', year: 6, topic: 14, name: 'Graphical Representation of Data', icon: '📈', blurb: 'Bar charts, pictograms, pie charts, line graphs, tables and Venn diagrams.', levels: [
       { id: 'gr-bar', name: 'Bar charts', badge: '📊', generate: () => genBar() },
@@ -747,6 +789,7 @@
       { id: 'gr-charts', name: 'Pie charts, line graphs & tables', badge: '🥧', generate: () => genCharts2() },
       { id: 'gr-venn', name: 'Venn diagrams', badge: '🔵', generate: () => T.vennDiagram() },
       { id: 'gr-hard', name: 'Two-way tables', badge: '⭐', stretch: true, generate: () => T.twoWayTable() },
+      SOLO('graphs'),
     ] },
     { id: 'percent', year: 6, topic: 15, name: 'Percentages', icon: '％', blurb: 'Of an amount, one number as a % of another, and increase/decrease.', levels: [
       { id: 'pc-of', name: '% of an amount', badge: '％', generate: () => genPercent() },
@@ -754,6 +797,7 @@
       { id: 'pc-ofwhat', name: 'What percentage of…?', badge: '❓', generate: () => genPercentOf() },
       { id: 'pc-change', name: 'Increase & decrease', badge: '📈', generate: () => genPercentChange() },
       { id: 'pc-hard', name: 'Reverse percentages', badge: '⭐', stretch: true, generate: () => genPercentReverse() },
+      SOLO('percent'),
     ] },
     { id: 'geometry', year: 6, topic: 16, name: 'Geometric Properties', icon: '🔷', blurb: 'Naming polygons, regular vs irregular, and the parts of a circle.', levels: [
       { id: 'geo-poly', name: 'Naming polygons', badge: '🔷', generate: () => T.namePolygon() },
@@ -768,12 +812,14 @@
       { id: 'vol-fev', name: 'Faces, edges & vertices', badge: '🔷', generate: () => genSolidCount() },
       { id: 'vol-prism', name: 'Prisms & missing sides', badge: '📦', generate: () => genPrismOrMissing() },
       { id: 'vol-hard', name: 'Surface area', badge: '⭐', stretch: true, generate: () => T.surfaceArea(rand(3, 9), rand(2, 7), rand(2, 8)) },
+      SOLO('volume'),
     ] },
     { id: 'solve', year: 6, name: 'Problem Solving', icon: '🧩', blurb: '10 problems, easy → hard, in tiny steps.', levels: [
       { id: 'solve-easy', name: 'Warm-up (easier)', badge: '🌱', generate: () => T.solveRandom() },
       { id: 'solve-lesson', name: 'Lesson (easy → hard)', badge: '🧩', generate: () => T.solveRandom() },
       { id: 'solve-hard', name: 'Challenge (harder)', badge: '🔥', generate: () => T.solveRandom() },
       { id: 'solve-exam', name: 'Exam-style 🏆', badge: '🏆', generate: () => T.solveRandom() },
+      SOLO('solve'),
     ] },
     // ---------------- YEAR 7 (KS3) ----------------
     // First Year 7 topic. Built from Section 5 of the CGP Foundation book while the
@@ -802,7 +848,10 @@
   // Unified match builder: works for every subject, dedupes within the match.
   function buildMatchFor(subjectId, levelId, n) {
     // Problem Solving is a graded LESSON: 10 problems ramping easy → hard, in order.
-    if (subjectId === 'solve') return T.buildSolveLesson(levelId, n || 10);
+    // Its "no steps" level is the exception — that one is not a ramp, so it must go
+    // through the normal path or buildSolveLesson would quietly serve a guided lesson
+    // under an unguided name.
+    if (subjectId === 'solve' && !/-solo$/.test(levelId)) return T.buildSolveLesson(levelId, n || 10);
     const lvl = levelOf(subjectId, levelId);
     const out = [], seen = new Set(), count = n || 10;
     for (let i = 0; i < count; i++) {

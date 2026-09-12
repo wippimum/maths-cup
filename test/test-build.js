@@ -53,9 +53,9 @@ const AFTER = {                       // file : files that must already have loa
   topics: ['numbers', 'format'],
   topics2: ['topics'], topics3: ['topics'], topics4: ['topics'], topics5: ['topics'],
   primes: ['numbers'], coords: ['topics'],
-  algebra1: ['topics'], curriculum1: ['topics'], curriculum2: ['topics', 'figures'], year7: ['topics'],
+  algebra1: ['topics'], curriculum1: ['topics'], curriculum2: ['topics', 'figures'], year7: ['topics'], unaided: [],
   harder: ['topics'], harder2: ['topics', 'figures'],
-  problems: ['steps', 'topics', 'harder', 'harder2', 'algebra1', 'curriculum1', 'curriculum2', 'year7', 'solving', 'bidmas'],
+  problems: ['steps', 'topics', 'harder', 'harder2', 'algebra1', 'curriculum1', 'curriculum2', 'year7', 'unaided', 'solving', 'bidmas'],
   app: ['problems', 'history', 'explanations'],
 };
 Object.entries(AFTER).forEach(([f, deps]) => {

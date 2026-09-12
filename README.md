@@ -128,6 +128,29 @@ on are the school's own topic numbers, shown on each tile.
 **Bold** entries are the ones built from the unit plans after an audit found the app had
 drifted from the course.
 
+### 🔥 "No steps — just the answer"
+
+Every topic has one, at the end of its ladder. It draws a question from that topic's own
+levels and removes the scaffolding: the question is shown whole, and only the answer is
+asked for. The full worked solution stays behind **Hint** and **Why?** — help on request,
+not help by default.
+
+The point is that being walked through a question never makes you practise the one thing
+class asks for: deciding what to do first. A child can look fluent all the way down a
+guided ladder and still stall on a bare question.
+
+Three rules keep these honest, enforced by `test/test-unaided.js`:
+
+- **one step**, never a disguised walk-through;
+- **answerable standing alone** — a step with neither options nor cards is a typed
+  *line*, transforming the line above it, and with those lines gone there is nothing to
+  transform, so the equation questions that work that way stay guided;
+- **never a coin toss** — at least three options, with exactly one accepted.
+
+Stretch levels are left out (this asks whether the *course* stuck), and **Shape facts**
+has no such level at all: every one of its levels is already a single recall question,
+so there is nothing to strip.
+
 ### ⭐ Stretch levels
 
 A handful of levels go **beyond** the Year 6 course. They are kept — they are good

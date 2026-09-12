@@ -14,7 +14,7 @@
 const path = '../src/';
 const W = {};
 for (const f of ['numbers', 'format', 'fraction', 'parser', 'explanations', 'figures', 'steps', 'topics',
-  'topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'numeracy1', 'algebra1', 'curriculum1', 'curriculum2', 'year7',
+  'topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'numeracy1', 'algebra1', 'curriculum1', 'curriculum2', 'year7', 'unaided',
   'harder', 'harder2', 'bidmas', 'solving', 'problems']) {
   Object.assign(W, require(path + f + '.js'));
 }
@@ -187,6 +187,15 @@ for (const [topic, objectives] of Object.entries(COVERAGE)) {
 const onCourse = new Set(Object.values(COVERAGE).flatMap((o) => Object.values(o).flat()));
 for (const [id, { subject, level }] of allLevels) {
   if (subject === 'solve') continue;              // application, taught across every unit
+  // A "-solo" level has no objective of its own: it re-presents the SUBJECT's existing
+  // objectives with the scaffolding removed (see unaided.js), drawing its questions from
+  // that subject's own levels. Mapping it separately would double-count every objective,
+  // and flagging it stretch would be a lie — it is course content, just unaided.
+  if (/-solo$/.test(id)) {
+    const from = allLevels.get(id);
+    if (from) ok(); else bad(`${id} claims to be a no-steps level but has no subject`);
+    continue;
+  }
   const core = onCourse.has(id), stretch = !!level.stretch;
   if (core && stretch) bad(`${subject}/${id} is on the course but flagged as stretch`);
   else if (!core && !stretch) bad(`${subject}/${id} is NOT on the Toddle course and is not flagged stretch — either map it to an objective or mark it`);
