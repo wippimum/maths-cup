@@ -22,8 +22,29 @@ record.
 
 ### Year 7 (KS3) — Adding & Subtracting Mixed Numbers
 
-Built from the homework itself: a Dr Frost exercise, *"Adding and Subtracting Mixed
-Numbers with the Same Denominator"*, plus the online questions set alongside it.
+Built from two sources, deliberately: the homework itself — a Dr Frost exercise,
+*"Adding and Subtracting Mixed Numbers with the Same Denominator"* — plus photos of the
+online questions set alongside it, and **Section 5 of the CGP Foundation book** for the
+parts of the KS3 unit the homework does not reach.
+
+Where each level came from:
+
+| Source | Levels |
+| --- | --- |
+| Dr Frost sheet, Q1–Q4 | same denominator (top-heavy) · mixed numbers, same denominator · adding with carrying · subtracting with borrowing |
+| Photos of the online questions | different denominators |
+| His own written work (`42/16 = 2 5/8`) | improper → mixed, simplest form |
+| CGP Section 5 | mixed ↔ improper · spot the odd one out · multiply · reciprocals & dividing |
+
+**One departure from the sheet, on purpose.** Dr Frost interleaves carrying with
+non-carrying (Q2 has both) and borrowing with non-borrowing (Q4 has both). Here they are
+separate levels. Interleaving is better for testing; separating is better for
+diagnosing — a low score on "adding with carrying" while "mixed numbers, same
+denominator" stays clean says exactly where the problem is.
+
+Not built yet: the sheet's **Q5 pyramid puzzles** ("the number in each box is the sum of
+the two below it"), and the **three-term** questions from the phone photos
+(`3 1/3 + 38/30 − 17/15`).
 
 | Level | What it drills |
 | --- | --- |
@@ -60,9 +81,11 @@ like "above/below" are untouched, and no generated string can inject markup.
 `test/test-mathfmt.js` strips the markup back off ~40,000 strings from every level and
 fails if any of them reads differently than before.
 
-⚠️ Still no Year 7 **Toddle unit plan** in the repo, so `test/test-curriculum.js` prints
+Still no Year 7 **Toddle unit plan** in the repo, so `test/test-curriculum.js` prints
 Year 7 under **NOT CHECKED** rather than pretending to verify it, and `test-vocab.js` has
-no Year 7 terms to enforce yet.
+no Year 7 terms to enforce yet. The homework-plus-CGP basis above is a deliberate choice,
+not a placeholder — when the plan arrives it should be checked against, and the wording
+reconciled, rather than the levels being thrown away.
 
 ## Topics — the actual Year 6 course
 
