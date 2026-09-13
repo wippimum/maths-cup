@@ -822,16 +822,6 @@
       { id: 'vol-hard', name: 'Surface area', badge: '⭐', stretch: true, generate: () => T.surfaceArea(rand(3, 9), rand(2, 7), rand(2, 8)) },
       SOLO('volume'),
     ] },
-    // A lesson of its own, on Naima's instruction — borrowing is the step the boys lose
-    // marks on, and the six worked examples she sent are its structure: compare, rename,
-    // subtract, simplify. The ladder separates the cases those examples separate.
-    { id: 'y7borrow', year: 7, name: 'Borrowing', icon: '🔻', blurb: 'KS3: subtracting mixed numbers when the fraction on top is too small — compare, rename, subtract, simplify.', levels: [
-      { id: 'bor-whole', name: 'A whole take a fraction', badge: '1️⃣', generate: () => T.borrowFromWhole() },
-      { id: 'bor-plain', name: 'Borrow, already simplest', badge: '🔻', generate: () => T.borrowMixedPair(false) },
-      { id: 'bor-simplify', name: 'Borrow, then simplify', badge: '➗', generate: () => T.borrowMixedPair(true) },
-      { id: 'bor-decide', name: 'Borrow or not? You decide', badge: '🤔', generate: () => T.borrowOrNot() },
-      SOLO('y7borrow'),
-    ] },
     { id: 'solve', year: 6, name: 'Problem Solving', icon: '🧩', blurb: '10 problems, easy → hard, in tiny steps.', levels: [
       { id: 'solve-easy', name: 'Warm-up (easier)', badge: '🌱', generate: () => T.solveRandom() },
       { id: 'solve-lesson', name: 'Lesson (easy → hard)', badge: '🧩', generate: () => T.solveRandom() },
@@ -848,12 +838,14 @@
       { id: 'y7-lowest', name: 'Improper → mixed, simplest form', badge: '➗', generate: () => T.improperLowestTerms() },
       { id: 'y7-mixed-same', name: 'Mixed numbers, same denominator', badge: '➕', generate: () => (Math.random() < 0.25 ? T.sameDenTopHeavy() : T.sameDenMixed()) },
       { id: 'y7-carry', name: 'Adding with carrying', badge: '🎒', generate: () => T.carryMixed() },
-      { id: 'y7-borrow', name: 'Subtracting with borrowing', badge: '🔻', generate: () => T.borrowMixed() },
+      { id: 'bor-whole', name: 'A whole take a fraction', badge: '1️⃣', generate: () => T.borrowFromWhole() },
+      { id: 'y7-borrow', name: 'Subtracting with borrowing', badge: '🔻', generate: () => T.borrowMixedPair(Math.random() < 0.5) },
+      { id: 'bor-decide', name: 'Borrow or not? You decide', badge: '🤔', generate: () => T.borrowOrNot() },
       { id: 'y7-diffden', name: 'Different denominators', badge: '🏆', generate: () => T.mixedPlusFraction() },
-      { id: 'y7-solo', name: 'No steps — just the answer', badge: '🔥', generate: () => T.unaided() },
       { id: 'y7-odd', name: 'Spot the odd one out', badge: '🔍', generate: () => T.oddOneOut() },
       { id: 'y7-mult', name: 'Multiply mixed numbers', badge: '✖️', generate: () => T.multMixed() },
       { id: 'y7-div', name: 'Reciprocals & dividing', badge: '🔁', generate: () => T.divideFractions() },
+      { id: 'y7-solo', name: 'No steps — just the answer', badge: '🔥', generate: () => T.unaided() },
     ] },
   ];
   function subjectById(id) { return SUBJECTS.find((s) => s.id === id) || SUBJECTS[0]; }

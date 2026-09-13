@@ -638,7 +638,7 @@
           mixStr(whole, sn, sd), mixStr(w, sn, sd + 1)]))]),
         expr: `${whole} − ${n}/${d}`, isAnswer: true }),
     ];
-    return { subject: 'y7borrow', sig: `bw:${whole}-${n}/${d}`,
+    return { subject: 'y7frac', sig: `bw:${whole}-${n}/${d}`,
       given: `Work out  ${whole} − ${n}/${d}`,
       note: w === 0 ? 'Give your answer in its simplest form.' : SIMPLEST_NOTE,
       answer, steps };
@@ -697,7 +697,7 @@
         pool: shuffle([...new Set(plausible([answer, mixStr(w + 1, rem, d), mixStr(w, rem, d + 1), `${rem}/${d}`]))]),
         expr: `${mixStr(w1, n1, d)} − ${mixStr(w2, n2, d)}`, isAnswer: true }));
     }
-    return { subject: 'y7borrow', sig: `bm:${w1}_${n1}-${w2}_${n2}/${d}:${needSimplify ? 's' : 'p'}`,
+    return { subject: 'y7frac', sig: `bm:${w1}_${n1}-${w2}_${n2}/${d}:${needSimplify ? 's' : 'p'}`,
       given: `Work out  ${mixStr(w1, n1, d)} − ${mixStr(w2, n2, d)}`,
       // Below one whole the answer is a plain fraction, so do not ask for a mixed
       // number — the worked examples say this in as many words.
@@ -715,7 +715,7 @@
     const rem = n1 - n2, w = w1 - w2, g = gcd(rem, d);
     if (rem < 1) return borrowOrNot();
     const answer = mixStr(w, rem / g, d / g);
-    return { subject: 'y7borrow', sig: `nb:${w1}_${n1}-${w2}_${n2}/${d}`,
+    return { subject: 'y7frac', sig: `nb:${w1}_${n1}-${w2}_${n2}/${d}`,
       given: `Work out  ${mixStr(w1, n1, d)} − ${mixStr(w2, n2, d)}`,
       note: SIMPLEST_NOTE, answer,
       steps: [
