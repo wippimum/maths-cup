@@ -6,7 +6,10 @@
      5.2  improper -> mixed IN ITS LOWEST TERMS (26/4 -> 13/2 -> 6 1/2), and whole
           numbers written as improper fractions
      5.4  adding and subtracting MIXED NUMBERS — see the block further down, which
-          follows the class's own method rather than the book's improper-fraction one
+          follows the class's own method rather than the book's improper-fraction one.
+          Adding two top-heavy fractions over a shared denominator had its own level
+          once; it came out because that step is already inside carrying, borrowing and
+          the different-denominator questions, and did not need a section of its own.
      5.5  multiplying mixed numbers, reciprocals, and dividing by a fraction
      5.2  spotting which of three fractions is not equivalent to the other two
 
@@ -274,6 +277,10 @@
   }
 
   // ---------- top-heavy fractions over the same denominator (Dr Frost Q1) ----------
+  // No tile of its own — that section came out because the step is already inside
+  // carrying, borrowing and the different-denominator questions. The SKILL is still
+  // tested though: these turn up as a minority of the same-denominator level, and in
+  // the no-steps pool. Removing the section is not the same as dropping the skill.
   function sameDenTopHeavy() {
     const d = pick([6, 7, 8, 9, 11, 12]);
     const add = Math.random() < 0.5;
@@ -571,8 +578,174 @@
     };
   }
 
+
+  // ============================================================================
+  // BORROWING — its own lesson, built to the six worked examples Naima sent.
+  //
+  // Their shape is the thing to copy, because it is the shape she wants him reading:
+  //
+  //   1  write the question          9 7/13 − 3 8/13
+  //   2  compare the fractions       7 < 8, so borrow one whole
+  //   3  rename the first number     9 7/13 = 8 20/13     (13/13 + 7/13 = 20/13)
+  //   4  subtract                    8 20/13 − 3 8/13 = 5 12/13
+  //   5  simplify, only if needed    2 15/27 = 2 5/9
+  //
+  // Two of the six start from a whole number rather than a mixed one (1 − 7/10 and
+  // 7 − 8/15), where the rename is the whole lesson: 1 = 10/10, 7 = 6 15/15. And one
+  // ends below one whole, where the answer is a plain fraction — the sheet says so in
+  // as many words, "do not show a mixed number because the result is less than one".
+  // Both cases are levels here, not footnotes.
+
+  // A wrong option has to be a mistake someone could actually make. "1 2/1" is not one:
+  // a top-heavy fraction part is never a candidate answer, and leaving such options in
+  // narrows the real choice for free.
+  const plausible = (opts) => opts.filter((o) => {
+    if (o == null) return false;
+    const m = String(o).match(/(\d+)\/(\d+)$/);
+    return !m || Number(m[1]) < Number(m[2]);
+  });
+  // the rename line the examples print under step 3
+  const renameLine = (d, n) => `${d}/${d} + ${n}/${d} = ${n + d}/${d}`;
+
+  // ---------- a whole number take a fraction (examples 1 and 2) ----------
+  function borrowFromWhole() {
+    const d = pick([7, 9, 10, 12, 15, 20]);
+    const n = rand(1, d - 1);
+    const whole = Math.random() < 0.35 ? 1 : rand(2, 9);
+    const w = whole - 1, rem = d - n, g = gcd(rem, d);
+    const sn = rem / g, sd = d / g;
+    const answer = w === 0 ? `${sn}/${sd}` : mixStr(w, sn, sd);
+    const steps = [
+      nStep({ key: 'rename', prompt: `There is no fraction to take ${n}/${d} from yet. Rename one whole as ${d}ths: 1 = ?/${d}`,
+        hint: `One whole is ${d}/${d}.`,
+        why: `You cannot subtract a fraction from a whole number as it stands. Turn ONE of the wholes into ${d}ths — one whole cut into ${d} pieces is ${d}/${d}${w ? `, which leaves ${w} whole${w === 1 ? '' : 's'} beside it, so ${whole} = ${mixStr(w, d, d)}` : ''}.`,
+        resultText: w === 0 ? `1 = ${d}/${d}` : `${whole} = ${mixStr(w, d, d)}`,
+        answer: d, pool: uniqSort([d, d - 1, d + 1, n, n + d]), expr: `one whole as ${d}ths` }),
+      nStep({ key: 'sub', prompt: `Now subtract the fractions: ${d} − ${n} = ?`,
+        hint: `${d} − ${n} = ${rem}, so ${rem}/${d}.`,
+        why: `Take the ${n} pieces from the ${d} you just made.${w ? ` The other ${w} whole${w === 1 ? ' is' : 's are'} untouched.` : ''}`,
+        resultText: w === 0 ? `${rem}/${d}` : `${mixStr(w, rem, d)}`,
+        answer: rem, lo: 1, hi: d, expr: `${d} − ${n}` }),
+      sStep({ key: 'final', prompt: w === 0 ? `Give the answer in its simplest form.` : `Give the answer as a mixed number in its simplest form.`,
+        hint: g > 1 ? `${rem}/${d} simplifies by ${g}, giving ${answer}.` : `${answer}.`,
+        why: (w === 0
+          ? `The result is LESS THAN ONE, so it stays a plain fraction — there is no whole number to write in front of it. `
+          : `${whole} became ${mixStr(w, d, d)}, and ${d}/${d} − ${n}/${d} = ${rem}/${d}, so the answer is ${mixStr(w, rem, d)}. `)
+          + (g > 1 ? `${rem} and ${d} both divide by ${g}, so it simplifies to ${answer}.` : `${sn} and ${sd} share no factor, so this is already simplest.`),
+        longWay: `${whole} − ${n}/${d}\n= ${w === 0 ? `${d}/${d}` : mixStr(w, d, d)} − ${n}/${d}\n= ${w === 0 ? `${rem}/${d}` : mixStr(w, rem, d)}${g > 1 ? `\n= ${answer}` : ''}`,
+        resultText: answer, answer,
+        pool: shuffle([...new Set(plausible([answer, w === 0 ? `${rem}/${d}` : mixStr(w, rem, d),
+          mixStr(whole, sn, sd), mixStr(w, sn, sd + 1)]))]),
+        expr: `${whole} − ${n}/${d}`, isAnswer: true }),
+    ];
+    return { subject: 'y7borrow', sig: `bw:${whole}-${n}/${d}`,
+      given: `Work out  ${whole} − ${n}/${d}`,
+      note: w === 0 ? 'Give your answer in its simplest form.' : SIMPLEST_NOTE,
+      answer, steps };
+  }
+
+  // ---------- mixed take mixed, borrowing (examples 3 to 6) ----------
+  // needSimplify picks whether the answer has to be simplified at the end, so the two
+  // can be separate levels the way the examples separate them.
+  function borrowMixedPair(needSimplify) {
+    const d = needSimplify ? pick([12, 27, 15, 20, 18]) : pick([7, 13, 11, 9, 8]);
+    const n2 = rand(2, d - 1), n1 = rand(1, n2 - 1);
+    const w2 = rand(2, 4), w1 = rand(w2 + 1, w2 + 5);
+    const rem = n1 + d - n2, w = w1 - 1 - w2;
+    if (rem < 1 || rem >= d || w < 0) return borrowMixedPair(needSimplify);
+    const g = gcd(rem, d);
+    if (needSimplify ? g === 1 : g !== 1) return borrowMixedPair(needSimplify);
+    const sn = rem / g, sd = d / g;
+    const answer = w === 0 ? `${sn}/${sd}` : mixStr(w, sn, sd);
+    const steps = [
+      sStep({ key: 'compare', prompt: `Compare the fractions: ${n1}/${d} and ${n2}/${d}. Which is true?`,
+        hint: `${n1} < ${n2}, so you have to borrow one whole.`,
+        why: `Always look at the fractions before you touch the whole numbers. ${n1}/${d} is SMALLER than ${n2}/${d}, so ${n1}/${d} − ${n2}/${d} would drop below zero. That is the signal to borrow one whole from the ${w1}.`,
+        resultText: `${n1} < ${n2}, so borrow one whole`, answer: `${n1} < ${n2}, so borrow one whole`,
+        pool: shuffle([`${n1} < ${n2}, so borrow one whole`, `${n1} > ${n2}, so subtract straight away`,
+          `They are equal, so the fraction part is 0`, `Swap them round and subtract`]),
+        expr: `whether ${n1}/${d} − ${n2}/${d} works as it stands` }),
+      nStep({ key: 'rename', prompt: `Rename ${mixStr(w1, n1, d)}. Borrow one whole, so the ${w1} becomes ${w1 - 1} and the fraction becomes ?/${d}`,
+        hint: `${renameLine(d, n1)} — so ${mixStr(w1, n1, d)} = ${w1 - 1} ${n1 + d}/${d}.`,
+        why: `The whole you borrowed is ${d}/${d}. Add it to the fraction you already had: ${renameLine(d, n1)}. Nothing has changed in value — ${mixStr(w1, n1, d)} and ${w1 - 1} ${n1 + d}/${d} are the same amount, written so the subtraction is now possible.`,
+        resultText: `${mixStr(w1, n1, d)} = ${w1 - 1} ${n1 + d}/${d}`,
+        answer: n1 + d, lo: d, hi: n1 + d + 6, expr: `${d} + ${n1}` }),
+      sStep({ key: 'sub', prompt: `Now subtract: ${w1 - 1} ${n1 + d}/${d} − ${mixStr(w2, n2, d)} = ?`,
+        hint: `Wholes: ${w1 - 1} − ${w2} = ${w}. Fractions: ${n1 + d} − ${n2} = ${rem}. So ${w === 0 ? `${rem}/${d}` : mixStr(w, rem, d)}.`,
+        why: `With the borrow done, both parts subtract normally: the whole numbers ${w1 - 1} − ${w2} = ${w}, and the fractions ${n1 + d} − ${n2} = ${rem} over the same denominator ${d}. Use ${w1 - 1}, not ${w1} — forgetting the borrow is the commonest slip in the whole method.`,
+        resultText: w === 0 ? `${rem}/${d}` : mixStr(w, rem, d),
+        answer: w === 0 ? `${rem}/${d}` : mixStr(w, rem, d),
+        pool: shuffle([...new Set(plausible([w === 0 ? `${rem}/${d}` : mixStr(w, rem, d),
+          mixStr(w + 1, rem, d), mixStr(w, Math.abs(n2 - n1), d), mixStr(w, rem, d + 1)]))]),
+        expr: `${w1 - 1} ${n1 + d}/${d} − ${mixStr(w2, n2, d)}` }),
+    ];
+    if (needSimplify) {
+      steps.push(sStep({ key: 'simplify', prompt: `Simplify. ${rem} and ${d} both divide by ${g} — what does ${w === 0 ? `${rem}/${d}` : mixStr(w, rem, d)} become?`,
+        hint: `${rem} ÷ ${g} = ${sn} and ${d} ÷ ${g} = ${sd}, so ${answer}.`,
+        why: `The subtraction is done, but the answer is not finished: ${rem}/${d} is not in its lowest terms. Divide top and bottom by ${g}. The whole number ${w === 0 ? 'part' : `${w}`} does not change — only the fraction is simplified.`,
+        longWay: `${mixStr(w1, n1, d)} − ${mixStr(w2, n2, d)}\n= ${w1 - 1} ${n1 + d}/${d} − ${mixStr(w2, n2, d)}\n= ${w === 0 ? `${rem}/${d}` : mixStr(w, rem, d)}\n= ${answer}`,
+        resultText: answer, answer,
+        pool: shuffle([...new Set(plausible([answer, w === 0 ? `${rem}/${d}` : mixStr(w, rem, d),
+          mixStr(w, sn, sd + 1), mixStr(w, sn + 1, sd)]))]),
+        expr: `${rem}/${d} in its lowest terms`, isAnswer: true }));
+    } else {
+      steps.push(sStep({ key: 'final', prompt: `Final answer — is ${w === 0 ? `${rem}/${d}` : mixStr(w, rem, d)} already in its simplest form?`,
+        hint: `Yes. ${rem} and ${d} share no common factor, so the answer is ${answer}.`,
+        why: `Check before writing it down: ${rem} and ${d} have no common factor, so ${rem}/${d} cannot be simplified and ${answer} is finished. Checking is the habit — most of these DO simplify, and an unsimplified answer is marked wrong even when the value is right.`,
+        longWay: `${mixStr(w1, n1, d)} − ${mixStr(w2, n2, d)}\n= ${w1 - 1} ${n1 + d}/${d} − ${mixStr(w2, n2, d)}\n= ${answer}`,
+        resultText: answer, answer,
+        pool: shuffle([...new Set(plausible([answer, mixStr(w + 1, rem, d), mixStr(w, rem, d + 1), `${rem}/${d}`]))]),
+        expr: `${mixStr(w1, n1, d)} − ${mixStr(w2, n2, d)}`, isAnswer: true }));
+    }
+    return { subject: 'y7borrow', sig: `bm:${w1}_${n1}-${w2}_${n2}/${d}:${needSimplify ? 's' : 'p'}`,
+      given: `Work out  ${mixStr(w1, n1, d)} − ${mixStr(w2, n2, d)}`,
+      // Below one whole the answer is a plain fraction, so do not ask for a mixed
+      // number — the worked examples say this in as many words.
+      note: w === 0 ? 'Give your answer in its simplest form.' : SIMPLEST_NOTE,
+      answer, steps };
+  }
+
+  // ---------- does it even need a borrow? (the decision, on its own) ----------
+  function borrowOrNot() {
+    if (Math.random() < 0.5) return borrowMixedPair(Math.random() < 0.5);
+    // the same shape, but no borrow needed — he has to notice
+    const d = pick([7, 9, 12, 13, 15, 20]);
+    const n1 = rand(2, d - 1), n2 = rand(1, n1 - 1);
+    const w2 = rand(1, 3), w1 = rand(w2 + 1, w2 + 5);
+    const rem = n1 - n2, w = w1 - w2, g = gcd(rem, d);
+    if (rem < 1) return borrowOrNot();
+    const answer = mixStr(w, rem / g, d / g);
+    return { subject: 'y7borrow', sig: `nb:${w1}_${n1}-${w2}_${n2}/${d}`,
+      given: `Work out  ${mixStr(w1, n1, d)} − ${mixStr(w2, n2, d)}`,
+      note: SIMPLEST_NOTE, answer,
+      steps: [
+        sStep({ key: 'compare', prompt: `Compare the fractions: ${n1}/${d} and ${n2}/${d}. Which is true?`,
+          hint: `${n1} > ${n2}, so you can subtract straight away — no borrowing.`,
+          why: `Check the fractions FIRST, every time. Here ${n1}/${d} is bigger than ${n2}/${d}, so the subtraction works as it stands and there is nothing to borrow. Borrowing when you do not need to is just as wrong as forgetting to.`,
+          resultText: `${n1} > ${n2}, so no borrowing needed`, answer: `${n1} > ${n2}, so subtract straight away`,
+          pool: shuffle([`${n1} > ${n2}, so subtract straight away`, `${n1} < ${n2}, so borrow one whole`,
+            `Borrow one whole to be safe`, `Turn both into improper fractions first`]),
+          expr: `whether ${n1}/${d} − ${n2}/${d} works as it stands` }),
+        sStep({ key: 'sub', prompt: `Subtract: wholes ${w1} − ${w2}, fractions ${n1} − ${n2}. What do you get?`,
+          hint: `${w1} − ${w2} = ${w} and ${n1} − ${n2} = ${rem}, so ${mixStr(w, rem, d)}.`,
+          why: `Both parts subtract straight across, keeping the denominator ${d}.`,
+          resultText: mixStr(w, rem, d), answer: mixStr(w, rem, d),
+          pool: shuffle([...new Set(plausible([mixStr(w, rem, d), mixStr(w - 1, rem, d), mixStr(w, n1 + n2, d), mixStr(w, rem, d + 1)]))]),
+          expr: `${w1} − ${w2} and ${n1} − ${n2}` }),
+        sStep({ key: 'final', prompt: `Give the answer as a mixed number in its simplest form.`,
+          hint: g > 1 ? `${rem}/${d} simplifies by ${g}, giving ${answer}.` : `${answer} — already simplest.`,
+          why: g > 1 ? `${rem} and ${d} both divide by ${g}, so ${mixStr(w, rem, d)} becomes ${answer}.`
+            : `${rem} and ${d} share no common factor, so ${answer} is finished.`,
+          longWay: `${mixStr(w1, n1, d)} − ${mixStr(w2, n2, d)}\n= ${mixStr(w, rem, d)}${g > 1 ? `\n= ${answer}` : ''}`,
+          resultText: answer, answer,
+          pool: shuffle([...new Set(plausible([answer, mixStr(w, rem, d), mixStr(w + 1, rem / g, d / g), mixStr(w, rem / g, d / g + 1)]))]),
+          expr: `${mixStr(w, rem, d)} in its simplest form`, isAnswer: true }),
+      ] };
+  }
+
   const api = { improperLowestTerms, multMixed, divideFractions, oddOneOut,
-    sameDenTopHeavy, sameDenMixed, carryMixed, borrowMixed, mixedPlusFraction, unaided };
+    sameDenTopHeavy, sameDenMixed, carryMixed, borrowMixed, mixedPlusFraction, unaided,
+    borrowFromWhole, borrowMixedPair, borrowOrNot };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.WAC = Object.assign(root.WAC || {}, api);
 })(typeof window !== 'undefined' ? window : globalThis);

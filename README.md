@@ -31,7 +31,7 @@ Where each level came from:
 
 | Source | Levels |
 | --- | --- |
-| Dr Frost sheet, Q1–Q4 | same denominator (top-heavy) · mixed numbers, same denominator · adding with carrying · subtracting with borrowing |
+| Dr Frost sheet, Q2–Q4 | mixed numbers, same denominator · adding with carrying · subtracting with borrowing |
 | Photos of the online questions | different denominators |
 | His own written work (`42/16 = 2 5/8`) | improper → mixed, simplest form |
 | CGP Section 5 | mixed ↔ improper · spot the odd one out · multiply · reciprocals & dividing |
@@ -50,7 +50,6 @@ the two below it"), and the **three-term** questions from the phone photos
 | --- | --- |
 | Mixed ↔ improper | the conversion both ways |
 | Improper → mixed, simplest form | `42/16 = 2 5/8` — simplify, then split off the wholes |
-| Same denominator (top-heavy) | `62/12 − 49/12` |
 | Mixed numbers, same denominator | `1 2/9 + 2 3/9`, `4 7/9 − 2 4/9` |
 | Adding with carrying | `8 5/12 + 4 11/12` — the fractions make another whole |
 | Subtracting with borrowing | `9 3/7 − 2 6/7`, and `1 − 7/10` |
@@ -150,6 +149,24 @@ Three rules keep these honest, enforced by `test/test-unaided.js`:
 Stretch levels are left out (this asks whether the *course* stuck), and **Shape facts**
 has no such level at all: every one of its levels is already a single recall question,
 so there is nothing to strip.
+
+### 🔻 Borrowing — a lesson of its own (Year 7)
+
+Borrowing is where the marks go, so it has its own tile rather than one level inside
+Fractions. Its structure is taken from six worked examples: **compare the fractions →
+rename the first mixed number → subtract → simplify**, with the rename shown the way
+the examples show it, `13/13 + 7/13 = 20/13`.
+
+| Level | Case |
+| --- | --- |
+| A whole take a fraction | `1 − 7/10`, `7 − 8/15` — the rename *is* the lesson |
+| Borrow, already simplest | `9 7/13 − 3 8/13` |
+| Borrow, then simplify | `8 6/12 − 4 9/12`, `7 13/27 − 4 25/27` |
+| Borrow or not? You decide | half need one, half don't — noticing is the skill |
+| 🔥 No steps | the same questions unaided |
+
+When the answer drops **below one whole** the question asks for a plain fraction, not a
+mixed number — as the examples state explicitly.
 
 ### ⭐ Stretch levels
 

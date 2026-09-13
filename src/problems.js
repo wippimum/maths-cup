@@ -628,15 +628,23 @@
     const levels = subj.levels.filter((l) => !/-solo$/.test(l.id) && !l.stretch);
     if (!levels.length) return null;
     let fallback = null;
-    for (let i = 0; i < 50; i++) {
-      const l = levels[Math.floor(Math.random() * levels.length)];
-      let p;
-      try { p = l.generate(); } catch (e) { continue; }
-      if (!p || !p.steps || !p.steps.length) continue;
-      const last = p.steps[p.steps.length - 1];
-      if (!T.unaidedIsSelfContained(last)) continue;      // nothing to answer on its own
-      fallback = fallback || p;
-      if (p.steps.length >= 2) return T.unaidedFrom(p);
+    // Sweep the levels in order rather than only sampling at random. Linear Equations is
+    // the reason: most of its levels are typed-LINE questions that cannot stand alone, so
+    // random draws could miss the two that can and come back with nothing — which then
+    // reached buildMatchFor as null and threw on p.sig. Rare, so it showed up as a test
+    // that failed about once in forty runs rather than as an obvious break.
+    const order = levels.slice();
+    for (let pass = 0; pass < 6; pass++) {
+      for (const l of order) {
+        for (let k = 0; k < 3; k++) {
+          let p;
+          try { p = l.generate(); } catch (e) { continue; }
+          if (!p || !p.steps || !p.steps.length) continue;
+          if (!T.unaidedIsSelfContained(p.steps[p.steps.length - 1])) continue;
+          fallback = fallback || p;
+          if (p.steps.length >= 2) return T.unaidedFrom(p);
+        }
+      }
     }
     return fallback ? T.unaidedFrom(fallback) : null;
   }
@@ -814,6 +822,16 @@
       { id: 'vol-hard', name: 'Surface area', badge: '⭐', stretch: true, generate: () => T.surfaceArea(rand(3, 9), rand(2, 7), rand(2, 8)) },
       SOLO('volume'),
     ] },
+    // A lesson of its own, on Naima's instruction — borrowing is the step the boys lose
+    // marks on, and the six worked examples she sent are its structure: compare, rename,
+    // subtract, simplify. The ladder separates the cases those examples separate.
+    { id: 'y7borrow', year: 7, name: 'Borrowing', icon: '🔻', blurb: 'KS3: subtracting mixed numbers when the fraction on top is too small — compare, rename, subtract, simplify.', levels: [
+      { id: 'bor-whole', name: 'A whole take a fraction', badge: '1️⃣', generate: () => T.borrowFromWhole() },
+      { id: 'bor-plain', name: 'Borrow, already simplest', badge: '🔻', generate: () => T.borrowMixedPair(false) },
+      { id: 'bor-simplify', name: 'Borrow, then simplify', badge: '➗', generate: () => T.borrowMixedPair(true) },
+      { id: 'bor-decide', name: 'Borrow or not? You decide', badge: '🤔', generate: () => T.borrowOrNot() },
+      SOLO('y7borrow'),
+    ] },
     { id: 'solve', year: 6, name: 'Problem Solving', icon: '🧩', blurb: '10 problems, easy → hard, in tiny steps.', levels: [
       { id: 'solve-easy', name: 'Warm-up (easier)', badge: '🌱', generate: () => T.solveRandom() },
       { id: 'solve-lesson', name: 'Lesson (easy → hard)', badge: '🧩', generate: () => T.solveRandom() },
@@ -828,8 +846,7 @@
     { id: 'y7frac', year: 7, name: 'Fractions & Mixed Numbers', icon: '½', blurb: 'KS3: adding and subtracting mixed numbers — carrying, borrowing, and always in its simplest form.', levels: [
       { id: 'y7-mixed', name: 'Mixed ↔ improper', badge: '🔄', generate: () => (Math.random() < 0.5 ? T.mixedToImproper() : T.improperToMixed()) },
       { id: 'y7-lowest', name: 'Improper → mixed, simplest form', badge: '➗', generate: () => T.improperLowestTerms() },
-      { id: 'y7-same', name: 'Same denominator (top-heavy)', badge: '🧱', generate: () => T.sameDenTopHeavy() },
-      { id: 'y7-mixed-same', name: 'Mixed numbers, same denominator', badge: '➕', generate: () => T.sameDenMixed() },
+      { id: 'y7-mixed-same', name: 'Mixed numbers, same denominator', badge: '➕', generate: () => (Math.random() < 0.25 ? T.sameDenTopHeavy() : T.sameDenMixed()) },
       { id: 'y7-carry', name: 'Adding with carrying', badge: '🎒', generate: () => T.carryMixed() },
       { id: 'y7-borrow', name: 'Subtracting with borrowing', badge: '🔻', generate: () => T.borrowMixed() },
       { id: 'y7-diffden', name: 'Different denominators', badge: '🏆', generate: () => T.mixedPlusFraction() },
@@ -856,7 +873,8 @@
     const out = [], seen = new Set(), count = n || 10;
     for (let i = 0; i < count; i++) {
       let p, tries = 0;
-      do { p = lvl.generate(); tries++; } while (seen.has(p.sig || p.given) && tries < 60);
+      do { p = lvl.generate(); tries++; } while (p && seen.has(p.sig || p.given) && tries < 60);
+      if (!p) continue;                       // a generator that came back empty
       seen.add(p.sig || p.given);
       out.push(p);
     }
