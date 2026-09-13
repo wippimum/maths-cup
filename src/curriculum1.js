@@ -108,6 +108,10 @@
   // ============================================================ T4 · mixed numbers ↔ improper fractions
   function mixedToImproper() {
     const d = rand(2, 9), whole = rand(2, 6), n = rand(1, d - 1);
+    // The fraction part must already be in its lowest terms, or the question shows
+    // "3 2/4" and the answer comes out as "2 3/9" — untidy in Year 6, and plainly wrong
+    // in Year 7, where every one of these ends "give your answer in its simplest form".
+    if (gcd(n, d) !== 1) return mixedToImproper();
     const top = whole * d + n;
     return {
       subject: 'fractions', sig: `mi:${whole}_${n}/${d}`, given: `Write  ${whole} ${n}/${d}  as an improper fraction`, answer: `${top}/${d}`,
@@ -134,6 +138,7 @@
   }
   function improperToMixed() {
     const d = rand(2, 9), whole = rand(2, 6), n = rand(1, d - 1);
+    if (gcd(n, d) !== 1) return improperToMixed();      // see mixedToImproper
     const top = whole * d + n;
     return {
       subject: 'fractions', sig: `im:${top}/${d}`, given: `Write  ${top}/${d}  as a mixed number`, answer: `${whole} ${n}/${d}`,

@@ -48,16 +48,26 @@ the two below it"), and the **three-term** questions from the phone photos
 
 | Level | What it drills |
 | --- | --- |
-| Mixed ↔ improper | the conversion both ways |
+| Mixed ↔ improper | both directions, plus spotting which of three forms is the odd one out |
 | Improper → mixed, simplest form | `42/16 = 2 5/8` — simplify, then split off the wholes |
-| Mixed numbers, same denominator | `1 2/9 + 2 3/9`, `4 7/9 − 2 4/9` |
+| Mixed numbers, same denominator | `1 2/9 + 2 3/9`, and top-heavy pairs like `62/12 − 49/12` |
 | Adding with carrying | `8 5/12 + 4 11/12` — the fractions make another whole |
-| Different denominators | `3 2/15 + 6/5`, `3 15/22 − 5/2` |
 | A whole take a fraction | `1 − 7/10`, `7 − 8/15` — the rename *is* the lesson |
-| Subtracting with borrowing | `9 7/13 − 3 8/13`, `8 6/12 − 4 9/12`, simplifying when needed |
+| Subtracting with borrowing | `9 7/13 − 3 8/13`, simplifying when it is needed |
 | Borrow or not? You decide | half need one, half don't — noticing is the skill |
+| Different denominators | `3 2/15 + 6/5`, `3 15/22 − 5/2` |
+| Multiply & divide | multiplying mixed numbers, reciprocals, dividing by a fraction |
 | **No steps — just the answer** 🔥 | the same questions with the scaffolding removed |
-| Multiply · Reciprocals & dividing | the rest of the KS3 fractions unit |
+
+Ten levels, ordered by difficulty and measured rather than assumed — step counts climb
+1 → 6 across the ladder. Two rows carry more than one thing so the list stays short:
+the odd-one-out rides inside the conversion level, and multiply shares a row with
+divide. Borrowing keeps three rows of its own, because it is the lesson he is on.
+
+Two dips in the step count are deliberate. *A whole take a fraction* is shorter than the
+carrying level before it but is the gateway to borrowing and belongs beside it, and
+*No steps* is one step because removing the scaffolding **is** the difficulty.
+
 
 **The unguided level.** Every other level walks through the method — find the common
 denominator, rewrite, carry, simplify. That is how the method is learnt, but it is not

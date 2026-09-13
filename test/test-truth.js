@@ -195,11 +195,17 @@ const CASES = {
       if (m) return Number(m[1]) / Number(m[2]);
       return Number(t);
     };
-    for (const lvl of ['y7-lowest', 'y7-mixed-same', 'y7-carry', 'bor-whole', 'y7-borrow', 'bor-decide', 'y7-diffden', 'y7-mult', 'y7-div', 'y7-odd']) {
+    for (const lvl of ['y7-lowest', 'y7-mixed-same', 'y7-carry', 'bor-whole', 'y7-borrow', 'bor-decide', 'y7-diffden', 'y7-muldiv', 'y7-mixed']) {
       const p = W.buildMatchFor('y7frac', lvl, 1)[0];
       const g = p.given;
       let truth = null, m;
-      if ((m = g.match(/Write\s+(\d+)\/(\d+)\s+as a mixed/))) truth = Number(m[1]) / Number(m[2]);
+      // "Write 4 2/6 as an improper fraction" is the one shape whose answer is SUPPOSED
+      // to be top-heavy and unsimplified, so it skips the finished-form checks below.
+      let improperIsTheAnswer = false;
+      if ((m = g.match(/Write\s+(\d+)\s+(\d+)\/(\d+)\s+as an improper/))) {
+        truth = (Number(m[1]) * Number(m[3]) + Number(m[2])) / Number(m[3]);
+        improperIsTheAnswer = true;
+      } else if ((m = g.match(/Write\s+(\d+)\/(\d+)\s+as a mixed/))) truth = Number(m[1]) / Number(m[2]);
       else if ((m = g.match(/^Work out\s+(.+?)\s+([+\u2212\u00d7\u00f7])\s+(.+?)\s*$/))) {
         const a = val(m[1]), b = val(m[3]);
         truth = m[2] === '+' ? a + b : m[2] === '\u2212' ? a - b : m[2] === '\u00d7' ? a * b : a / b;
@@ -207,7 +213,7 @@ const CASES = {
       if (truth !== null) {
         if (Math.abs(val(p.answer) - truth) > 1e-9) { bad(`year7 ${lvl}: "${g}" claims ${p.answer}, truth ${truth}`); continue; }
         ok();
-        const f = String(p.answer).match(/(\d+)\/(\d+)/);
+        const f = improperIsTheAnswer ? null : String(p.answer).match(/(\d+)\/(\d+)/);
         if (f && gcd(Number(f[1]), Number(f[2])) !== 1) bad(`year7 ${lvl}: ${p.answer} is not in its lowest terms`); else ok();
         if (f && Number(f[1]) >= Number(f[2])) bad(`year7 ${lvl}: ${p.answer} is still an improper fraction`); else ok();
       }

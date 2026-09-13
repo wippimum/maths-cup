@@ -833,8 +833,16 @@
     // First Year 7 topic. Built from Section 5 of the CGP Foundation book while the
     // school's Year 7 Toddle unit plan is still to come — the objectives and the
     // wording here must be reconciled against that plan once it arrives.
+    // Ordered by difficulty, measured not assumed. Step counts climb 1 → 6 across the
+    // ladder with two deliberate exceptions: "A whole take a fraction" is shorter than
+    // the carrying level before it but is the gateway to borrowing and has to sit with
+    // it, and "No steps" is one step because removing the scaffolding IS the difficulty.
+    // Ten levels, some carrying more than one thing: spotting the odd one out rides
+    // inside the conversion level rather than taking a row of its own, and multiply and
+    // divide share one. Borrowing keeps all three of its rows — it is the lesson he is
+    // actually on, and the whole-take-a-fraction case is two of the six worked examples.
     { id: 'y7frac', year: 7, name: 'Fractions & Mixed Numbers', icon: '½', blurb: 'KS3: adding and subtracting mixed numbers — carrying, borrowing, and always in its simplest form.', levels: [
-      { id: 'y7-mixed', name: 'Mixed ↔ improper', badge: '🔄', generate: () => (Math.random() < 0.5 ? T.mixedToImproper() : T.improperToMixed()) },
+      { id: 'y7-mixed', name: 'Mixed ↔ improper', badge: '🔄', generate: () => { const r = Math.random(); return r < 0.25 ? T.oddOneOut() : r < 0.62 ? T.mixedToImproper() : T.improperToMixed(); } },
       { id: 'y7-lowest', name: 'Improper → mixed, simplest form', badge: '➗', generate: () => T.improperLowestTerms() },
       { id: 'y7-mixed-same', name: 'Mixed numbers, same denominator', badge: '➕', generate: () => (Math.random() < 0.25 ? T.sameDenTopHeavy() : T.sameDenMixed()) },
       { id: 'y7-carry', name: 'Adding with carrying', badge: '🎒', generate: () => T.carryMixed() },
@@ -842,9 +850,7 @@
       { id: 'y7-borrow', name: 'Subtracting with borrowing', badge: '🔻', generate: () => T.borrowMixedPair(Math.random() < 0.5) },
       { id: 'bor-decide', name: 'Borrow or not? You decide', badge: '🤔', generate: () => T.borrowOrNot() },
       { id: 'y7-diffden', name: 'Different denominators', badge: '🏆', generate: () => T.mixedPlusFraction() },
-      { id: 'y7-odd', name: 'Spot the odd one out', badge: '🔍', generate: () => T.oddOneOut() },
-      { id: 'y7-mult', name: 'Multiply mixed numbers', badge: '✖️', generate: () => T.multMixed() },
-      { id: 'y7-div', name: 'Reciprocals & dividing', badge: '🔁', generate: () => T.divideFractions() },
+      { id: 'y7-muldiv', name: 'Multiply & divide', badge: '✖️', generate: () => (Math.random() < 0.5 ? T.multMixed() : T.divideFractions()) },
       { id: 'y7-solo', name: 'No steps — just the answer', badge: '🔥', generate: () => T.unaided() },
     ] },
   ];
