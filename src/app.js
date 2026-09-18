@@ -124,6 +124,7 @@
   function goHome() {
     // Nobody has picked a year yet (a brand-new save): the chooser IS the menu.
     if (!save.year) { showYearScreen(); return; }
+    if (save.year === 4) { location.href = 'stars.html'; return; }
     const inMatch = game && !$('gameScreen').classList.contains('hidden');
     if (inMatch) {
       const solved = game.matchStats.solved;
@@ -716,13 +717,22 @@
     applyTeam(); refreshHeader();
     // The year buttons on the landing screen, and the way back to it.
     document.querySelectorAll('.year-card').forEach((btn) => {
-      btn.onclick = () => enterYear(Number(btn.getAttribute('data-year')));
+      btn.onclick = () => {
+        const y = Number(btn.getAttribute('data-year'));
+        // Year 4 is a separate app (stars.html) rather than a set of topic tiles. Its
+        // choice is remembered all the same, so the iPad it lives on opens straight to it.
+        if (y === 4) { save.year = 4; persist(); location.href = 'stars.html'; return; }
+        enterYear(y);
+      };
     });
     $('yearBtn').onclick = showYearScreen;
     $('homeBtn').onclick = goHome;
     // A save that already knows its year goes straight to the menu; only a brand-new
-    // one (or someone who tapped "change year") is asked the question.
-    if (save.year) enterYear(save.year); else { renderMenu(); showYearScreen(); }
+    // one, or someone arriving from Star Tables' back arrow (#year), is asked the question.
+    if (location.hash === '#year') { renderMenu(); showYearScreen(); history.replaceState(null, '', location.pathname); }
+    else if (save.year === 4) { location.replace('stars.html'); return; }
+    else if (save.year) enterYear(save.year);
+    else { renderMenu(); showYearScreen(); }
     $('kickoffBtn').onclick = startMatch;
     $('historyBtn').onclick = showHistory;
     $('buildStamp').onclick = () => checkForUpdate(true);

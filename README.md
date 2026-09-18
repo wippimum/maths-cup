@@ -12,7 +12,7 @@ inside a match it asks first, because the crest is easy to catch by accident; sa
 ends the match the same way the "End match" button does, so how far he got is still
 recorded in his history.
 
-The app opens on a **year chooser**: Year 6 or Year 7. The choice is remembered, so it
+The app opens on a **year chooser**: Year 4, Year 6 or Year 7. The choice is remembered, so it
 is only asked once — after that it goes straight to the menu, and **🎓 change year** on
 the menu brings the chooser back.
 
@@ -108,6 +108,24 @@ Year 7 under **NOT CHECKED** rather than pretending to verify it, and `test-voca
 no Year 7 terms to enforce yet. The homework-plus-CGP basis above is a deliberate choice,
 not a placeholder — when the plan arrives it should be checked against, and the wording
 reconciled, rather than the levels being thrown away.
+
+### Year 4 — Star Tables
+
+**Year 4** opens a separate app, `stars.html`: a times-tables drill (×4 to ×10) with
+levels, a star map, stickers and ranks. It was built on its own first and is carried in
+here nearly unchanged — the maths cup's topic tiles are not used for it.
+
+- Picking Year 4 is **remembered**, so the iPad it lives on opens straight into it. The
+  **←** in its header goes back to the year chooser.
+- **Progress carried over.** The first version kept its save inside Claude, where this
+  site cannot reach it, so a snapshot read on 18 Sept 2026 (34,550 points, 474 stickers)
+  is built in and used **only on a device that has never saved here** — it can never
+  overwrite anything played since. *Reset all progress* still resets to zero.
+- **No child's name in the repo.** This site and repo are public, so the page says
+  *Star Tables*, not a name. The greeting ("Hi …!") uses a name typed once under **For
+  grown-ups**, stored on that iPad only — the same approach as the parent email.
+  `test/test-build.js` now fails if any of the children's names appears in a published
+  file, `stars.html` included.
 
 ## Topics — the actual Year 6 course
 
