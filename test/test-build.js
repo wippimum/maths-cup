@@ -91,7 +91,7 @@ if (!/return \(step && step\.mode\) \|\| 'build'/.test(app)) bad('stepMode() no 
 // any email address that must never appear, so the URL can't be tied back to them.
 const SECRETS = [/[\w.+-]+@[\w-]+\.[\w.]+/, /\bHamdan\b/i, /\bSultan\b/i, /\bAlya\b/i, /\bLeyna\b/i,
   /\b(Hamdan|Sultan)[\s\w]*Al\s*Falasi\b/i];
-fs.readdirSync(path.join(ROOT, 'src')).concat(['index.html', 'stars.html', 'sw.js', 'manifest.json', 'README.md']).forEach((f) => {
+fs.readdirSync(path.join(ROOT, 'src')).concat(['index.html', 'stars.html', 'heroes.html', 'sw.js', 'manifest.json', 'README.md']).forEach((f) => {
   const p = f.endsWith('.js') && !f.includes('.') === false && fs.existsSync(path.join(ROOT, 'src', f))
     ? path.join(ROOT, 'src', f) : path.join(ROOT, f);
   if (!fs.existsSync(p) || fs.statSync(p).isDirectory()) return;

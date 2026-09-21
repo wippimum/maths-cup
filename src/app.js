@@ -117,6 +117,10 @@
     pendingSubject = save.subject; pendingLevel = save.level;
     persist();
   }
+  // Year groups that are a whole separate page, not topic tiles in this app. setYear()
+  // must never run for these: they have no subjects, and it would crash on mine[0].
+  const SEPARATE_APP = { 2: 'heroes.html', 4: 'stars.html' };
+
   // The crest is a home button: back to THIS year's menu, never to the year chooser.
   // Mid-match it behaves like "End match", which records how far he got — but it asks
   // first, because the crest sits at the top of the screen and is easy to catch by
@@ -124,7 +128,7 @@
   function goHome() {
     // Nobody has picked a year yet (a brand-new save): the chooser IS the menu.
     if (!save.year) { showYearScreen(); return; }
-    if (save.year === 4) { location.href = 'stars.html'; return; }
+    if (SEPARATE_APP[save.year]) { location.href = SEPARATE_APP[save.year]; return; }
     const inMatch = game && !$('gameScreen').classList.contains('hidden');
     if (inMatch) {
       const solved = game.matchStats.solved;
@@ -719,18 +723,18 @@
     document.querySelectorAll('.year-card').forEach((btn) => {
       btn.onclick = () => {
         const y = Number(btn.getAttribute('data-year'));
-        // Year 4 is a separate app (stars.html) rather than a set of topic tiles. Its
-        // choice is remembered all the same, so the iPad it lives on opens straight to it.
-        if (y === 4) { save.year = 4; persist(); location.href = 'stars.html'; return; }
+        // Years 2 and 4 are separate apps rather than sets of topic tiles. The choice is
+        // remembered all the same, so the iPad each lives on opens straight to it.
+        if (SEPARATE_APP[y]) { save.year = y; persist(); location.href = SEPARATE_APP[y]; return; }
         enterYear(y);
       };
     });
     $('yearBtn').onclick = showYearScreen;
     $('homeBtn').onclick = goHome;
     // A save that already knows its year goes straight to the menu; only a brand-new
-    // one, or someone arriving from Star Tables' back arrow (#year), is asked the question.
+    // one, or someone arriving from a separate app's back arrow (#year), is asked the question.
     if (location.hash === '#year') { renderMenu(); showYearScreen(); history.replaceState(null, '', location.pathname); }
-    else if (save.year === 4) { location.replace('stars.html'); return; }
+    else if (SEPARATE_APP[save.year]) { location.replace(SEPARATE_APP[save.year]); return; }
     else if (save.year) enterYear(save.year);
     else { renderMenu(); showYearScreen(); }
     $('kickoffBtn').onclick = startMatch;

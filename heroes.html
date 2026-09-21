@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Web Hero Academy</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Web Hero">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@600;800;900&display=swap">
+<style>
+:root{
+  --night:#12153A; --night2:#1E2360; --panel:#232A72; --web:#EEF1FF; --muted:#AEB6F2;
+  --hero:#8A3FFC; --hero2:#B98BFF; --gold:#FFC93C; --sky:#4CC3FF; --coral:#FF5E6C; --good:#3DDC97;
+  --ink:#12153A;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--night);color:var(--web);font-family:"Nunito",ui-rounded,"Segoe UI",system-ui,sans-serif;font-weight:800;-webkit-tap-highlight-color:transparent}
+#sky{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(120% 80% at 70% 0%,#2C3290 0%,var(--night) 60%)}
+#sky svg{position:absolute;bottom:0;left:0;width:100%;height:32vh}
+.star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:.7;animation:tw 3s infinite ease-in-out}
+@keyframes tw{50%{opacity:.15}}
+#app{position:relative;z-index:1;max-width:760px;margin:0 auto;padding-inline:16px;padding-block:14px 40px;min-height:100%}
+h1,h2,.comic{font-family:"Bangers","Comic Sans MS",cursive;letter-spacing:.04em;font-weight:400}
+h1{font-size:clamp(2.4rem,8vw,3.6rem);margin:0;line-height:.95;color:var(--gold);text-shadow:3px 3px 0 var(--hero),6px 6px 0 rgba(0,0,0,.35)}
+h2{font-size:2rem;margin:0 0 8px;color:var(--gold)}
+button{font:inherit;cursor:pointer;border:0;color:inherit}
+button:focus-visible,input:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.top .mascot{width:92px;flex:none}
+.back{align-self:flex-start;display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--night2);border:2px solid #3A43A8;color:var(--web);text-decoration:none;font-size:1.4rem;flex:none}
+.tag{color:var(--muted);font-size:1rem;margin-top:6px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 16px}
+.chip{background:var(--night2);border:2px solid #3A43A8;border-radius:999px;padding:8px 14px;font-size:.95rem}
+.chip b{color:var(--gold)}
+.btn{background:var(--gold);color:var(--ink);border-radius:16px;padding:14px 22px;font-size:1.2rem;box-shadow:0 5px 0 #C8901A;transition:transform .08s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #C8901A}
+.btn.alt{background:var(--night2);color:var(--web);box-shadow:0 5px 0 #0B0E2A;border:2px solid #3A43A8}
+/* map */
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+.lvl{position:relative;text-align:left;background:linear-gradient(180deg,var(--panel),var(--night2));border:3px solid #3A43A8;border-radius:18px;padding:12px 12px 10px;min-height:128px;display:flex;flex-direction:column;gap:4px}
+.lvl .n{font-family:"Bangers",cursive;font-size:2rem;color:var(--sky);line-height:1}
+.lvl .t{font-size:1.05rem;line-height:1.15}
+.lvl .d{font-size:.8rem;color:var(--muted);font-weight:600}
+.lvl .s{margin-top:auto;color:var(--gold);letter-spacing:2px;font-size:1.1rem}
+.lvl.locked{background:#191D4E;border-color:#2A3080;color:#6C73B8;cursor:not-allowed}
+.lvl.locked .n,.lvl.locked .d,.lvl.locked .s{color:#4E5598}
+.lvl.locked .n::after{content:" \1F512";font-size:1rem}
+.lvl.next{border-color:var(--gold);box-shadow:0 0 0 4px rgba(255,201,60,.25)}
+.lvl.boss{border-color:var(--coral)}
+.stickers{margin-top:20px;background:rgba(255,255,255,.05);border:2px dashed #3A43A8;border-radius:18px;padding:12px 14px}
+.stickers .row{display:flex;gap:8px;flex-wrap:wrap;font-size:2rem;margin-top:6px}
+.stickers .row span{width:48px;height:48px;display:grid;place-items:center;background:var(--night2);border-radius:12px}
+.stickers .row span.empty{opacity:.3;font-size:1rem}
+/* play */
+.hud{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.hud .title{font-family:"Bangers",cursive;font-size:1.6rem;color:var(--gold);flex:1;min-width:150px}
+.icon-btn{background:var(--night2);border:2px solid #3A43A8;border-radius:12px;padding:8px 12px;font-size:.95rem}
+.track{position:relative;height:74px;margin:4px 0 12px}
+.track .line{position:absolute;left:0;right:0;top:14px;height:3px;background:repeating-linear-gradient(90deg,var(--web) 0 10px,transparent 10px 16px);opacity:.6}
+.track .rider{position:absolute;top:0;width:66px;transform:translateX(-50%);transition:left .7s cubic-bezier(.3,1.6,.5,1)}
+.track .rider .thread{position:absolute;left:50%;top:14px;width:2px;height:14px;background:var(--web)}
+.track .goal{position:absolute;right:-4px;top:0;font-size:1.8rem}
+.card{background:var(--web);color:var(--ink);border-radius:24px;padding:20px 18px 22px;box-shadow:0 10px 0 rgba(0,0,0,.25);position:relative}
+.q{font-size:clamp(1.5rem,5.5vw,2.3rem);text-align:center;line-height:1.2;margin:4px 0 12px}
+.q .big{font-family:"Bangers",cursive;font-size:clamp(2.6rem,11vw,4rem);letter-spacing:.06em;color:var(--hero)}
+.visual{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:6px 0 14px}
+.web{background:repeating-conic-gradient(from 0deg,#C7CEF8 0 3deg,transparent 3deg 45deg),repeating-radial-gradient(circle,#fff 0 11px,#C7CEF8 11px 13px);border:3px solid #C7CEF8;border-radius:50%;width:94px;height:94px;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:4px;padding:10px}
+.web.big{width:130px;height:130px}
+.fly{width:17px;height:17px;border-radius:50%;background:var(--ink);position:relative}
+.fly::before,.fly::after{content:"";position:absolute;top:-5px;width:9px;height:7px;border-radius:50%;background:#9FD8FF;opacity:.9}
+.fly::before{left:-5px}.fly::after{right:-5px}
+.web.k10 .fly{width:12px;height:12px}
+.arr{display:inline-grid;gap:8px;padding:12px;background:#E3E7FF;border-radius:16px}
+.arr i{width:22px;height:22px;border-radius:50%;background:var(--hero);display:block}
+.roofs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.roof{width:60px;height:74px;background:var(--night2);color:var(--web);border-radius:8px 8px 0 0;display:grid;place-items:center;font-family:"Bangers",cursive;font-size:1.9rem;position:relative}
+.roof::after{content:"";position:absolute;inset:auto 8px 10px;height:10px;background:repeating-linear-gradient(90deg,var(--gold) 0 8px,transparent 8px 14px);opacity:.6}
+.roof.q{background:var(--hero);color:var(--gold)}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+.opt{background:var(--hero);color:#fff;font-size:clamp(1.5rem,5vw,2rem);padding:16px 8px;border-radius:18px;box-shadow:0 6px 0 #5A1FC4;font-weight:900}
+.opt:active{transform:translateY(4px);box-shadow:0 2px 0 #5A1FC4}
+.opt.right{background:var(--good);box-shadow:0 6px 0 #1E9E68}
+.opt.wrong{background:var(--coral);box-shadow:0 6px 0 #C23443;animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.display{min-height:72px;border:4px dashed var(--hero2);border-radius:18px;display:grid;place-items:center;font-family:"Bangers",cursive;font-size:3rem;color:var(--hero);margin:0 auto 12px;max-width:260px}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:340px;margin:0 auto}
+.pad button{background:var(--night2);color:#fff;font-size:1.8rem;padding:12px 0;border-radius:16px;box-shadow:0 5px 0 #0B0E2A;font-weight:900}
+.pad button.go{background:var(--good);color:var(--ink);box-shadow:0 5px 0 #1E9E68}
+.pad button.del{background:#5B64C9}
+.fb{margin-top:14px;border-radius:16px;padding:12px 14px;font-size:1.1rem;line-height:1.35}
+.fb.good{background:#D9FBEA;color:#0E5A3A}
+.fb.bad{background:#FFE3E6;color:#7A1522}
+.fb .next{margin-top:10px}
+.boss-bar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.boss-bar .hp{flex:1;height:18px;background:var(--night2);border-radius:999px;overflow:hidden;border:2px solid #3A43A8}
+.boss-bar .hp i{display:block;height:100%;background:var(--coral);transition:width .5s}
+.hearts{font-size:1.4rem;letter-spacing:2px}
+.center{text-align:center}
+.result .mascot{width:150px;margin:0 auto}
+.bigstars{font-size:3.2rem;color:var(--gold);letter-spacing:6px}
+.guide{background:var(--web);color:var(--ink);border-radius:20px;padding:20px;font-weight:600;line-height:1.55}
+.guide h2{color:var(--hero)}
+.guide h3{margin:18px 0 6px;font-size:1.1rem;color:var(--night2);font-weight:900}
+.guide table{width:100%;border-collapse:collapse;font-size:.92rem}
+.guide td,.guide th{border-bottom:1px solid #D5DAF7;padding:7px 6px;text-align:left;vertical-align:top}
+.guide th{font-weight:900}
+.guide .tw{overflow-x:auto}
+.name-in{font:inherit;font-size:1.1rem;padding:10px 12px;border-radius:12px;border:2px solid #3A43A8;background:var(--night2);color:var(--web);width:190px}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:5}
+.pop{animation:pop .4s}
+@keyframes pop{0%{transform:scale(.85)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="sky"></div>
+<canvas id="confetti"></canvas>
+<main id="app"></main>
+
+<script>
+/* ---------- art ---------- */
+const MASCOT = (mood='happy') => `
+<svg viewBox="0 0 120 120" class="mascot" role="img" aria-label="Captain Cobweb, a friendly red spider in a gold cape">
+  <path d="M35 62 Q60 118 85 62 Z" fill="#FFC93C"/>
+  <g stroke="#7A0F1E" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M40 58 Q18 44 8 56"/><path d="M40 66 Q16 62 6 76"/><path d="M42 74 Q22 82 14 98"/><path d="M46 80 Q34 96 32 112"/>
+    <path d="M80 58 Q102 44 112 56"/><path d="M80 66 Q104 62 114 76"/><path d="M78 74 Q98 82 106 98"/><path d="M74 80 Q86 96 88 112"/>
+  </g>
+  <ellipse cx="60" cy="64" rx="26" ry="24" fill="#E0263B"/>
+  <circle cx="60" cy="38" r="22" fill="#E0263B"/>
+  <path d="M40 34 Q60 22 80 34 L78 42 Q60 34 42 42 Z" fill="#FFC93C"/>
+  <ellipse cx="51" cy="38" rx="7" ry="8" fill="#fff"/><ellipse cx="69" cy="38" rx="7" ry="8" fill="#fff"/>
+  <circle cx="${mood==='sad'?50:52}" cy="40" r="3.5" fill="#12153A"/><circle cx="${mood==='sad'?68:70}" cy="40" r="3.5" fill="#12153A"/>
+  ${mood==='sad' ? '<path d="M52 53 Q60 47 68 53" stroke="#12153A" stroke-width="3" fill="none" stroke-linecap="round"/>'
+                 : '<path d="M50 49 Q60 58 70 49" stroke="#12153A" stroke-width="3" fill="none" stroke-linecap="round"/>'}
+  <path d="M60 60 l4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z" fill="#FFC93C"/>
+</svg>`;
+const VILLAIN = `
+<svg viewBox="0 0 120 120" style="width:84px;flex:none" role="img" aria-label="Doctor Muddle">
+  <path d="M20 110 Q20 40 60 30 Q100 40 100 110 Z" fill="#3DDC97"/>
+  <path d="M30 22 L60 6 L90 22 L84 34 L36 34 Z" fill="#FF5E6C"/>
+  <circle cx="46" cy="62" r="13" fill="#fff" stroke="#12153A" stroke-width="4"/><circle cx="74" cy="62" r="13" fill="#fff" stroke="#12153A" stroke-width="4"/>
+  <path d="M40 62 q6-8 12 0 q-6 8 -8 0" stroke="#8A3FFC" stroke-width="3" fill="none"/><path d="M68 62 q6-8 12 0 q-6 8 -8 0" stroke="#8A3FFC" stroke-width="3" fill="none"/>
+  <path d="M44 88 Q52 82 60 88 Q68 94 76 88" stroke="#12153A" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <text x="60" y="108" text-anchor="middle" font-family="Bangers,cursive" font-size="16" fill="#12153A">?×?</text>
+</svg>`;
+
+(function sky(){
+  const s=document.getElementById('sky');
+  for(let i=0;i<40;i++){const d=document.createElement('i');d.className='star';d.style.left=Math.random()*100+'%';d.style.top=Math.random()*55+'%';d.style.animationDelay=(Math.random()*3)+'s';s.appendChild(d)}
+  let b='';let x=0;while(x<1200){const w=50+Math.random()*70,h=60+Math.random()*170;b+=`<rect x="${x}" y="${260-h}" width="${w}" height="${h}" fill="#0B0E2A"/>`;for(let wy=260-h+14;wy<250;wy+=22)for(let wx=x+10;wx<x+w-10;wx+=16)if(Math.random()<.35)b+=`<rect x="${wx}" y="${wy}" width="7" height="9" fill="#FFC93C" opacity=".55"/>`;x+=w+4}
+  s.insertAdjacentHTML('beforeend',`<svg viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax slice">${b}</svg>`);
+})();
+
+/* ---------- helpers ---------- */
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const countUp=(k,n)=>Array.from({length:n},(_,i)=>(i+1)*k).join(', ');
+function numOpts(ans,k,count=4){
+  const s=new Set([ans]);const c=[ans+k,ans-k,ans+1,ans-1,ans+2*k,ans+10,ans-2].filter(v=>v>=0&&v!==ans);
+  for(const v of shuffle(c)){if(s.size>=count)break;s.add(v)}
+  while(s.size<count)s.add(ans+s.size*3);
+  return shuffle([...s]);
+}
+const webs=(n,k)=>`<div class="visual">${Array.from({length:n},()=>`<div class="web ${k===10?'k10 big':''}">${'<span class="fly"></span>'.repeat(k)}</div>`).join('')}</div>`;
+const flies=(t)=>`<div class="visual"><div style="display:flex;flex-wrap:wrap;gap:10px;max-width:360px;justify-content:center">${'<span class="fly"></span>'.repeat(t)}</div></div>`;
+const array=(r,c)=>`<div class="visual"><div class="arr" style="grid-template-columns:repeat(${c},22px)">${'<i></i>'.repeat(r*c)}</div></div>`;
+const roofs=(seq,miss)=>`<div class="visual roofs">${seq.map((v,i)=>`<div class="roof ${i===miss?'q':''}">${i===miss?'?':v}</div>`).join('')}</div>`;
+
+/* ---------- levels (National Curriculum Y2: 2, 5, 10 tables) ---------- */
+const LEVELS=[
+ {t:'Web Jumps',d:'Count in 2s across the rooftops',sticker:'🕸️',gen(){const st=2*R(0,8),seq=[0,1,2,3,4].map(i=>st+2*i),m=R(1,4),a=seq[m];
+   return{kind:'choice',html:`<div class="q">Jump in 2s! Which number is missing?</div>${roofs(seq,m)}`,say:`Jump in twos. ${seq.map((v,i)=>i===m?'what':v).join(', ')}. Which number is missing?`,ans:a,opts:numOpts(a,2,3),hint:`Counting in 2s means add 2 each jump: ${seq.join(', ')}.`}}},
+ {t:'Big Swings',d:'Count in 5s and 10s',sticker:'🦸',gen(){const k=pick([5,10]),st=k*R(0,6),seq=[0,1,2,3,4].map(i=>st+k*i),m=R(1,4),a=seq[m];
+   return{kind:'choice',html:`<div class="q">Swing in ${k}s! Which number is missing?</div>${roofs(seq,m)}`,say:`Swing in ${k}s. ${seq.map((v,i)=>i===m?'what':v).join(', ')}. Which number is missing?`,ans:a,opts:numOpts(a,k,3),hint:`Add ${k} each swing: ${seq.join(', ')}. ${k===5?'5s always end in 5 or 0.':'10s always end in 0.'}`}}},
+ {t:'Fly Catcher',d:'Groups of flies in webs',sticker:'🪰',gen(){const n=R(2,5),k=pick([2,5,10]),a=n*k;
+   return{kind:'choice',html:`<div class="q">There are <b>${n}</b> webs with <b>${k}</b> flies each.<br>How many flies altogether?</div>${webs(n,k)}`,say:`There are ${n} webs with ${k} flies each. How many flies altogether?`,ans:a,opts:numOpts(a,k,4),hint:`Count in ${k}s, one web at a time: ${countUp(k,n)}. So ${n} lots of ${k} is ${a}.`}}},
+ {t:'Web Writer',d:'Turn groups into × sentences',sticker:'✏️',gen(){const n=R(2,5),k=pick([2,5,10]);const right=`${n} × ${k}`;
+   const opts=shuffle([right,`${n} + ${k}`,`${n+1} × ${k}`]);
+   return{kind:'choice',html:`<div class="q">Which number sentence matches the webs?</div>${webs(n,k)}`,say:`Which number sentence matches? There are ${n} webs with ${k} flies in each.`,ans:right,opts,hint:`${n} groups of ${k} is written ${n} × ${k}. "Groups of" means times, not plus. It makes ${n*k}.`}}},
+ {t:'2× Tower',d:'Know your 2 times table',sticker:'🏙️',gen(){const a=R(1,12),flip=Math.random()<.4,ans=a*2;const s=flip?`2 × ${a}`:`${a} × 2`;
+   return{kind:'choice',html:`<div class="q">Climb the tower!<br><span class="big">${s} = ?</span></div>`,say:`${s.replace('×','times')}`,ans,opts:numOpts(ans,2,4),hint:`Double ${a}! ${a} + ${a} = ${ans}. Count in 2s: ${countUp(2,a)}.`}}},
+ {t:'10× Rocket',d:'Type the 10 times table',sticker:'🚀',gen(){const a=R(1,12),ans=a*10,s=Math.random()<.4?`10 × ${a}`:`${a} × 10`;
+   return{kind:'pad',html:`<div class="q">Blast off!<br><span class="big">${s} = ?</span></div>`,say:s.replace('×','times'),ans,hint:`Times 10: the number moves one place bigger and a 0 holds the ones. ${a} tens are ${ans}.`}}},
+ {t:'5× Clock Tower',d:'Type the 5 times table',sticker:'⏰',gen(){const a=R(1,12),ans=a*5,s=Math.random()<.4?`5 × ${a}`:`${a} × 5`;
+   return{kind:'pad',html:`<div class="q">Tick tock, beat the clock!<br><span class="big">${s} = ?</span></div>`,say:s.replace('×','times'),ans,hint:`Count in 5s like minutes on a clock: ${countUp(5,a)}. Trick: 5s are half of 10s. ${a} × 10 = ${a*10}, half is ${ans}.`}}},
+ {t:'Flip Trick',d:'Turnaround facts, odd and even',sticker:'🔄',gen(){const type=pick(['flip','flip','array','oddeven']);const k=pick([2,5,10]),a=R(2,9);
+   if(type==='flip')return{kind:'pad',html:`<div class="q">Flip it!<br><span class="big">${a} × ${k} = ${k} × ?</span></div>`,say:`${a} times ${k} equals ${k} times what?`,ans:a,hint:`Times works in any order! ${a} × ${k} and ${k} × ${a} both make ${a*k}.`};
+   if(type==='array'){const r=R(2,5),c=pick([2,5]);return{kind:'pad',html:`<div class="q">${r} rows of ${c} dots.<br>How many dots?</div>${array(r,c)}`,say:`There are ${r} rows of ${c} dots. How many dots?`,ans:r*c,hint:`Count the rows in ${c}s: ${countUp(c,r)}. Turn the picture sideways and it is ${c} × ${r}. Same answer!`}}
+   const x=R(3,40);return{kind:'choice',html:`<div class="q">Is <span class="big">${x}</span> odd or even?</div>`,say:`Is ${x} odd or even?`,ans:x%2?'Odd':'Even',opts:['Odd','Even'],hint:`Look at the last digit. Even numbers end in 0, 2, 4, 6 or 8. They are all in the 2 times table. ${x} is ${x%2?'odd':'even'}.`}}},
+ {t:'Snack Share',d:'Division by grouping',sticker:'🍪',gen(){const type=pick(['group','missing','share']);
+   if(type==='group'){const k=pick([2,5,10]),n=R(2,5),T=n*k;return{kind:'pad',html:`<div class="q">${T} flies. Put <b>${k}</b> on each web.<br>How many webs do you need?</div>${flies(T)}`,say:`There are ${T} flies. Put ${k} on each web. How many webs do you need?`,ans:n,hint:`Count in ${k}s until you reach ${T}: ${countUp(k,n)}. That is ${n} jumps, so ${T} ÷ ${k} = ${n}.`}}
+   if(type==='missing'){const k=pick([2,5,10]),n=R(2,10),T=n*k;return{kind:'pad',html:`<div class="q">Find the missing number<br><span class="big">? × ${k} = ${T}</span></div>`,say:`What times ${k} equals ${T}?`,ans:n,hint:`Count in ${k}s to ${T}: ${countUp(k,n)}. You made ${n} jumps.`}}
+   const n=R(2,10),T=n*2;return{kind:'pad',html:`<div class="q">Share ${T} cookies equally between 2 spiders.<br><span class="big">${T} ÷ 2 = ?</span></div>`,say:`Share ${T} cookies equally between 2 spiders. How many each?`,ans:n,hint:`Halving! ${n} + ${n} = ${T}, so each spider gets ${n}.`}}},
+ {t:'Boss: Doctor Muddle',d:'Mixed facts to save the city',sticker:'🏆',boss:true,gen(){
+   if(Math.random()<.3){const k=pick([2,5,10]),n=R(2,10),thing=pick(['spider','kitten','robot','rocket']);const w=pick([
+       {s:`${n} ${thing}s each have ${k} stickers. How many stickers altogether?`,a:n*k,h:`${n} lots of ${k}: ${countUp(k,n)}.`},
+       {s:`Captain Cobweb has ${n*k} buttons. He puts ${k} in each bag. How many bags?`,a:n,h:`Count in ${k}s to ${n*k}: ${countUp(k,n)}. That is ${n} bags.`}]);
+     return{kind:'pad',html:`<div class="q" style="font-size:1.5rem">${w.s}</div>`,say:w.s,ans:w.a,hint:w.h}}
+   return LEVELS[pick([2,4,5,6,7,8])].gen()}}
+];
+
+/* ---------- state ---------- */
+const KEY='webhero-v1';
+let S={name:'',stars:Array(10).fill(0),voice:true};
+try{const raw=localStorage.getItem(KEY);if(raw)S={...S,...JSON.parse(raw)}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const unlocked=i=>i===0||S.stars[i-1]>0;
+
+/* ---------- sound & voice ---------- */
+let AC;function beep(freqs,dur=.12,type='triangle'){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();let t=AC.currentTime;freqs.forEach(f=>{const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+dur);t+=dur*.8})}catch(e){}}
+const sGood=()=>beep([660,880,1320]),sBad=()=>beep([300,220],.18,'sawtooth'),sWin=()=>beep([523,659,784,1047,784,1047],.14);
+function speak(txt){if(!S.voice||!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang='en-GB';u.rate=.9;u.pitch=1.1;const v=speechSynthesis.getVoices().find(v=>v.lang==='en-GB');if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
+
+/* ---------- confetti ---------- */
+function confetti(){const c=document.getElementById('confetti');if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;
+  const P=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*200,v:2+Math.random()*4,r:Math.random()*6.28,s:6+Math.random()*6,col:pick(['#FFC93C','#8A3FFC','#4CC3FF','#3DDC97','#FF5E6C'])}));let f=0;
+  (function loop(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.y+=p.v;p.r+=.1;x.save();x.translate(p.x+Math.sin(p.r)*8,p.y);x.rotate(p.r);x.fillStyle=p.col;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()});if(++f<160)requestAnimationFrame(loop);else x.clearRect(0,0,c.width,c.height)})()}
+
+/* ---------- screens ---------- */
+const app=document.getElementById('app');
+const hero=()=>S.name||'Web Hero';
+
+function home(){
+  const next=S.stars.findIndex((s,i)=>s===0&&unlocked(i));
+  const total=S.stars.reduce((a,b)=>a+b,0);
+  app.innerHTML=`
+  <div class="top"><a href="index.html#year" class="back" title="Change year" aria-label="Change year">&#8592;</a>${MASCOT()}<div style="flex:1;min-width:220px"><h1>Web Hero Academy</h1>
+   <div class="tag">Captain Cobweb, the red spider hero, needs a partner to beat Doctor Muddle, the number scrambler.</div></div></div>
+  <div class="bar">
+    <label class="chip" for="nm">Hero name <input id="nm" class="name-in" maxlength="16" placeholder="Type your name" value="${S.name.replace(/"/g,'')}"></label>
+    <span class="chip">Stars <b>${total} / 30</b></span>
+    <button class="chip" id="vc">${S.voice?'🔊 Voice on':'🔇 Voice off'}</button>
+    <button class="chip" id="gu">For grown-ups</button>
+  </div>
+  <div class="map">${LEVELS.map((L,i)=>`<button class="lvl ${unlocked(i)?'':'locked'} ${i===next?'next':''} ${L.boss?'boss':''}" data-i="${i}" ${unlocked(i)?'':'aria-disabled="true"'}>
+     <span class="n">${L.boss?'BOSS':i+1}</span><span class="t">${L.t}</span><span class="d">${L.d}</span><span class="s">${'★'.repeat(S.stars[i])}${'☆'.repeat(3-S.stars[i])}</span></button>`).join('')}</div>
+  <div class="stickers"><div class="comic" style="font-size:1.3rem;color:var(--gold)">Sticker book</div>
+   <div class="row">${LEVELS.map((L,i)=>S.stars[i]?`<span title="${L.t}">${L.sticker}</span>`:`<span class="empty">${i+1}</span>`).join('')}</div></div>`;
+  app.querySelector('#nm').oninput=e=>{S.name=e.target.value.trim();save()};
+  app.querySelector('#vc').onclick=()=>{S.voice=!S.voice;save();home()};
+  app.querySelector('#gu').onclick=guide;
+  app.querySelectorAll('.lvl').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(unlocked(i))play(i);else{sBad();speak('Finish the level before to unlock this one!')}});
+}
+
+let G;
+function play(i){
+  const L=LEVELS[i],N=L.boss?12:8;
+  G={i,L,queue:Array.from({length:N},()=>L.gen()),done:0,total:N,miss:0,hearts:3,hp:N,retry:new Set()};
+  if(L.boss)speak(`Doctor Muddle has scrambled the city's numbers! Answer ${N} questions to stop him. ${hero()}, go!`);
+  ask();
+}
+function header(){
+  const L=G.L,pct=G.done/G.total*100;
+  return `<div class="hud"><button class="icon-btn" id="bk" aria-label="Back to map">← Map</button><div class="title">${L.boss?'':'Level '+(G.i+1)+': '}${L.t}</div><button class="icon-btn" id="rd">🔊 Read</button></div>
+  ${L.boss?`<div class="boss-bar">${VILLAIN}<div style="flex:1"><div class="hp"><i style="width:${G.hp/G.total*100}%"></i></div><div class="hearts" aria-label="${G.hearts} hearts left">${'❤️'.repeat(G.hearts)}${'🤍'.repeat(3-G.hearts)}</div></div></div>`
+  :`<div class="track"><div class="line"></div><div class="rider" style="left:calc(${Math.max(6,Math.min(88,pct))}%)"><span class="thread"></span>${MASCOT()}</div><div class="goal">🏁</div></div>`}`;
+}
+function ask(){
+  const q=G.queue[0];G.cur=q;G.locked=false;G.typed='';
+  app.innerHTML=header()+`<div class="card pop">${q.html}
+   ${q.kind==='choice'?`<div class="opts">${q.opts.map(o=>`<button class="opt" data-v="${o}">${o}</button>`).join('')}</div>`
+   :`<div class="display" id="dp" aria-live="polite">&nbsp;</div><div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-k="${n}">${n}</button>`).join('')}<button class="del" data-k="del" aria-label="Delete">⌫</button><button data-k="0">0</button><button class="go" data-k="go">GO</button></div>`}
+   <div id="fb"></div></div>`;
+  app.querySelector('#bk').onclick=()=>{window.speechSynthesis&&speechSynthesis.cancel();home()};
+  app.querySelector('#rd').onclick=()=>{const w=S.voice;S.voice=true;speak(q.say);S.voice=w};
+  if(q.kind==='choice')app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(b.dataset.v,b));
+  else app.querySelectorAll('.pad button').forEach(b=>b.onclick=()=>key(b.dataset.k));
+  speak(q.say);
+}
+function key(k){
+  if(G.locked)return;const dp=document.getElementById('dp');
+  if(k==='del')G.typed=G.typed.slice(0,-1);
+  else if(k==='go'){if(G.typed)answer(G.typed);return}
+  else if(G.typed.length<3)G.typed+=k;
+  dp.textContent=G.typed||' ';
+}
+document.addEventListener('keydown',e=>{if(!G||!document.getElementById('dp'))return;if(/^[0-9]$/.test(e.key))key(e.key);else if(e.key==='Backspace')key('del');else if(e.key==='Enter')key('go')});
+
+const PRAISE=['Thwip! Spot on!','Web-tastic!','Super swing!','Amazing, hero!','Brilliant!','You caught it!','Sticky-good!'];
+function answer(v,btn){
+  if(G.locked)return;G.locked=true;const q=G.cur;const ok=String(v)===String(q.ans);const fb=document.getElementById('fb');
+  if(btn){btn.classList.add(ok?'right':'wrong');if(!ok)app.querySelectorAll('.opt').forEach(b=>{if(b.dataset.v===String(q.ans))b.classList.add('right')})}
+  G.queue.shift();
+  if(ok){
+    sGood();const p=pick(PRAISE);speak(p);
+    if(!G.retry.has(q)){G.done++;if(G.L.boss)G.hp--;}
+    fb.innerHTML=`<div class="fb good">${p} <b>${q.ans}</b> is right.</div>`;
+    setTimeout(next,1000);
+  }else{
+    sBad();G.miss++;if(G.L.boss)G.hearts--;
+    if(!G.retry.has(q)){G.retry.add(q);G.queue.push(q);G.done++;if(G.L.boss)G.hp--;}
+    fb.innerHTML=`<div class="fb bad">Nearly! The answer is <b>${q.ans}</b>.<br>${q.hint}<div class="next"><button class="btn" id="nx">Got it, next!</button></div></div>`;
+    speak(`Nearly! The answer is ${q.ans}. ${q.hint.replace(/×/g,'times').replace(/÷/g,'divided by')}`);
+    document.getElementById('nx').onclick=next;document.getElementById('nx').focus();
+  }
+}
+function next(){
+  if(G.L.boss&&G.hearts<=0)return finish(false);
+  if(!G.queue.length)return finish(true);
+  ask();
+}
+function finish(won){
+  window.speechSynthesis&&speechSynthesis.cancel();
+  if(!won){app.innerHTML=`<div class="card center result">${MASCOT('sad')}<h2 style="color:var(--coral)">Doctor Muddle escaped!</h2><p>Every hero trains harder after a tricky fight. Practise the hints and try again.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn" id="ag">Try again</button><button class="btn alt" id="mp">Back to map</button></div></div>`;
+    speak('Doctor Muddle escaped! Try again, hero.');app.querySelector('#ag').onclick=()=>play(G.i);app.querySelector('#mp').onclick=home;return}
+  const stars=G.miss===0?3:G.miss<=2?2:1;const first=!S.stars[G.i];S.stars[G.i]=Math.max(S.stars[G.i],stars);save();
+  sWin();confetti();
+  const last=G.i===9;
+  const msg=last?`${hero()} saved the city! Doctor Muddle is unscrambled. You are a Times Tables Hero!`:`Level ${G.i+1} complete, ${hero()}!`;
+  app.innerHTML=`<div class="card center result pop">${MASCOT()}<h2 style="color:var(--hero)">${last?'City saved!':'Level complete!'}</h2>
+   <div class="bigstars">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div>
+   <p style="font-size:1.2rem">${msg}${first?`<br>New sticker: <span style="font-size:2rem">${G.L.sticker}</span>`:''}</p>
+   <p style="color:#5A6090;font-weight:600">${stars<3?'Play again with no slips to earn 3 stars.':'Perfect run. Zero slips!'}</p>
+   <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">${!last?`<button class="btn" id="nl">Next level →</button>`:''}<button class="btn alt" id="ag">Play again</button><button class="btn alt" id="mp">Map</button></div></div>`;
+  speak(msg);
+  const nl=app.querySelector('#nl');if(nl)nl.onclick=()=>play(G.i+1);
+  app.querySelector('#ag').onclick=()=>play(G.i);app.querySelector('#mp').onclick=home;
+}
+
+function guide(){
+  app.innerHTML=`<div class="hud"><button class="icon-btn" id="bk">← Map</button><div class="title">For grown-ups</div></div>
+  <div class="guide">
+   <h2 class="comic">What Year 2 expects</h2>
+   <p>The National Curriculum for England asks Year 2 children to recall and use multiplication and division facts for the <b>2, 5 and 10</b> times tables, spot odd and even numbers, write sentences with ×, ÷ and =, understand that multiplication works in any order (division does not), and solve problems using objects, arrays, repeated addition and mental methods. The 3, 4 and 8 tables arrive in Year 3. Every table to 12 × 12 is due by the end of Year 4, when the statutory Multiplication Tables Check runs.</p>
+   <p>Schools teach this Concrete, then Pictorial, then Abstract. Real objects first, then pictures and arrays, then bare number facts. Children who skip straight to chanting can often recite the table and still fail to use it. The ten levels follow that order.</p>
+   <h3>How the levels build</h3>
+   <div class="tw"><table><tr><th>Level</th><th>Skill</th><th>Stage</th></tr>
+   <tr><td>1 to 2</td><td>Counting in 2s, 5s, 10s (the backbone of every table)</td><td>Pictorial</td></tr>
+   <tr><td>3</td><td>Equal groups: "3 webs of 5 flies"</td><td>Pictorial</td></tr>
+   <tr><td>4</td><td>Writing groups as a × sentence, not a + one</td><td>Pictorial to abstract</td></tr>
+   <tr><td>5 to 7</td><td>Recall of 2, 10, then 5 tables. Choosing, then typing</td><td>Abstract</td></tr>
+   <tr><td>8</td><td>Turnaround facts, arrays, odd and even</td><td>Reasoning</td></tr>
+   <tr><td>9</td><td>Division as grouping and sharing, missing numbers</td><td>Inverse</td></tr>
+   <tr><td>Boss</td><td>Mixed facts and word problems, 3 lives</td><td>Fluency</td></tr></table></div>
+   <h3>Four-week action plan (10 minutes a day)</h3>
+   <div class="tw"><table><tr><th>Week</th><th>On screen</th><th>Off screen (this matters more)</th></tr>
+   <tr><td>1</td><td>Levels 1 to 3</td><td>Count pairs of socks and shoes in 2s. Stack 10p coins. Clap and jump while counting in 5s.</td></tr>
+   <tr><td>2</td><td>Levels 4 to 5</td><td>Lay out snacks in equal rows. Ask her to say the × sentence aloud: "4 groups of 2 is 4 × 2."</td></tr>
+   <tr><td>3</td><td>Levels 6 to 8</td><td>Read clock minutes in 5s. Build an array with Lego, turn it round, and ask "same answer?"</td></tr>
+   <tr><td>4</td><td>Levels 9 to Boss, then replay for 3 stars</td><td>Share sweets between family members. Car game: "I'm thinking of a number in the 5s that is bigger than 30."</td></tr></table></div>
+   <h3>Coaching tips</h3>
+   <p>Keep sessions short. Two levels, then stop while she still wants more. When she slips, the game shows a hint and brings that question back at the end of the round. Sit beside her for those moments and ask her to explain the hint back to you. Stars reward accuracy, not speed, which suits this age. Speed only matters from Year 4.</p>
+   <p>Watch for three classic Year 2 errors: adding instead of multiplying (3 × 5 = 8), losing count when skip counting past 50, and thinking 20 ÷ 5 and 5 ÷ 20 are the same. If one keeps appearing, go back to objects on the table before replaying.</p>
+   <p style="font-size:.85rem;color:#5A6090">Progress and stickers are saved in this browser on this device only.</p>
+   <button class="btn" id="rs" style="margin-top:6px;background:#FFE3E6;box-shadow:0 5px 0 #E3A5AD">Reset progress</button>
+  </div>`;
+  app.querySelector('#bk').onclick=home;
+  app.querySelector('#rs').onclick=e=>{if(e.target.dataset.sure){S.stars=Array(10).fill(0);save();home()}else{e.target.dataset.sure=1;e.target.textContent='Tap again to erase all stars'}};
+}
+
+if('speechSynthesis' in window){try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}catch(e){}}
+home();
+</script>
+</body>
+</html>
