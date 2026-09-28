@@ -53,6 +53,7 @@ button:focus-visible,input:focus-visible{outline:4px solid var(--gold);outline-o
 .lvl.locked .n::after{content:" \1F512";font-size:1rem}
 .lvl.next{border-color:var(--gold);box-shadow:0 0 0 4px rgba(255,201,60,.25)}
 .lvl.boss{border-color:var(--coral)}
+.chap{font-family:"Bangers",cursive;font-size:1.5rem;color:var(--sky);letter-spacing:.04em;margin:18px 0 8px}
 .stickers{margin-top:20px;background:rgba(255,255,255,.05);border:2px dashed #3A43A8;border-radius:18px;padding:12px 14px}
 .stickers .row{display:flex;gap:8px;flex-wrap:wrap;font-size:2rem;margin-top:6px}
 .stickers .row span{width:48px;height:48px;display:grid;place-items:center;background:var(--night2);border-radius:12px}
@@ -204,14 +205,98 @@ const LEVELS=[
        {s:`${n} ${thing}s each have ${k} stickers. How many stickers altogether?`,a:n*k,h:`${n} lots of ${k}: ${countUp(k,n)}.`},
        {s:`Captain Cobweb has ${n*k} buttons. He puts ${k} in each bag. How many bags?`,a:n,h:`Count in ${k}s to ${n*k}: ${countUp(k,n)}. That is ${n} bags.`}]);
      return{kind:'pad',html:`<div class="q" style="font-size:1.5rem">${w.s}</div>`,say:w.s,ans:w.a,hint:w.h}}
-   return LEVELS[pick([2,4,5,6,7,8])].gen()}}
+   return LEVELS[pick([2,4,5,6,7,8])].gen()}},
+
+ /* ---- Chapter 2. Unlocks after the first boss. Everything here is still Year 2:
+    counting in 3s and backwards and in tens from ANY number are place-value
+    statements ("count in steps of 2, 3 and 5 from 0, and in 10s from any number,
+    forward and backward"), and the commutativity rule is statutory too. ---- */
+ {t:'Three Steps',d:'Count in 3s from zero',sticker:'🐾',gen(){const s0=R(0,8),seq=[0,1,2,3,4].map(i=>3*(s0+i)),m=R(1,4),a=seq[m];
+   return{kind:'choice',html:`<div class="q">Tiptoe in 3s! Which number is missing?</div>${roofs(seq,m)}`,say:`Count in threes. ${seq.map((v,i)=>i===m?'what':v).join(', ')}. Which number is missing?`,ans:a,opts:numOpts(a,3,3),hint:`Counting in 3s adds 3 each step: ${seq.join(', ')}. Three is a new step for Year 2 — say it out loud from zero: 0, 3, 6, 9, 12.`}}},
+ {t:'Backwards Blast',d:'Count back in 2s, 5s and 10s',sticker:'⏪',gen(){const k=pick([2,5,10]),st=k*R(5,12),seq=[0,1,2,3,4].map(i=>st-k*i),m=R(1,4),a=seq[m];
+   return{kind:'choice',html:`<div class="q">Swing BACKWARDS in ${k}s! Which number is missing?</div>${roofs(seq,m)}`,say:`Count backwards in ${k}s. ${seq.map((v,i)=>i===m?'what':v).join(', ')}. Which number is missing?`,ans:a,opts:numOpts(a,k,3),hint:`Going backwards you take ${k} away each jump: ${seq.join(', ')}.`}}},
+ {t:'Ten Jumps Anywhere',d:'Count in 10s from any number',sticker:'🪜',gen(){const st=R(2,48),back=Math.random()<.4&&st>42,seq=[0,1,2,3,4].map(i=>back?st-10*i:st+10*i),m=R(1,4),a=seq[m];
+   return{kind:'choice',html:`<div class="q">Jump ${back?'down':'up'} in 10s! Which number is missing?</div>${roofs(seq,m)}`,say:`Count ${back?'back':'on'} in tens. ${seq.map((v,i)=>i===m?'what':v).join(', ')}. Which number is missing?`,ans:a,opts:numOpts(a,10,3),hint:`Only the tens digit changes — the ones digit stays the same the whole way: ${seq.join(', ')}.`}}},
+ {t:'Double Trouble',d:'Doubling and halving',sticker:'👯',gen(){
+   if(Math.random()<.5){const a=R(2,15),ans=a*2;return{kind:'pad',html:`<div class="q">Double it!<br><span class="big">Double ${a} = ?</span></div>`,say:`Double ${a}`,ans,hint:`Doubling is the 2 times table. ${a} + ${a} = ${ans}, and that is the same as ${a} × 2.`}}
+   const h=R(2,12),T=h*2;return{kind:'pad',html:`<div class="q">Halve it!<br><span class="big">Half of ${T} = ?</span></div>`,say:`What is half of ${T}?`,ans:h,hint:`Halving undoes doubling. ${h} + ${h} = ${T}, so half of ${T} is ${h}. It is the same as ${T} ÷ 2.`}}},
+ {t:'Signs and Sentences',d:'Use ×, ÷ and =, and the flip rule',sticker:'🟰',gen(){const type=pick(['sign','sign','flip','match']);const k=pick([2,5,10]),n=R(2,9),T=n*k;
+   if(type==='sign'){const div=Math.random()<.5;
+     return div?{kind:'choice',html:`<div class="q">Which sign makes this true?<br><span class="big">${T} ? ${k} = ${n}</span></div>`,say:`Which sign makes ${T} something ${k} equals ${n} true?`,ans:'÷',opts:shuffle(['÷','×','+']),hint:`${T} split into groups of ${k} gives ${n} groups, so it is a division: ${T} ÷ ${k} = ${n}.`}
+              :{kind:'choice',html:`<div class="q">Which sign makes this true?<br><span class="big">${n} ? ${k} = ${T}</span></div>`,say:`Which sign makes ${n} something ${k} equals ${T} true?`,ans:'×',opts:shuffle(['×','÷','+']),hint:`${n} groups of ${k} is ${T}, so it is a multiplication: ${n} × ${k} = ${T}.`}}
+   if(type==='flip'){const mul=Math.random()<.5;
+     // the two numbers must differ, or "2 × 2 = 2 × 2" comes out and teaches nothing
+     const f=(n===k)?(k===10?9:n+1):n, F=f*k;
+     return mul?{kind:'choice',html:`<div class="q">Is this TRUE or FALSE?<br><span class="big">${f} × ${k} = ${k} × ${f}</span></div>`,say:`True or false? ${f} times ${k} equals ${k} times ${f}.`,ans:'True',opts:['True','False'],hint:`True! Times can be done in any order. Both make ${F}. Turn an array sideways and the answer does not change.`}
+              :{kind:'choice',html:`<div class="q">Is this TRUE or FALSE?<br><span class="big">${F} ÷ ${k} = ${k} ÷ ${F}</span></div>`,say:`True or false? ${F} divided by ${k} equals ${k} divided by ${F}.`,ans:'False',opts:['True','False'],hint:`False! Sharing does NOT work in any order. ${F} ÷ ${k} = ${f}, but ${k} ÷ ${F} is not ${f}. Times can flip, dividing cannot.`}}
+   return{kind:'choice',html:`<div class="q">${n} × ${k} = ${T}.<br>Which one is ALSO true?</div>`,say:`${n} times ${k} equals ${T}. Which one is also true?`,ans:`${k} × ${n} = ${T}`,opts:shuffle([`${k} × ${n} = ${T}`,`${T} × ${k} = ${n}`,`${n} + ${k} = ${T}`]),hint:`Flip the times sentence round: ${k} × ${n} = ${T} as well. The other two change what the numbers mean.`}}},
+ {t:'Story Squad',d:'Word problems in real places',sticker:'📚',gen(){const k=pick([2,5,10]),n=R(2,9),T=n*k;const w=pick([
+     {s:`${n} spiders each knit ${k} socks. How many socks altogether?`,a:T,h:`${n} lots of ${k}: ${countUp(k,n)}.`},
+     {s:`A packet holds ${k} crayons. How many crayons are in ${n} packets?`,a:T,h:`Count in ${k}s, one packet at a time: ${countUp(k,n)}.`},
+     {s:`${T} buns are shared equally onto ${k} plates. How many buns on each plate?`,a:n,h:`Sharing ${T} between ${k} plates: count in ${k}s up to ${T} — that is ${n} for each plate.`},
+     {s:`${T} children line up in teams of ${k}. How many teams?`,a:n,h:`Count in ${k}s to ${T}: ${countUp(k,n)}. That makes ${n} teams.`},
+     {s:`A ticket costs ${k} dirhams. How much for ${n} tickets?`,a:T,h:`${n} tickets at ${k} dirhams each: ${countUp(k,n)}.`},
+     {s:`Captain Cobweb caught ${T} flies and put ${k} in each web. How many webs?`,a:n,h:`Count in ${k}s to ${T}: ${countUp(k,n)}. He filled ${n} webs.`}]);
+   return{kind:'pad',html:`<div class="q" style="font-size:1.45rem">${w.s}</div>`,say:w.s,ans:w.a,hint:w.h}}},
+ {t:'Final Boss: Muddle Returns',d:'Everything you know, all at once',sticker:'👑',boss:true,gen(){return LEVELS[pick([10,11,12,13,14,15,2,6,8])].gen()}}
 ];
+
+/* ---------- hero badges: stickers you earn for HOW you play, not just for
+   finishing a level. Ten levels gave ten stickers and then nothing, which is why
+   the sticker book stopped being a reason to come back. ---------- */
+const BADGES=[
+ {id:'first', e:'🌟', n:'First win',          w:'Finish any level'},
+ {id:'three', e:'🥉', n:'Three stars',        w:'Get 3 stars on a level'},
+ {id:'str5',  e:'🔥', n:'On fire',            w:'5 right in a row'},
+ {id:'str10', e:'⚡', n:'Lightning',          w:'10 right in a row'},
+ {id:'c25',   e:'🎯', n:'25 club',            w:'25 right answers'},
+ {id:'c60',   e:'🎪', n:'60 club',            w:'60 right answers'},
+ {id:'c120',  e:'🏹', n:'120 club',           w:'120 right answers'},
+ {id:'p3',    e:'💯', n:'Perfect three',      w:'3 no-slip rounds'},
+ {id:'boss1', e:'🦸', n:'Muddle beaten',      w:'Win the first boss'},
+ {id:'heart', e:'💖', n:'Not a scratch',      w:'Beat a boss with all 3 hearts'},
+ {id:'ch1',   e:'🌆', n:'Chapter 1 done',     w:'Finish levels 1 to 10'},
+ {id:'ch2',   e:'🌃', n:'Chapter 2 done',     w:'Finish levels 11 to 17'},
+ {id:'d3',    e:'📅', n:'Three days',         w:'Play on 3 different days'},
+ {id:'d7',    e:'🗓️', n:'Seven days',        w:'Play on 7 different days'},
+ {id:'crown', e:'👑', n:'Times Tables Hero',  w:'3 stars on every level'},
+];
+const BADGE_TEST={
+ first:()=>S.stars.some(v=>v>0),
+ three:()=>S.stars.some(v=>v===3),
+ str5:()=>S.best>=5, str10:()=>S.best>=10,
+ c25:()=>S.correct>=25, c60:()=>S.correct>=60, c120:()=>S.correct>=120,
+ p3:()=>S.perfect>=3,
+ boss1:()=>S.stars[9]>0,
+ heart:()=>!!S.flawless,
+ ch1:()=>S.stars.slice(0,10).every(v=>v>0),
+ ch2:()=>S.stars.slice(10).every(v=>v>0),
+ d3:()=>S.days.length>=3, d7:()=>S.days.length>=7,
+ crown:()=>S.stars.every(v=>v===3),
+};
+/* returns the badges won just now, and records them */
+function checkBadges(){
+  const won=[];
+  for(const b of BADGES){ if(S.badges.includes(b.id))continue;
+    let ok=false; try{ok=BADGE_TEST[b.id]()}catch(e){}
+    if(ok){S.badges.push(b.id);won.push(b)} }
+  if(won.length)save();
+  return won;
+}
 
 /* ---------- state ---------- */
 const KEY='webhero-v1';
-let S={name:'',stars:Array(10).fill(0),voice:true};
+let S={name:'',stars:[],voice:true,correct:0,streak:0,best:0,perfect:0,days:[],badges:[],flawless:false};
 try{const raw=localStorage.getItem(KEY);if(raw)S={...S,...JSON.parse(raw)}}catch(e){}
+/* Migration. The save on her iPad was written when there were 10 levels; keep every
+   star she has already earned and just make room for the new ones. */
+S.stars=Array.from({length:LEVELS.length},(_,i)=>S.stars[i]||0);
+if(!Array.isArray(S.days))S.days=[];
+if(!Array.isArray(S.badges))S.badges=[];
+['correct','streak','best','perfect'].forEach(k=>{if(typeof S[k]!=='number')S[k]=0});
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+/* "played on N different days" — one entry per calendar day, newest last */
+(function today(){const d=new Date().toISOString().slice(0,10);if(!S.days.includes(d)){S.days.push(d);save()}})();
 const unlocked=i=>i===0||S.stars[i-1]>0;
 
 /* ---------- sound & voice ---------- */
@@ -227,6 +312,10 @@ function confetti(){const c=document.getElementById('confetti');if(matchMedia('(
 /* ---------- screens ---------- */
 const app=document.getElementById('app');
 const hero=()=>S.name||'Web Hero';
+const gotStickers=()=>S.stars.filter(v=>v>0).length+S.badges.length;
+const cards=(a,b,next)=>LEVELS.slice(a,b).map((L,j)=>{const i=a+j;
+  return `<button class="lvl ${unlocked(i)?'':'locked'} ${i===next?'next':''} ${L.boss?'boss':''}" data-i="${i}" ${unlocked(i)?'':'aria-disabled="true"'}>
+     <span class="n">${L.boss?'BOSS':i+1}</span><span class="t">${L.t}</span><span class="d">${L.d}</span><span class="s">${'★'.repeat(S.stars[i])}${'☆'.repeat(3-S.stars[i])}</span></button>`}).join('');
 
 function home(){
   const next=S.stars.findIndex((s,i)=>s===0&&unlocked(i));
@@ -236,18 +325,24 @@ function home(){
    <div class="tag">Captain Cobweb, the red spider hero, needs a partner to beat Doctor Muddle, the number scrambler.</div></div></div>
   <div class="bar">
     <label class="chip" for="nm">Hero name <input id="nm" class="name-in" maxlength="16" placeholder="Type your name" value="${S.name.replace(/"/g,'')}"></label>
-    <span class="chip">Stars <b>${total} / 30</b></span>
+    <span class="chip">Stars <b>${total} / ${LEVELS.length*3}</b></span>
+    <span class="chip">Stickers <b>${gotStickers()} / ${LEVELS.length+BADGES.length}</b></span>
     <button class="chip" id="vc">${S.voice?'🔊 Voice on':'🔇 Voice off'}</button>
     <button class="chip" id="gu">For grown-ups</button>
   </div>
-  <div class="map">${LEVELS.map((L,i)=>`<button class="lvl ${unlocked(i)?'':'locked'} ${i===next?'next':''} ${L.boss?'boss':''}" data-i="${i}" ${unlocked(i)?'':'aria-disabled="true"'}>
-     <span class="n">${L.boss?'BOSS':i+1}</span><span class="t">${L.t}</span><span class="d">${L.d}</span><span class="s">${'★'.repeat(S.stars[i])}${'☆'.repeat(3-S.stars[i])}</span></button>`).join('')}</div>
+  ${WELCOME.length?`<div class="stickers" style="margin-top:0;border-color:var(--gold)"><div class="comic" style="font-size:1.3rem;color:var(--gold)">${WELCOME.length} new badge${WELCOME.length>1?'s':''} for what you have already done!</div><div class="row">${WELCOME.map(b=>`<span title="${b.n}">${b.e}</span>`).join('')}</div></div>`:''}
+  <div class="chap">Chapter 1 · Save the city</div>
+  <div class="map">${cards(0,10,next)}</div>
+  <div class="chap">Chapter 2 · Muddle returns ${S.stars[9]?'':'🔒'}</div>
+  <div class="map">${cards(10,LEVELS.length,next)}</div>
   <div class="stickers"><div class="comic" style="font-size:1.3rem;color:var(--gold)">Sticker book</div>
-   <div class="row">${LEVELS.map((L,i)=>S.stars[i]?`<span title="${L.t}">${L.sticker}</span>`:`<span class="empty">${i+1}</span>`).join('')}</div></div>`;
+   <div class="row">${LEVELS.map((L,i)=>S.stars[i]?`<span title="${L.t}">${L.sticker}</span>`:`<span class="empty">${i+1}</span>`).join('')}</div>
+   <div class="comic" style="font-size:1.1rem;color:var(--sky);margin-top:14px">Hero badges</div>
+   <div class="row">${BADGES.map(b=>S.badges.includes(b.id)?`<span title="${b.n} — ${b.w}">${b.e}</span>`:`<span class="empty" title="${b.w}">?</span>`).join('')}</div></div>`;
   app.querySelector('#nm').oninput=e=>{S.name=e.target.value.trim();save()};
   app.querySelector('#vc').onclick=()=>{S.voice=!S.voice;save();home()};
   app.querySelector('#gu').onclick=guide;
-  app.querySelectorAll('.lvl').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(unlocked(i))play(i);else{sBad();speak('Finish the level before to unlock this one!')}});
+  app.querySelectorAll('.lvl').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(unlocked(i)){WELCOME=[];play(i)}else{sBad();speak('Finish the level before to unlock this one!')}});
 }
 
 let G;
@@ -291,11 +386,12 @@ function answer(v,btn){
   G.queue.shift();
   if(ok){
     sGood();const p=pick(PRAISE);speak(p);
+    S.correct++;S.streak++;if(S.streak>S.best)S.best=S.streak;save();
     if(!G.retry.has(q)){G.done++;if(G.L.boss)G.hp--;}
     fb.innerHTML=`<div class="fb good">${p} <b>${q.ans}</b> is right.</div>`;
     setTimeout(next,1000);
   }else{
-    sBad();G.miss++;if(G.L.boss)G.hearts--;
+    sBad();G.miss++;S.streak=0;save();if(G.L.boss)G.hearts--;
     if(!G.retry.has(q)){G.retry.add(q);G.queue.push(q);G.done++;if(G.L.boss)G.hp--;}
     fb.innerHTML=`<div class="fb bad">Nearly! The answer is <b>${q.ans}</b>.<br>${q.hint}<div class="next"><button class="btn" id="nx">Got it, next!</button></div></div>`;
     speak(`Nearly! The answer is ${q.ans}. ${q.hint.replace(/×/g,'times').replace(/÷/g,'divided by')}`);
@@ -311,13 +407,18 @@ function finish(won){
   window.speechSynthesis&&speechSynthesis.cancel();
   if(!won){app.innerHTML=`<div class="card center result">${MASCOT('sad')}<h2 style="color:var(--coral)">Doctor Muddle escaped!</h2><p>Every hero trains harder after a tricky fight. Practise the hints and try again.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn" id="ag">Try again</button><button class="btn alt" id="mp">Back to map</button></div></div>`;
     speak('Doctor Muddle escaped! Try again, hero.');app.querySelector('#ag').onclick=()=>play(G.i);app.querySelector('#mp').onclick=home;return}
-  const stars=G.miss===0?3:G.miss<=2?2:1;const first=!S.stars[G.i];S.stars[G.i]=Math.max(S.stars[G.i],stars);save();
+  const stars=G.miss===0?3:G.miss<=2?2:1;const first=!S.stars[G.i];S.stars[G.i]=Math.max(S.stars[G.i],stars);
+  if(G.miss===0)S.perfect++;
+  if(G.L.boss&&G.hearts===3)S.flawless=true;
+  save();
+  const won2=checkBadges();
   sWin();confetti();
-  const last=G.i===9;
-  const msg=last?`${hero()} saved the city! Doctor Muddle is unscrambled. You are a Times Tables Hero!`:`Level ${G.i+1} complete, ${hero()}!`;
+  const last=G.i===LEVELS.length-1;
+  const msg=last?`${hero()} saved the city for good! Doctor Muddle is unscrambled. You are a Times Tables Hero!`:G.i===9?`Boss beaten, ${hero()}! Chapter 2 is unlocked.`:`Level ${G.i+1} complete, ${hero()}!`;
   app.innerHTML=`<div class="card center result pop">${MASCOT()}<h2 style="color:var(--hero)">${last?'City saved!':'Level complete!'}</h2>
    <div class="bigstars">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div>
    <p style="font-size:1.2rem">${msg}${first?`<br>New sticker: <span style="font-size:2rem">${G.L.sticker}</span>`:''}</p>
+   ${won2.length?`<p style="font-size:1.1rem;color:var(--hero)">New badge${won2.length>1?'s':''}! ${won2.map(b=>`<span style="font-size:1.8rem">${b.e}</span> ${b.n}`).join(' &nbsp; ')}</p>`:''}
    <p style="color:#5A6090;font-weight:600">${stars<3?'Play again with no slips to earn 3 stars.':'Perfect run. Zero slips!'}</p>
    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">${!last?`<button class="btn" id="nl">Next level →</button>`:''}<button class="btn alt" id="ag">Play again</button><button class="btn alt" id="mp">Map</button></div></div>`;
   speak(msg);
@@ -332,6 +433,8 @@ function guide(){
    <p>The National Curriculum for England asks Year 2 children to recall and use multiplication and division facts for the <b>2, 5 and 10</b> times tables, spot odd and even numbers, write sentences with ×, ÷ and =, understand that multiplication works in any order (division does not), and solve problems using objects, arrays, repeated addition and mental methods. The 3, 4 and 8 tables arrive in Year 3. Every table to 12 × 12 is due by the end of Year 4, when the statutory Multiplication Tables Check runs.</p>
    <p>Schools teach this Concrete, then Pictorial, then Abstract. Real objects first, then pictures and arrays, then bare number facts. Children who skip straight to chanting can often recite the table and still fail to use it. The ten levels follow that order.</p>
    <h3>How the levels build</h3>
+   <p>Chapter 2 unlocks once Doctor Muddle is beaten the first time. It is not harder for
+   the sake of it — it covers the parts of the Year 2 programme the first ten levels left out.</p>
    <div class="tw"><table><tr><th>Level</th><th>Skill</th><th>Stage</th></tr>
    <tr><td>1 to 2</td><td>Counting in 2s, 5s, 10s (the backbone of every table)</td><td>Pictorial</td></tr>
    <tr><td>3</td><td>Equal groups: "3 webs of 5 flies"</td><td>Pictorial</td></tr>
@@ -339,24 +442,50 @@ function guide(){
    <tr><td>5 to 7</td><td>Recall of 2, 10, then 5 tables. Choosing, then typing</td><td>Abstract</td></tr>
    <tr><td>8</td><td>Turnaround facts, arrays, odd and even</td><td>Reasoning</td></tr>
    <tr><td>9</td><td>Division as grouping and sharing, missing numbers</td><td>Inverse</td></tr>
-   <tr><td>Boss</td><td>Mixed facts and word problems, 3 lives</td><td>Fluency</td></tr></table></div>
-   <h3>Four-week action plan (10 minutes a day)</h3>
-   <div class="tw"><table><tr><th>Week</th><th>On screen</th><th>Off screen (this matters more)</th></tr>
-   <tr><td>1</td><td>Levels 1 to 3</td><td>Count pairs of socks and shoes in 2s. Stack 10p coins. Clap and jump while counting in 5s.</td></tr>
-   <tr><td>2</td><td>Levels 4 to 5</td><td>Lay out snacks in equal rows. Ask her to say the × sentence aloud: "4 groups of 2 is 4 × 2."</td></tr>
-   <tr><td>3</td><td>Levels 6 to 8</td><td>Read clock minutes in 5s. Build an array with Lego, turn it round, and ask "same answer?"</td></tr>
-   <tr><td>4</td><td>Levels 9 to Boss, then replay for 3 stars</td><td>Share sweets between family members. Car game: "I'm thinking of a number in the 5s that is bigger than 30."</td></tr></table></div>
+   <tr><td>10 Boss</td><td>Mixed facts and word problems, 3 lives</td><td>Fluency</td></tr>
+   <tr><td>11</td><td>Counting in 3s from zero</td><td>Place value</td></tr>
+   <tr><td>12</td><td>Counting backwards in 2s, 5s and 10s</td><td>Place value</td></tr>
+   <tr><td>13</td><td>Counting in 10s from <em>any</em> number: 7, 17, 27…</td><td>Place value</td></tr>
+   <tr><td>14</td><td>Doubling and halving</td><td>Fluency</td></tr>
+   <tr><td>15</td><td>Choosing ×, ÷ or =; times flips, dividing does not</td><td>Reasoning</td></tr>
+   <tr><td>16</td><td>Word problems in real contexts</td><td>Application</td></tr>
+   <tr><td>17 Boss</td><td>Everything, mixed</td><td>Fluency</td></tr></table></div>
+
+   <h3>Where each part comes from</h3>
+   <p>Every level maps to a statement in the National Curriculum for England. The
+   multiplication ones sit in <b>Year 2 multiplication and division</b>: recall and use the
+   2, 5 and 10 tables including odd and even; write statements using ×, ÷ and =; show that
+   multiplication can be done in any order and division cannot; solve problems using
+   materials, arrays, repeated addition, mental methods and facts, including in contexts.
+   Levels 11 to 13 sit in <b>Year 2 number and place value</b>: count in steps of 2, 3 and 5
+   from 0, and in tens from any number, forward and backward. Counting in 3s belongs to Year 2
+   even though the 3 times table itself is not taught until Year 3 — so level 11 asks her to
+   count in 3s and never to recall a 3× fact.</p>
+
+   <h3>Stickers and badges</h3>
+   <p>There are two kinds now, because finishing ten levels used to mean the sticker book
+   stopped giving anything back. Each level still has its own sticker. On top of that there
+   are 15 <b>hero badges</b> for how she plays: five right in a row, a round with no slips,
+   25 then 60 then 120 right answers, playing on three then seven different days, beating a
+   boss without losing a heart. They arrive at uneven intervals on purpose, so there is
+   almost always one close enough to be worth another round. Tap any locked badge to see
+   what it needs.</p>
    <h3>Coaching tips</h3>
    <p>Keep sessions short. Two levels, then stop while she still wants more. When she slips, the game shows a hint and brings that question back at the end of the round. Sit beside her for those moments and ask her to explain the hint back to you. Stars reward accuracy, not speed, which suits this age. Speed only matters from Year 4.</p>
+   <p>After Chapter 2, replaying for 3 stars is the natural next goal, and the badges give a reason to keep coming back.</p>
    <p>Watch for three classic Year 2 errors: adding instead of multiplying (3 × 5 = 8), losing count when skip counting past 50, and thinking 20 ÷ 5 and 5 ÷ 20 are the same. If one keeps appearing, go back to objects on the table before replaying.</p>
    <p style="font-size:.85rem;color:#5A6090">Progress and stickers are saved in this browser on this device only.</p>
    <button class="btn" id="rs" style="margin-top:6px;background:#FFE3E6;box-shadow:0 5px 0 #E3A5AD">Reset progress</button>
   </div>`;
   app.querySelector('#bk').onclick=home;
-  app.querySelector('#rs').onclick=e=>{if(e.target.dataset.sure){S.stars=Array(10).fill(0);save();home()}else{e.target.dataset.sure=1;e.target.textContent='Tap again to erase all stars'}};
+  app.querySelector('#rs').onclick=e=>{if(e.target.dataset.sure){S.stars=S.stars.map(()=>0);S.badges=[];S.correct=0;S.streak=0;S.best=0;S.perfect=0;S.flawless=false;save();home()}else{e.target.dataset.sure=1;e.target.textContent='Tap again to erase all stars'}};
 }
 
 if('speechSynthesis' in window){try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}catch(e){}}
+/* Badges she has ALREADY earned before this version existed — award them on the way in,
+   so the first thing the upgrade does is hand her a pile of stickers rather than a
+   longer list of things she has not done. */
+let WELCOME=checkBadges();
 home();
 </script>
 </body>
