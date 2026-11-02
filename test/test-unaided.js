@@ -17,7 +17,7 @@
 const path = '../src/';
 const W = {};
 for (const f of ['numbers', 'format', 'fraction', 'mathfmt', 'unaided', 'parser', 'explanations', 'figures', 'steps', 'topics',
-  'topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'numeracy1', 'algebra1', 'curriculum1', 'curriculum2', 'year7',
+  'topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'numeracy1', 'algebra1', 'curriculum1', 'curriculum2', 'year7', 'computing7',
   'harder', 'harder2', 'bidmas', 'solving', 'problems']) {
   Object.assign(W, require(path + f + '.js'));
 }

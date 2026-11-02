@@ -6,7 +6,7 @@
 const path = '../src/';
 const W = {};
 for (const f of ['numbers', 'format', 'fraction', 'parser', 'explanations', 'figures', 'steps', 'topics',
-  'topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'numeracy1', 'algebra1', 'curriculum1', 'curriculum2', 'year7', 'unaided', 'harder', 'harder2',
+  'topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'numeracy1', 'algebra1', 'curriculum1', 'curriculum2', 'year7', 'computing7', 'unaided', 'harder', 'harder2',
   'bidmas', 'solving', 'problems']) {
   Object.assign(W, require(path + f + '.js'));
 }
@@ -373,6 +373,102 @@ const CASES = {
     // the whole point of the question: the outlier must really drag the mean off
     if (!(mean > median)) bad(`whichAverage: mean ${mean} is not above median ${median}, so the median is not the better answer`); else ok();
     if (sorted[4] - sorted[3] < 10) bad(`whichAverage: ${sorted[4]} is not clearly an outlier next to ${sorted[3]}`); else ok(); },
+
+  // ---------- Year 7 COMPUTING: every number a child is asked for, re-derived from the
+  // text and the spreadsheet grid actually on screen — never from the generator's own
+  // working. Units use 1,000 between steps, as the school's poster does.
+  'computing': () => {
+    const UNITS = ['bytes', 'KB', 'MB', 'GB', 'TB'];
+    const n = (s) => Number(String(s).replace(/,/g, ''));
+    const evalExpr = (e) => {
+      const t = e.replace(/,/g, '').replace(/×/g, '*').replace(/÷/g, '/');
+      if (!/^[\d\s+*/]+$/.test(t)) return NaN;
+      return Function(`return (${t});`)();
+    };
+    const gridCol = (html, col) => {                     // numbers in one column, row 2 down
+      const rows = [...String(html).matchAll(/<tr><th>(\d+)<\/th>(.*?)<\/tr>/g)];
+      return rows.filter((r) => Number(r[1]) >= (col === 0 ? 1 : 2)).map((r) => [...r[2].matchAll(/<td[^>]*>(.*?)<\/td>/g)].map((c) => c[1])[col])
+        .filter((v) => v !== undefined && /^-?\d+$/.test(v)).map(Number);
+    };
+    const gridRows = (html) => [...String(html).matchAll(/<tr><th>(\d+)<\/th>(.*?)<\/tr>/g)]
+      .map((r) => ({ row: Number(r[1]), cells: [...r[2].matchAll(/<td[^>]*>(.*?)<\/td>/g)].map((c) => c[1]) }));
+    const gridCell = (html, col, row) => { const r = gridRows(html).find((x) => x.row === row); return r ? r.cells['ABCDEFG'.indexOf(col)] : undefined; };
+    const gridFind = (html, val) => { const hits = []; gridRows(html).forEach((r) => r.cells.forEach((c, j) => { if (c === val) hits.push('ABCDEFG'[j] + r.row); }));
+      if (hits.length !== 1) bad(`computing: "${val}" appears ${hits.length} times in the grid — the question is ambiguous`); return hits[0]; };
+    const S = W.SUBJECTS.find((s) => s.id === 'y7comp');
+    for (const l of S.levels) {
+      const p = l.generate();
+      for (const st of p.steps) {
+        if (st.mode !== 'pick') continue;
+        const right = st.pool.filter((v) => st.check(v).correct);
+        const at = `computing ${l.id}/${st.key} "${st.prompt}"`;
+        let truth = null, m;
+        if ((m = st.prompt.match(/((?:\d[\d,]*)(?:\s*[+×÷]\s*\d[\d,]*)+)\s*=\s*\?/))) truth = evalExpr(m[1]);
+        else if ((m = st.prompt.match(/(\d[\d,]*) × (\d[\d,]*) MB = \?/))) truth = n(m[1]) * n(m[2]);
+        else if ((m = st.prompt.match(/^What is in cell ([A-G])(\d+)\?$/))) {
+          const cell = gridCell(p.diagram, m[1], Number(m[2]));
+          if (right.length === 1 && right[0] === cell) ok(); else bad(`${at}: accepts [${right}], the grid shows "${cell}"`);
+          continue;
+        } else if ((m = st.prompt.match(/^Which cell holds "(.+)"\?$/))) {
+          const ref = gridFind(p.diagram, m[1]);
+          if (right.length === 1 && right[0] === ref) ok(); else bad(`${at}: accepts [${right}], the grid has it in ${ref}`);
+          continue;
+        } else if ((m = st.prompt.match(/^Which ROW holds (\w+)'s results\?$/))) {
+          const ref = gridFind(p.diagram, m[1]);
+          if (right.length === 1 && right[0] === ref.slice(1)) ok(); else bad(`${at}: accepts [${right}], the grid has ${m[1]} in ${ref}`);
+          continue;
+        }
+        else if ((m = st.prompt.match(/(\d[\d,]*) (TB|GB|MB|KB) = how many (bytes|KB|MB|GB|TB)\?/))) truth = n(m[1]) * 1000 ** (UNITS.indexOf(m[2]) - UNITS.indexOf(m[3]));
+        else if ((m = st.prompt.match(/=SUM\(A1:A4\) = \? \(([\d +]+)\)/))) truth = evalExpr(m[1]);
+        else if ((m = st.prompt.match(/^And =(MAX|MIN)\(A1:A4\) = \?/))) { const v = gridCol(p.diagram, 0); truth = m[1] === 'MAX' ? Math.max(...v) : Math.min(...v); }
+        else if ((m = st.prompt.match(/^What will =(MAX|MIN)\(B2:B(\d+)\) show\?/))) {
+          const v = gridCol(p.diagram, 1);
+          if (v.length !== Number(m[2]) - 1) bad(`${at}: grid column B has ${v.length} numbers, range says ${Number(m[2]) - 1}`);
+          truth = m[1] === 'MAX' ? Math.max(...v) : Math.min(...v);
+        }
+        if (truth !== null) {
+          if (!Number.isInteger(truth) || truth < 0) bad(`${at}: the true answer ${truth} is not a whole number — not calculator-free`);
+          else if (right.length === 1 && n(right[0]) === truth) ok();
+          else bad(`${at}: accepts [${right}], truth is ${truth}`);
+          continue;
+        }
+        // decisions that rest on a number
+        if ((m = st.prompt.match(/^([\d,]+) MB to save, ([\d,]+) MB free\. Do they all fit\?/))) {
+          const want = n(m[1]) < n(m[2]) ? 'Yes, they fit' : 'No, they do not fit';
+          if (right[0] === want) ok(); else bad(`${at}: says ${right[0]}`);
+        } else if ((m = st.prompt.match(/MORE storage: (\d+) (TB|GB|MB|KB) or ([\d,]+) (bytes|KB|MB|GB|TB)\?/))) {
+          const a = n(m[1]) * 1000 ** UNITS.indexOf(m[2]), b = n(m[3]) * 1000 ** UNITS.indexOf(m[4]);
+          const want = a > b ? `${m[1]} ${m[2]}` : `${m[3]} ${m[4]}`;
+          if (right[0] === want) ok(); else bad(`${at}: says ${right[0]}, truth ${want}`);
+        } else if (/turns them into CORRECT information/.test(st.prompt)) {
+          const v = p.given.match(/[\d, ]+$/)[0].split(',').map(Number);
+          if (right[0] === `The highest test score was ${Math.max(...v)}.`) ok(); else bad(`${at}: says ${right[0]} for ${v}`);
+        } else if (/MOST goals scored in one match/.test(st.prompt)) {
+          const v = p.given.match(/says: ([\d, ]+)\./)[1].split(',').map(Number);
+          if (n(right[0]) === Math.max(...v)) ok(); else bad(`${at}: says ${right[0]} for ${v}`);
+        } else if (/^Which sentence is INFORMATION made from this data\?/.test(st.prompt)) {
+          const v = p.given.match(/says: ([\d, ]+)\./)[1].split(',').map(Number);
+          const num = Number((right[0].match(/(\d+) goals/) || right[0].match(/was (\d+)/) || [])[1]);
+          const want = /scored \d+ goals in our last/.test(right[0]) ? v.reduce((s, x) => s + x, 0) : Math.max(...v);
+          if (num === want) ok(); else bad(`${at}: "${right[0]}" for ${v}`);
+        }
+      }
+      // the built formula covers exactly the numbers in the grid, and its answer is right
+      if (p.data && p.data.kind === 'formula') {
+        const v = gridCol(p.diagram, 1);
+        if (JSON.stringify(v) === JSON.stringify(p.data.values)) ok(); else bad(`computing ${l.id}: grid ${v} ≠ data ${p.data.values}`);
+        const f = p.data.fn, tr = f === 'SUM' ? v.reduce((s, x) => s + x, 0) : f === 'AVERAGE' ? v.reduce((s, x) => s + x, 0) / v.length : f === 'MAX' ? Math.max(...v) : Math.min(...v);
+        if (Number.isInteger(tr)) ok(); else bad(`computing ${l.id}: =${f} of ${v} is ${tr}, not a whole number`);
+        const last = p.steps[p.steps.length - 1];
+        if (last.check(String(tr)).correct || last.check(String(tr).replace(/\B(?=(\d{3})+(?!\d))/g, ',')).correct) ok();
+        else bad(`computing ${l.id}: final step rejects the true =${f} ${tr} of ${v}`);
+        const b = p.steps[0];
+        if (b.check(`=${f}(B2:B${v.length + 1})`).correct) ok(); else bad(`computing ${l.id}: build step rejects =${f}(B2:B${v.length + 1})`);
+        if (!b.check(`${f}(B2:B${v.length + 1})`).correct && !b.check(`=${f}(B1:B${v.length + 1})`).correct && !b.check(`=${f}(A2:A${v.length + 1})`).correct) ok();
+        else bad(`computing ${l.id}: build step accepts a broken formula`);
+      }
+    }
+  },
 };
 
 for (const [name, fn] of Object.entries(CASES)) {

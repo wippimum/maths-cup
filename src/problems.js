@@ -853,6 +853,33 @@
       { id: 'y7-muldiv', name: 'Multiply & divide', badge: '✖️', generate: () => (Math.random() < 0.5 ? T.multMixed() : T.divideFractions()) },
       { id: 'y7-solo', name: 'No steps — just the answer', badge: '🔥', generate: () => T.unaided() },
     ] },
+    // COMPUTING, not maths: the Year 7 Computing Term 1 test, built from the school's
+    // revision poster (see computing7.js). Seven sections, each LEARN → PRACTISE → REAL
+    // LIFE, then the mixed test. `group` puts a section heading above each ladder.
+    { id: 'y7comp', year: 7, tag: 'Computing', name: 'Computing · Term 1 Test', icon: '💻', blurb: 'COMPUTING, not maths. Hardware, storage, units, data, spreadsheets, formulas and fair data — the whole revision poster.', levels: [
+      { id: 'cs1-learn', group: '1 · Hardware and Software', name: 'Learn: hardware & software', badge: '📘', generate: () => T.csHwLearn() },
+      { id: 'cs1-sort', group: '1 · Hardware and Software', name: 'Sort it: hardware, system, application', badge: '🗂️', generate: () => T.csHwSort() },
+      { id: 'cs1-real', group: '1 · Hardware and Software', name: 'Real life: kit out the club office', badge: '⚽', generate: () => T.csHwReal() },
+      { id: 'cs2-learn', group: '2 · Computer Storage', name: 'Learn: storage devices', badge: '📘', generate: () => T.csStLearn() },
+      { id: 'cs2-compare', group: '2 · Computer Storage', name: 'HDD or SSD? Compare them', badge: '⚖️', generate: () => T.csStCompare() },
+      { id: 'cs2-real', group: '2 · Computer Storage', name: 'Real life: choose and justify', badge: '⚽', generate: () => T.csStReal() },
+      { id: 'cs3-learn', group: '3 · Storage Units', name: 'Learn: Byte to TB', badge: '📘', generate: () => T.csUnLearn() },
+      { id: 'cs3-order', group: '3 · Storage Units', name: 'Order and compare units', badge: '🪜', generate: () => T.csUnOrder() },
+      { id: 'cs3-real', group: '3 · Storage Units', name: 'Real life: will the goal clips fit?', badge: '⚽', generate: () => T.csUnReal() },
+      { id: 'cs4-learn', group: '4 · Data and Information', name: 'Learn: data vs information', badge: '📘', generate: () => T.csDiLearn() },
+      { id: 'cs4-sort', group: '4 · Data and Information', name: 'Data or information?', badge: '🗂️', generate: () => T.csDiSort() },
+      { id: 'cs4-real', group: '4 · Data and Information', name: "Real life: the coach's notebook", badge: '⚽', generate: () => T.csDiReal() },
+      { id: 'cs5-learn', group: '5 · Spreadsheets', name: 'Learn: cells, rows, columns', badge: '📘', generate: () => T.csShLearn() },
+      { id: 'cs5-cells', group: '5 · Spreadsheets', name: 'Find the cell', badge: '🔎', generate: () => T.csShCells() },
+      { id: 'cs5-real', group: '5 · Spreadsheets', name: "Real life: a striker's season sheet", badge: '⚽', generate: () => T.csShReal() },
+      { id: 'cs6-learn', group: '6 · Spreadsheet Formulas', name: 'Learn: =SUM =AVERAGE =MAX =MIN', badge: '📘', generate: () => T.csFmLearn() },
+      { id: 'cs6-pick', group: '6 · Spreadsheet Formulas', name: 'Pick the formula, spot the mistake', badge: '🕵️', generate: () => T.csFmPick() },
+      { id: 'cs6-real', group: '6 · Spreadsheet Formulas', name: 'Real life: build it, work it out', badge: '⚽', generate: () => T.csFmReal() },
+      { id: 'cs7-learn', group: '7 · Good Data Collection', name: 'Learn: collecting data fairly', badge: '📘', generate: () => T.csDcLearn() },
+      { id: 'cs7-spot', group: '7 · Good Data Collection', name: 'What went wrong?', badge: '🕵️', generate: () => T.csDcFair() },
+      { id: 'cs7-real', group: '7 · Good Data Collection', name: 'Real life: check the results table', badge: '⚽', generate: () => T.csDcReal() },
+      { id: 'cs-test', group: 'The test', name: 'Test 1 practice (mixed, no glossary)', badge: '🏆', generate: () => T.csTest() },
+    ] },
   ];
   function subjectById(id) { return SUBJECTS.find((s) => s.id === id) || SUBJECTS[0]; }
   function levelOf(subjectId, levelId) {

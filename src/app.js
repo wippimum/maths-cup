@@ -5,7 +5,7 @@
   const $ = (id) => document.getElementById(id);
   const MATCH_LEN = 10;
 
-  const SUBJ_SHORT = { numeracy: 'Numeracy', integers: 'Integers', bidmas: 'Order of operations', hcf: 'HCF', lcm: 'LCM', primes: 'Primes', fractions: 'Fractions', algebra1: 'Intro to algebra', coords: 'Symmetry & co-ordinates', rounding: 'Degrees of accuracy', decimals: 'Decimals', algebra: 'Linear equations', angles: 'Angles', fdp: 'Fractions, decimals & %', area: 'Mensuration 2D', measures: 'Units & measures', stats: 'Statistical measures', graphs: 'Graphs & data', percent: 'Percentages', geometry: 'Geometric properties', volume: '3D shape & volume', ratio: 'Ratio (extra)', solve: 'Problem solving', y7frac: 'Fractions & mixed numbers' };
+  const SUBJ_SHORT = { numeracy: 'Numeracy', integers: 'Integers', bidmas: 'Order of operations', hcf: 'HCF', lcm: 'LCM', primes: 'Primes', fractions: 'Fractions', algebra1: 'Intro to algebra', coords: 'Symmetry & co-ordinates', rounding: 'Degrees of accuracy', decimals: 'Decimals', algebra: 'Linear equations', angles: 'Angles', fdp: 'Fractions, decimals & %', area: 'Mensuration 2D', measures: 'Units & measures', stats: 'Statistical measures', graphs: 'Graphs & data', percent: 'Percentages', geometry: 'Geometric properties', volume: '3D shape & volume', ratio: 'Ratio (extra)', solve: 'Problem solving', y7frac: 'Fractions & mixed numbers', y7comp: 'Computing · Test 1' };
   // School (Toddle) topic numbers, straight from the unit-plan folder names. A few topics
   // are split across more than one tile so no single tile ends up with a dozen levels:
   // T2 is Integers + Order of operations, T3 is HCF + LCM + Primes, T12 is Mensuration +
@@ -13,7 +13,7 @@
   // The school's topic number now lives on the subject itself (see SUBJECTS in
   // problems.js), so the tiles can be listed in course order T1 → T17 and the
   // number can never drift away from the tile it labels.
-  const TASK_WORD = { algebra1: 'ALGEBRA', measures: 'CONVERT', algebra: 'SOLVE', hcf: 'FIND THE HCF', lcm: 'FIND THE LCM', primes: 'PRIMES', ratio: 'RATIO', decimals: 'WORK OUT', percent: 'WORK OUT', solve: 'PROBLEM', fractions: 'FRACTIONS', integers: 'WORK OUT', bidmas: 'WORK IT OUT IN ORDER', rounding: 'ROUND', stats: 'STATISTICS', fdp: 'CONVERT', numeracy: 'WORK OUT', angles: 'FIND THE ANGLE', area: 'WORK OUT', volume: 'VOLUME', coords: 'COORDINATES', geometry: 'SHAPE FACTS', graphs: 'READ THE CHART' };
+  const TASK_WORD = { algebra1: 'ALGEBRA', measures: 'CONVERT', algebra: 'SOLVE', hcf: 'FIND THE HCF', lcm: 'FIND THE LCM', primes: 'PRIMES', ratio: 'RATIO', decimals: 'WORK OUT', percent: 'WORK OUT', solve: 'PROBLEM', fractions: 'FRACTIONS', integers: 'WORK OUT', bidmas: 'WORK IT OUT IN ORDER', rounding: 'ROUND', stats: 'STATISTICS', fdp: 'CONVERT', numeracy: 'WORK OUT', angles: 'FIND THE ANGLE', area: 'WORK OUT', volume: 'VOLUME', coords: 'COORDINATES', geometry: 'SHAPE FACTS', graphs: 'READ THE CHART', y7comp: 'COMPUTING' };
 
   // ---------------- persistent save ----------------
   const KEY = 'wac-save-v1';
@@ -33,6 +33,9 @@
     catch (e) { s = Object.assign({}, defaults); }
     if (!s.progress) s.progress = {};
     if (!Array.isArray(s.history)) s.history = [];
+    // Computing mastery (build 47). Older saves have none; a damaged one is repaired,
+    // never wiped — masteryMigrate keeps every record it can read.
+    s.mastery = WAC.masteryMigrate ? WAC.masteryMigrate(s.mastery) : (s.mastery || {});
     // migrate the old algebra-only save (had .round / .consecutiveWins)
     if (s.round && !s.progress.algebra) { s.subject = 'algebra'; s.level = s.round; s.progress.algebra = { levelId: s.round, consec: s.consecutiveWins || 0 }; }
     // Ratio lost its own tile and moved under Fractions. Without this, anyone who
@@ -170,6 +173,7 @@
       const card = document.createElement('button');
       card.className = 'subject-card' + (s.id === pendingSubject ? ' sel' : '');
       const tnum = s.topic ? `<span class="subj-num">T${s.topic}</span>`
+        : s.tag ? `<span class="subj-num extra">${s.tag}</span>`
         : s.year === 7 ? '<span class="subj-num extra">KS3</span>'
         : '<span class="subj-num extra">extra</span>';
       card.innerHTML = `${tnum}<div class="subj-icon">${s.icon}</div><div class="subj-name">${SUBJ_SHORT[s.id]}</div><div class="subj-blurb">${s.blurb}</div>`;
@@ -182,7 +186,13 @@
     const subj = subjectById(pendingSubject);
     const row = $('levelRow'); row.innerHTML = '';
     if (!subj.levels.some((l) => l.id === pendingLevel)) pendingLevel = subj.levels[0].id;
+    let lastGroup = null;
     subj.levels.forEach((l) => {
+      // a long ladder (Computing has 22 levels) reads as sections, not one wall of cards
+      if (l.group && l.group !== lastGroup) {
+        const h = document.createElement('div'); h.className = 'lvl-group'; h.textContent = l.group;
+        row.appendChild(h); lastGroup = l.group;
+      }
       const card = document.createElement('button');
       card.className = 'level-card' + (l.id === pendingLevel ? ' sel' : '');
       // ⭐ marks a level that goes BEYOND the school's Year 6 course — kept as stretch,
@@ -194,6 +204,30 @@
       row.appendChild(card);
     });
     $('kickoffBtn').disabled = false;
+    const mp = $('masteryPanel');
+    if (mp) {
+      if (subj.id === 'y7comp' && WAC.masterySummary) { mp.innerHTML = masteryHTML(); mp.classList.remove('hidden'); }
+      else { mp.innerHTML = ''; mp.classList.add('hidden'); }
+    }
+  }
+
+  // ---------------- computing: mastery meter ----------------
+  // Seven section cards (the poster's seven boxes) with their ideas ticked off, then the
+  // poster's own Key Revision Checklist. Words, not dots: on an iPad there is no hover
+  // to reveal what a dot means.
+  function masteryHTML(justNow) {
+    const m = WAC.masterySummary(save.mastery);
+    let h = `<h3>🏅 Mastery — ${m.mastered} of ${m.total} ideas</h3><div class="m-grid">`;
+    m.sections.forEach((s) => {
+      h += `<div class="m-sec${s.mastered === s.total ? ' done' : ''}"><div class="m-head"><span class="m-ico">${s.icon}</span> ${s.n} · ${s.name}`
+        + `<span class="m-count">${s.mastered}/${s.total}</span></div><ul>`
+        + s.concepts.map((c) => `<li class="${c.mastered ? 'on' : ''}${justNow && justNow.includes(c.id) ? ' new' : ''}">${c.mastered ? '✅' : `<span class="m-run">${'●'.repeat(Math.min(c.streak, 2))}${'○'.repeat(Math.max(0, 3 - Math.min(c.streak, 2)))}</span>`} ${c.label}</li>`).join('')
+        + '</ul></div>';
+    });
+    h += '</div><h4>Key Revision Checklist</h4><ul class="m-check">'
+      + m.checklist.map((c) => `<li class="${c.done ? 'on' : ''}">${c.done ? '✅' : '⬜'} ${c.text}</li>`).join('') + '</ul>';
+    h += '<p class="m-note">An idea is mastered after 3 right first time in a row, with no hint or definition, across at least 2 different kinds of question. Miss one and it comes back later in the same match.</p>';
+    return h;
   }
 
   function refreshHeader() {
@@ -255,25 +289,97 @@
   function loadProblem() {
     const prob = game.match[game.matchIndex];
     game.problem = prob; game.stepIndex = 0; game.solvedLines = [prob.given];
-    game.firstTry = true; game.stepAttempts = 0;
+    game.firstTry = true; game.stepAttempts = 0; game.stepMissed = false; game.stepHelped = false;
     renderProblemHeader(prob);
     resetBall(); $('nextBtn').classList.add('hidden');
     renderDots(); renderSteps(); renderActive();
     mascot('⚽', save.team.name ? `Come on ${save.team.name}!` : "Let's go!", true);
   }
 
-  function renderProblemHeader(prob) {
+  // ---------------- computing glossary ----------------
+  // Key words are underlined; tapping one (iPad) or hovering it (desktop) shows the
+  // poster's definition. Only Computing is glossed, and never the test level or a step
+  // whose question IS a definition ("What is data?") — that would hand over the answer.
+  function glossOn(prob) { return !!(prob && prob.subject === 'y7comp' && prob.gloss !== false && WAC.glossify); }
+  function G(html, on) { return on ? WAC.glossify(html) : html; }
+  function helpG(html) { return G(html, glossOn(game && game.problem)); }
+  // A card whose whole text is a glossary word gets a small ⓘ instead of an underline,
+  // so tapping the word still picks the card and only the ⓘ opens the definition.
+  function chipHTML(val, on) {
+    const base = mathHTML(val);
+    if (!on) return base;
+    const id = WAC.glossTermOf(val);
+    if (id) return `${base}<span class="gl gl-i" data-gl="${id}" role="button" tabindex="0" aria-label="What does this mean?">ⓘ</span>`;
+    return WAC.glossify(base);
+  }
+  function markHelped() { if (game && !$('gameScreen').classList.contains('hidden')) game.stepHelped = true; }
+  function glossSetup() {
+    if (!WAC.GLOSS_BY_ID) return;
+    const pop = document.createElement('div');
+    pop.id = 'glossPop'; pop.className = 'gloss-pop hidden'; pop.setAttribute('role', 'tooltip');
+    document.body.appendChild(pop);
+    let pinned = null;
+    const show = (el) => {
+      const e = WAC.GLOSS_BY_ID[el.getAttribute('data-gl')];
+      if (!e) return;
+      pop.innerHTML = `📖 ${WAC.mathEscape(e.def)}`;
+      pop.classList.remove('hidden');
+      const r = el.getBoundingClientRect(), pw = Math.min(300, window.innerWidth - 24);
+      pop.style.width = pw + 'px';
+      pop.style.left = Math.max(12, Math.min(r.left + r.width / 2 - pw / 2, window.innerWidth - pw - 12)) + 'px';
+      const ph = pop.offsetHeight;
+      let top = r.bottom + 8;
+      if (top + ph > window.innerHeight - 8) top = r.top - ph - 8;
+      pop.style.top = Math.max(8, top) + 'px';
+    };
+    const hide = () => { pop.classList.add('hidden'); pinned = null; };
+    // CAPTURE phase, so a tap on a word inside a card is handled here and stopped before
+    // it reaches the card's own onclick — reading a definition never selects an answer.
+    document.addEventListener('click', (ev) => {
+      const el = ev.target && ev.target.closest ? ev.target.closest('.gl') : null;
+      if (el) {
+        ev.preventDefault(); ev.stopPropagation();
+        if (pinned === el) { hide(); return; }
+        pinned = el; show(el); markHelped(); return;
+      }
+      if (!pop.classList.contains('hidden')) hide();
+    }, true);
+    document.addEventListener('keydown', (ev) => {
+      const el = document.activeElement;
+      if ((ev.key === 'Enter' || ev.key === ' ') && el && el.classList && el.classList.contains('gl')) {
+        ev.preventDefault(); ev.stopPropagation(); pinned = el; show(el); markHelped();
+      } else if (ev.key === 'Escape') hide();
+    }, true);
+    if (window.matchMedia && window.matchMedia('(hover: hover)').matches) {
+      document.addEventListener('mouseover', (ev) => { const el = ev.target.closest && ev.target.closest('.gl'); if (el && !pinned) show(el); });
+      document.addEventListener('mouseout', (ev) => { const el = ev.target.closest && ev.target.closest('.gl'); if (el && !pinned) pop.classList.add('hidden'); });
+    }
+    // A small scroll (iOS nudges the page when a word takes focus) must not close a
+    // definition the child just opened — keep it beside its word instead, and only
+    // close it once the word has scrolled out of sight.
+    window.addEventListener('scroll', () => {
+      if (pop.classList.contains('hidden')) return;
+      if (!pinned) { pop.classList.add('hidden'); return; }
+      const r = pinned.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > window.innerHeight || !document.body.contains(pinned)) hide(); else show(pinned);
+    }, { passive: true });
+  }
+
+  // `step` is the step on screen: when its question IS a definition, the question text
+  // above it is shown without definitions too, or the header would give the answer away.
+  function renderProblemHeader(prob, step) {
+    const gon = glossOn(prob) && !(step && step.noGloss);
     const solveLike = prob.subject === 'solve' || prob.given.length > 46;
     const storyText = prob.story || (solveLike ? prob.given : '');
-    if (storyText) { $('problemStory').innerHTML = mathHTML(storyText); $('problemStory').classList.remove('hidden'); }
+    if (storyText) { $('problemStory').innerHTML = G(mathHTML(storyText), gon); $('problemStory').classList.remove('hidden'); }
     else $('problemStory').classList.add('hidden');
-    const headline = prob.story ? prob.given : (solveLike ? 'Work it out step by step 🧩' : prob.given);
-    $('problemGiven').innerHTML = mathHTML(headline);
+    const headline = prob.story ? prob.given : (solveLike ? (prob.subject === 'y7comp' ? 'Think it through, step by step 💻' : 'Work it out step by step 🧩') : prob.given);
+    $('problemGiven').innerHTML = G(mathHTML(headline), gon);
     // A wording note ("give your answer in its simplest form") belongs UNDER the
     // calculation, not inside it — kept in `given` it made the string long enough to be
     // mistaken for a word problem, which shunted the equation into the little story box.
     const note = $('problemNote');
-    if (prob.note) { note.innerHTML = mathHTML(prob.note); note.classList.remove('hidden'); }
+    if (prob.note) { note.innerHTML = G(mathHTML(prob.note), gon); note.classList.remove('hidden'); }
     else { note.innerHTML = ''; note.classList.add('hidden'); }
     const dia = $('problemDiagram');
     if (prob.diagram) { dia.innerHTML = prob.diagram; dia.classList.remove('hidden'); } else { dia.innerHTML = ''; dia.classList.add('hidden'); }
@@ -316,7 +422,9 @@
   function renderActive() {
     const step = curStep();
     if (!step) return;
-    $('stepPrompt').innerHTML = mathHTML(step.prompt);
+    const gon = glossOn(game.problem) && !step.noGloss;
+    if (game.problem.subject === 'y7comp') renderProblemHeader(game.problem, step);
+    $('stepPrompt').innerHTML = G(mathHTML(step.prompt), gon);
     $('feedback').classList.add('hidden');
     $('btnLong').classList.toggle('hidden', !step.longWay);
     const tray = $('cardTray'); tray.innerHTML = '';
@@ -326,7 +434,7 @@
       $('buildRow').classList.add('hidden');
       step.pool.forEach((val) => {
         const c = document.createElement('button');
-        c.className = 'chip'; c.innerHTML = mathHTML(val); c.dataset.val = val;
+        c.className = 'chip'; c.innerHTML = chipHTML(val, gon); c.dataset.val = val;
         c.onclick = () => {
           if (mode === 'pick') { tray.querySelectorAll('.chip').forEach((x) => x.classList.remove('sel')); c.classList.add('sel'); }
           else c.classList.toggle('sel');
@@ -396,10 +504,16 @@
       flashActiveRow('flash-green'); sfx.cheer();
       const newIndex = game.stepIndex + 1 + skip, last = newIndex >= steps.length;
       const head = last ? 'GOAL! ⚽🥅' : (skip ? 'Two in one — quick! ⚡✓' : 'Nice — one good step ✓');
-      showFeedback('good', head, last ? '' : (skip ? 'You did two steps at once and nailed it.' : 'On to the next step.'));
+      // Mastery counts what was answered UNAIDED: a step solved after a hint, a "why", the
+      // long way or a glossary tap is neither credit nor a miss — just no evidence.
+      const mastered = step.concept && !game.stepHelped ? recordConcept(step, !game.stepMissed) : null;
+      game.stepMissed = false; game.stepHelped = false;
+      showFeedback('good', head, (last ? '' : (skip ? 'You did two steps at once and nailed it.' : 'On to the next step.'))
+        + (mastered ? `<br>🏅 Idea mastered: <strong>${WAC.CS_CONCEPTS[mastered]}</strong>!` : ''));
       game.stepIndex = newIndex; advanceBall();
       if (last) finishProblem();
       else { renderSteps(); renderActive(); mascot(skip ? '⚡' : '😃', skip ? 'Speedy!' : 'Keep it moving!', false); }
+      if (mastered) mascot('🏅', 'Mastered!', true);
     } else if (res.soft) {
       flashActiveRow('flash-amber');
       showFeedback('info', 'One step at a time ⚽', explain(res.id, res.ctx));
@@ -408,7 +522,11 @@
       flashActiveRow('flash-amber'); sfx.whistle();
       game.firstTry = false; game.stepAttempts++;
       recordMistake(res.id);
-      showFeedback('bad', "Referee's whistle — try again 🟡", explain(res.id, res.ctx));
+      // The first miss on a step is what counts for mastery, and it books a replay of
+      // the same idea a little later in this match.
+      if (step.concept && !game.stepMissed) { recordConcept(step, false); scheduleReview(step.concept); }
+      game.stepMissed = true;
+      showFeedback('bad', "Referee's whistle — try again 🟡", helpG(explain(res.id, res.ctx)));
       mascot('🙂', 'Nearly! Read the tip.', false);
       if (mode === 'build') { $('lineInput').focus(); $('lineInput').select(); }
     }
@@ -451,6 +569,32 @@
   }
   function nextProblem() { if (game.matchIndex >= MATCH_LEN - 1) { fullTime(); return; } game.matchIndex++; loadProblem(); }
 
+  // ---------------- computing: mastery + spaced replay ----------------
+  function recordConcept(step, firstTry) {
+    if (!WAC.masteryRecord) return null;
+    save.mastery = WAC.masteryMigrate(save.mastery);
+    const just = WAC.masteryRecord(save.mastery, step.concept, step.kind, firstTry);
+    persist();
+    if (!just) return null;
+    game.justMastered = (game.justMastered || []).concat([step.concept]);
+    return step.concept;
+  }
+  // A missed idea comes back two problems later (never straight away, which would only
+  // test short-term memory), replacing a problem not yet played so the match stays 10.
+  function scheduleReview(concept) {
+    if (!WAC.csReview || game.subject !== 'y7comp') return;
+    game.reviewed = game.reviewed || {};
+    if (game.reviewed[concept]) return;
+    for (let at = game.matchIndex + 2; at < MATCH_LEN; at++) {
+      if (game.match[at] && game.match[at].review) continue;
+      const r = WAC.csReview(concept);
+      if (!r) return;
+      if (game.problem && game.problem.gloss === false) r.gloss = false;
+      game.match[at] = r; game.reviewed[concept] = true;
+      return;
+    }
+  }
+
   function recordMistake(id) {
     if (id === 'generic' || id === 'unparseable' || id === 'empty') return;
     game.matchStats.mistakes[id] = (game.matchStats.mistakes[id] || 0) + 1;
@@ -476,6 +620,7 @@
     'dec-dir': 'which way the point moves', 'dec-places': 'how many places to move', 'dec-answer': 'moving the decimal point', 'dec-addsub': 'lining up the decimal points',
     'pc-ten': 'finding 10%', 'pc-mult': 'scaling up the percentage', 'pc-half': 'finding 5%', 'pc-add': 'adding the parts', 'num-wrong': 'a calculation',
   };
+  Object.assign(LABELS, WAC.CS_MISTAKE_LABELS || {});
   const TIPS = {
     'flip-number': 'When a number crosses the =, flip it: +3 becomes −3.',
     'combine-wrong': '33x − 2x is 33 − 2 = 31 of the same thing.',
@@ -555,6 +700,11 @@
       html += `<p>The trickiest thing today was <strong>${LABELS[topId] || 'one of the steps'}</strong>.</p>`;
       if (TIPS[topId]) html += `<p>💡 Tip: ${TIPS[topId]}</p>`;
     } else html += `<p>💡 Amazing — no mistakes at all today. Try a harder level next!</p>`;
+    if (save.subject === 'y7comp' && WAC.masterySummary) {
+      const just = game.justMastered || [];
+      if (just.length) html += `<div class="promo">🏅 New ideas mastered: <strong>${just.map((c) => WAC.CS_CONCEPTS[c]).join(', ')}</strong></div>`;
+      html += `<div class="mastery in-modal">${masteryHTML(just)}</div>`;
+    }
     $('summaryBody').innerHTML = html;
     $('summaryModal').classList.remove('hidden');
   }
@@ -622,7 +772,7 @@
     location.href = `mailto:${encodeURIComponent(save.parentEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
   function copyBackup() {
-    const blob = JSON.stringify({ v: 1, history: save.history, progress: save.progress, goalsScored: save.goalsScored, streak: save.streak });
+    const blob = JSON.stringify({ v: 1, history: save.history, progress: save.progress, goalsScored: save.goalsScored, streak: save.streak, mastery: save.mastery });
     const done = () => alert(`Copied ${save.history.length} matches to the clipboard.\nPaste it somewhere safe (Notes, a message to yourself).`);
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(blob).then(done, () => prompt('Copy this:', blob));
     else prompt('Copy this:', blob);
@@ -638,6 +788,7 @@
     if (data.progress) save.progress = data.progress;
     if (typeof data.goalsScored === 'number') save.goalsScored = data.goalsScored;
     if (typeof data.streak === 'number') save.streak = data.streak;
+    if (data.mastery && WAC.masteryMigrate) save.mastery = WAC.masteryMigrate(data.mastery);
     persist(); refreshHeader(); showHistory();
   }
 
@@ -718,7 +869,7 @@
 
   // ---------------- wire up ----------------
   function init() {
-    applyTeam(); refreshHeader();
+    applyTeam(); refreshHeader(); glossSetup();
     // The year buttons on the landing screen, and the way back to it.
     document.querySelectorAll('.year-card').forEach((btn) => {
       btn.onclick = () => {
@@ -761,9 +912,9 @@
       const step = curStep();
       if (step && stepMode(step) !== 'build') checkStep();
     });
-    $('btnHint').onclick = () => { const step = curStep(); if (step) showFeedback('info', 'Hint 💡', mathHTML(step.hint)); };
-    $('btnWhy').onclick = () => { const step = curStep(); if (!step) return; let body = mathHTML(step.why); if (save.longWay && step.longWay) body += `<pre>${mathHTML(step.longWay)}</pre>`; showFeedback('info', 'Why does this work? 🤔', body); };
-    $('btnLong').onclick = () => { const step = curStep(); if (!step) return; save.longWay = true; persist(); showFeedback('info', 'The long way 🧮', `<pre>${mathHTML(step.longWay || step.hint)}</pre>`); };
+    $('btnHint').onclick = () => { const step = curStep(); if (step) markHelped(); if (step) showFeedback('info', 'Hint 💡', helpG(mathHTML(step.hint))); };
+    $('btnWhy').onclick = () => { const step = curStep(); if (!step) return; markHelped(); let body = mathHTML(step.why); if (save.longWay && step.longWay) body += `<pre>${mathHTML(step.longWay)}</pre>`; showFeedback('info', 'Why does this work? 🤔', helpG(body)); };
+    $('btnLong').onclick = () => { const step = curStep(); if (!step) return; markHelped(); save.longWay = true; persist(); showFeedback('info', 'The long way 🧮', helpG(`<pre>${mathHTML(step.longWay || step.hint)}</pre>`)); };
     $('nextBtn').onclick = nextProblem;
     $('quitBtn').onclick = endMatch;
     $('playAgainBtn').onclick = playAgain;
