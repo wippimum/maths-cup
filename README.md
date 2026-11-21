@@ -156,6 +156,9 @@ the class exercise sheet.
   practice subjects, sentence starters, and a live coach that colours every imparfait and
   passé composé and flags the usual slips (agreement with être, *a tombé*, *c'est* instead
   of *c'était*, *il fait*, agreement wrongly made with avoir).
+- **Four mock exams (/20)** in the real format: an unseen text (not one of the 22) with ten
+  questions, two of them written answers, scored /10; then an imposed writing subject scored
+  /10 by the coach (2 points per ticked box). The menu shows each exam's mark.
 - **Three players.** The public page says *Joueur 1/2/3*. To fill the names on a device
   without putting them in this repo, open the page once with `#noms=Name1,Name2,Name3` at
   the end of its address: the names are stored on that device and the address is cleaned.

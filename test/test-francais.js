@@ -92,11 +92,12 @@ const AUX = F.AVOIR.concat(F.ETRE);
 const IMPS = new Set(), PPS = new Set();
 Object.keys(F.V).forEach((v) => { for (let p = 0; p < 6; p++) IMPS.add(F.imp(v, p)); ['', 'e', 's', 'es'].forEach((x) => PPS.add(F.V[v].pp + x)); });
 const ids = new Set();
-eq(F.TEXTS.length >= 20, true, 'at least 20 reading texts');
-F.TEXTS.forEach((T) => {
+eq(F.TEXTS.length >= 20, true, 'at least 20 reading texts'); eq(F.MOCKS.length, 4, 'four mock exams');
+F.TEXTS.concat(F.MOCKS).forEach((T) => {
   const who = `text "${T.t}"`;
   checks++; if (ids.has(T.id)) { fails++; console.log(`  ✗ duplicate id ${T.id}`); } ids.add(T.id);
   eq([T.q.length, T.vf.length, T.o.length, T.c.length], [3, 2, 3, 2], `${who} has every part`);
+  if (T.w) eq([T.o2.length, T.w.length], [3, 2], `${who} (mock exam) has its second question and subject`);
   T.q.forEach((q) => { checks++; if ((q.match(/\*/g) || []).length !== 1 || q.split('|').length < 4) { fails++; console.log(`  ✗ ${who}: bad choice "${q}"`); } });
   const tags = [...T.x.matchAll(/\[([ip]):([^\]]+)\]/g)];
   const imps = tags.filter((m) => m[1] === 'i'), pcs = tags.filter((m) => m[1] === 'p');
