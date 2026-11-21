@@ -127,6 +127,29 @@ here nearly unchanged — the maths cup's topic tiles are not used for it.
   `test/test-build.js` now fails if any of the children's names appears in a published
   file, `stars.html` included.
 
+### Français Y7 — Coupe des Temps (imparfait & passé composé)
+
+`examen-de-francais/index.html` is a separate, self-contained page (no build, no `src/`
+files) for the Year 7 French exam: **imparfait vs passé composé**. It is reached from the
+Year 7 menu (🇫🇷 button) and from the year chooser. Built from the class revision sheet and
+the class exercise sheet.
+
+- **Two players on one device.** Each has their own points, stars and sticker album. Names
+  are typed on the device, never written into the repo (`test-build.js` checks this page too).
+- **12 stations:** the lesson (8 interactive slides: décor vs action, signal words, imparfait
+  builder, passé composé, la maison d'être, agreement with être + a "bonus 5e" note on avoir
+  with a COD placed before), avoir/être au présent, ÊTRE or AVOIR goal-shooting, participes
+  passés, imparfait, passé composé, agreement, **La VAR** (choose the tense, then *why*),
+  choose the tense in a sentence, fill-in match reports, then two mock exams: the teacher's
+  sheet word for word, and a freshly generated one.
+- **Every wrong answer is diagnosed:** wrong auxiliary, missing agreement, agreement wrongly
+  made with avoir, imparfait typed for passé composé (and back), right stem with wrong ending.
+  A missing accent gets one free retry.
+- **Rewards:** points, streaks, 1 to 3 stars per station, a mystery sticker pack at 7/10,
+  special stickers for exploits, ranks from Remplaçant to Ballon d'Or, a house leaderboard.
+- `node test/test-francais.js` checks the engine against hand-checked forms, the worksheet
+  answers, every question bank and every diagnosis.
+
 ## Topics — the actual Year 6 course
 
 The menu follows the school's **Toddle unit plans**, topic by topic. Every

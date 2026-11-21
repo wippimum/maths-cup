@@ -1,0 +1,1360 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Coupe des Temps</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Coupe des Temps">
+<link rel="apple-touch-icon" href="../icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Nunito:wght@600;700;800;900&display=swap">
+<style>
+/* Night match under the floodlights: one column, a scoreboard header, pitch-green cards.
+   Blue = imparfait, red = passé composé, orange = être: the same colours as the class sheet. */
+:root{
+  --night:#08140F; --turf:#0F2C1F; --turf2:#16402D; --edge:#2A6A4C; --chalk:#EEF7F0; --muted:#9CC2AE;
+  --imp:#58AEFF; --imp-bg:rgba(88,174,255,.15); --pc:#FF6157; --pc-bg:rgba(255,97,87,.15);
+  --etre:#FFA640; --gold:#FFD447; --good:#3EE08A; --good-bg:rgba(62,224,138,.16); --bad:#FF6157; --near:#FFB547;
+  --ink:#08140F;
+  --display:"Anton","Impact","Arial Narrow Bold",sans-serif;
+  --body:"Nunito",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;color:var(--chalk);font-family:var(--body);font-weight:700;font-size:17px;line-height:1.45;-webkit-tap-highlight-color:transparent;
+  background:radial-gradient(90% 45% at 50% -8%,rgba(255,240,180,.16),transparent 62%),repeating-linear-gradient(90deg,rgba(255,255,255,.022) 0 72px,transparent 72px 144px),var(--night);
+  background-color:var(--night);background-attachment:fixed}
+#app{max-width:780px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 56px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.02em;text-wrap:balance;margin:0}
+b{font-weight:900}
+
+/* header */
+.top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.crest{display:flex;align-items:center;gap:10px;text-align:left;padding:4px 6px 4px 0}
+.crest-ball{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--chalk);font-size:28px;box-shadow:0 0 0 3px var(--gold),0 6px 18px rgba(0,0,0,.5)}
+.crest b{display:block;font-family:var(--display);font-weight:400;font-size:1.55rem;line-height:1;letter-spacing:.03em;color:var(--gold);text-transform:uppercase}
+.crest small{display:block;color:var(--muted);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}
+.top-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.icon-btn{width:44px;height:44px;border-radius:12px;background:var(--turf);border:2px solid var(--edge);font-size:1.2rem;display:grid;place-items:center}
+.back{color:var(--muted);text-decoration:none;font-size:.85rem;border:2px solid var(--edge);border-radius:10px;padding:6px 10px;white-space:nowrap}
+
+/* generic */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:var(--ink);border-radius:14px;padding:13px 20px;font-weight:900;font-size:1.05rem;box-shadow:0 5px 0 #B38B12;transition:transform .08s,box-shadow .08s;text-decoration:none}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #B38B12}
+.btn.ghost{background:var(--turf);color:var(--chalk);box-shadow:0 5px 0 #04100A;border:2px solid var(--edge)}
+.btn.sm{padding:8px 12px;font-size:.88rem;border-radius:11px}
+.btn[disabled]{opacity:.5;cursor:default}
+.lead{color:var(--muted);margin:6px 0 16px;max-width:60ch}
+.note{color:var(--muted);font-size:.85rem;font-weight:600}
+.sec{font-size:1.5rem;color:var(--chalk);margin:22px 0 10px;text-transform:uppercase;letter-spacing:.04em}
+.card{background:linear-gradient(180deg,var(--turf2),var(--turf));border:2px solid var(--edge);border-radius:20px;padding:18px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--gold);color:var(--ink);font-weight:900;padding:12px 18px;border-radius:14px;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.5);max-width:calc(100% - 32px);text-align:center}
+
+/* players */
+.hero-title{font-size:clamp(2.1rem,7vw,3.2rem);line-height:1;color:var(--chalk);text-transform:uppercase}
+.hero-title span{color:var(--gold)}
+.jerseys{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.jersey{display:flex;flex-direction:column;gap:8px}
+.jersey-main{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 16px 18px;border-radius:22px;background:linear-gradient(160deg,var(--c),color-mix(in srgb,var(--c) 45%,#000));border:3px solid rgba(255,255,255,.25);box-shadow:0 10px 26px rgba(0,0,0,.45);text-align:center}
+.j-av{font-size:3.4rem;line-height:1;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
+.j-name{font-family:var(--display);font-weight:400;font-size:2rem;letter-spacing:.03em;text-transform:uppercase;line-height:1.05;word-break:break-word}
+.jersey-main small{opacity:.9}
+.jersey-main .btn{margin-top:8px}
+.j-edit{color:var(--muted);font-size:.9rem;padding:6px}
+.edit-box{margin-top:16px}
+.edit-box input{width:100%;font:inherit;font-size:1.2rem;padding:12px 14px;border-radius:12px;border:2px solid var(--edge);background:var(--night);color:var(--chalk)}
+.avatars{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.avatars button{width:52px;height:52px;border-radius:14px;background:var(--night);border:2px solid var(--edge);font-size:1.8rem}
+.avatars button.on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,212,71,.3)}
+
+/* home */
+.player-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.avatar{display:grid;place-items:center;width:54px;height:54px;border-radius:16px;background:var(--c);font-size:2rem;flex:none;border:2px solid rgba(255,255,255,.3)}
+.pb-txt{min-width:0;flex:1}
+.pb-txt b{display:block;font-family:var(--display);font-weight:400;font-size:1.6rem;letter-spacing:.03em;line-height:1.05;text-transform:uppercase;word-break:break-word}
+.pb-txt small{color:var(--muted)}
+.countdown{margin-top:14px;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:var(--pc-bg);border:2px dashed var(--pc);font-size:.95rem}
+.countdown b{font-family:var(--display);font-weight:400;font-size:1.5rem;color:var(--pc);letter-spacing:.03em}
+.path{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;position:relative}
+.path::before{content:"";position:absolute;left:27px;top:20px;bottom:20px;border-left:3px dashed rgba(238,247,240,.25)}
+.lvl{position:relative;width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px 12px 10px;border-radius:18px;background:linear-gradient(180deg,var(--turf2),var(--turf));border:2px solid var(--edge)}
+.lvl-n{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--night);border:3px solid var(--chalk);font-family:var(--display);font-size:1.15rem;z-index:1}
+.lvl-ic{font-size:1.7rem;flex:none}
+.lvl-txt{min-width:0;flex:1}
+.lvl-txt b{display:block;font-size:1.05rem;line-height:1.2}
+.lvl-txt small{display:block;color:var(--muted);font-size:.85rem;font-weight:600}
+.lvl-st{flex:none;color:var(--gold);letter-spacing:1px;font-size:1.05rem}
+.lvl.next{border-color:var(--gold);box-shadow:0 0 0 4px rgba(255,212,71,.2)}
+.lvl.next::after{content:"À toi !";position:absolute;top:-10px;right:12px;background:var(--gold);color:var(--ink);font-size:.72rem;font-weight:900;padding:2px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.06em}
+.lvl.exam{background:linear-gradient(180deg,#3A2410,#22160A);border-color:var(--etre)}
+.home-foot{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.board{margin-top:18px}
+.board h3{font-size:1.2rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.board-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid rgba(238,247,240,.1);font-variant-numeric:tabular-nums}
+.board-row .avatar{width:38px;height:38px;font-size:1.3rem;border-radius:11px}
+.board-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board-row .pt{font-family:var(--display);font-size:1.3rem;color:var(--gold)}
+
+/* play */
+.play-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ptitle{flex:1;min-width:0}
+.ptitle b{display:block;font-family:var(--display);font-weight:400;font-size:1.3rem;letter-spacing:.03em;text-transform:uppercase;line-height:1.1}
+.ptitle small{color:var(--muted);font-size:.82rem}
+.scoreboard{display:flex;gap:6px;font-variant-numeric:tabular-nums}
+.sb{background:#020805;border:2px solid #24443A;border-radius:10px;padding:4px 10px;text-align:center;min-width:58px}
+.sb b{display:block;font-family:var(--display);font-weight:400;font-size:1.35rem;color:var(--gold);line-height:1.1}
+.sb small{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.quit-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--pc-bg);border:2px solid var(--pc);border-radius:14px;padding:10px 12px;margin-bottom:10px}
+.dots{display:flex;gap:5px;margin-bottom:10px}
+.dots span{flex:1;height:8px;border-radius:99px;background:rgba(238,247,240,.15)}
+.dots span.cur{background:var(--chalk)}
+.dots span.w{background:var(--good)} .dots span.d{background:var(--near)} .dots span.l{background:var(--bad)}
+.pitch{position:relative;height:66px;border-radius:16px;overflow:hidden;border:2px solid var(--edge);margin-bottom:12px;
+  background:repeating-linear-gradient(90deg,#123D2A 0 44px,#17492F 44px 88px)}
+.pitch::before{content:"";position:absolute;left:50%;top:-30px;bottom:-30px;border-left:2px solid rgba(255,255,255,.35)}
+.pitch::after{content:"";position:absolute;left:calc(50% - 26px);top:7px;width:52px;height:52px;border:2px solid rgba(255,255,255,.35);border-radius:50%}
+.goal{position:absolute;right:8px;top:9px;bottom:9px;width:36px;border:3px solid #fff;border-right:0;border-radius:4px 0 0 4px;background:repeating-linear-gradient(45deg,rgba(255,255,255,.28) 0 2px,transparent 2px 7px),repeating-linear-gradient(-45deg,rgba(255,255,255,.28) 0 2px,transparent 2px 7px);z-index:1}
+.keeper{position:absolute;left:4px;top:50%;transform:translateY(-50%);font-size:22px}
+.ball{position:absolute;left:var(--x,14px);top:50%;transform:translateY(-50%);font-size:26px;z-index:2;transition:left .6s ease}
+.pitch.shoot .ball{animation:shoot .55s ease-in forwards}
+.pitch.shoot .goal{animation:net .5s .5s}
+.pitch.save .keeper{animation:dive .45s forwards}
+.pitch.save .ball{animation:blocked .7s ease-out forwards}
+@keyframes shoot{to{left:calc(100% - 40px);transform:translateY(-50%) rotate(720deg)}}
+@keyframes net{30%{transform:scaleX(1.25)}60%{transform:scaleX(.92)}}
+@keyframes dive{to{transform:translate(-18px,-50%) rotate(-35deg) scale(1.3)}}
+@keyframes blocked{55%{left:calc(100% - 70px)}100%{left:calc(100% - 150px);transform:translateY(-50%) rotate(-360deg)}}
+.qcard{background:linear-gradient(180deg,var(--turf2),var(--turf));border:2px solid var(--edge);border-radius:20px;padding:18px}
+.ex-title{display:inline-block;padding:6px 12px;border-radius:8px;font-weight:900;font-size:.95rem;margin-bottom:12px;background:var(--tag,#2E9E4F);color:#fff}
+.q-ask{color:var(--muted);font-size:.9rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.q-prompt{font-size:1.35rem;line-height:1.4;margin-bottom:16px}
+.q-prompt .big-verb{font-family:var(--display);font-weight:400;font-size:3rem;letter-spacing:.02em;line-height:1;color:var(--chalk);margin:4px 0 6px}
+.gap{display:inline-block;min-width:3.5em;border-bottom:3px solid var(--gold);color:var(--gold);text-align:center}
+.inf{color:var(--muted);font-style:italic;font-weight:700}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opt{padding:16px 12px;border-radius:14px;background:var(--night);border:2px solid var(--edge);font-size:1.2rem;font-weight:900;min-height:60px}
+.opt:hover{border-color:var(--chalk)}
+.opt.right{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.opt.wrong{background:var(--pc-bg);border-color:var(--bad);color:var(--bad)}
+.opts.goals .opt{min-height:110px;font-family:var(--display);font-weight:400;font-size:2rem;letter-spacing:.04em;position:relative;border-width:3px;border-style:solid;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.06) 0 2px,transparent 2px 9px),var(--night)}
+.opts.goals .opt.etre{border-color:var(--etre);color:var(--etre)}
+.opts.goals .opt.avoir{border-color:var(--pc);color:var(--pc)}
+.opts.goals .opt.timp{border-color:var(--imp);color:var(--imp);font-size:1.6rem}
+.opts.goals .opt.tpc{border-color:var(--pc);color:var(--pc);font-size:1.6rem}
+.opts.reasons{grid-template-columns:1fr}
+.opts.reasons .opt{font-size:1.02rem;text-align:left;min-height:52px}
+.opts.goals .opt small{display:block;font-family:var(--body);font-size:.8rem;letter-spacing:0;color:var(--muted)}
+.opts.goals .opt.right{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+.opts.goals .opt.wrong{background:var(--pc-bg)}
+.lines{display:flex;flex-direction:column;gap:14px;margin-bottom:14px}
+.line{margin:0;font-size:1.18rem;line-height:2.15}
+.line .num{display:inline-block;width:1.6em;color:var(--muted)}
+.pick{display:inline-flex;gap:4px;padding:2px 4px;border-radius:12px;background:rgba(0,0,0,.25);vertical-align:middle;flex-wrap:wrap;line-height:1.3}
+.chip{padding:5px 10px;border-radius:9px;border:2px solid var(--edge);background:var(--night);font-weight:800;font-size:1.02rem}
+.chip.on{border-color:var(--gold);background:rgba(255,212,71,.16);color:var(--gold)}
+.chip.right{border-color:var(--good);background:var(--good-bg);color:var(--good)}
+.chip.wrong{border-color:var(--bad);background:var(--pc-bg);color:var(--bad);text-decoration:line-through}
+.typed{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.blank{font:inherit;font-size:1.1rem;font-weight:800;color:var(--chalk);background:var(--night);border:0;border-bottom:3px solid var(--gold);border-radius:8px 8px 0 0;padding:4px 8px;max-width:100%;min-width:5ch}
+.blank.right{border-bottom-color:var(--good);color:var(--good);background:var(--good-bg)}
+.blank.wrong{border-bottom-color:var(--bad);color:var(--bad);background:var(--pc-bg);text-decoration:line-through}
+.blank.near{border-bottom-color:var(--near);background:rgba(255,181,71,.15)}
+.fix{color:var(--good);font-weight:900}
+.accent-bar{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 14px}
+.accent-bar button{min-width:44px;height:44px;border-radius:10px;background:var(--night);border:2px solid var(--edge);font-size:1.15rem;font-weight:800}
+.q-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.hint{margin-top:12px;padding:10px 14px;border-radius:12px;background:var(--imp-bg);border:2px solid var(--imp);font-size:.98rem}
+.feedback{margin-top:12px;border-radius:20px;padding:16px 18px;border:3px solid var(--good);background:var(--good-bg)}
+.feedback.bad{border-color:var(--bad);background:var(--pc-bg)}
+.feedback.mid{border-color:var(--near);background:rgba(255,181,71,.13)}
+.fb-title{font-family:var(--display);font-weight:400;font-size:2rem;letter-spacing:.03em;line-height:1.05;text-transform:uppercase}
+.feedback .fb-title{color:var(--good)} .feedback.bad .fb-title{color:var(--bad)} .feedback.mid .fb-title{color:var(--near)}
+.fb-pts{font-family:var(--display);font-weight:400;color:var(--gold);font-size:1.3rem;margin-left:8px}
+.fb-list{margin:10px 0 14px;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.fb-list li{background:rgba(0,0,0,.25);border-radius:12px;padding:10px 12px;font-weight:600;line-height:1.45}
+.fb-list li b{font-weight:900}
+.fb-ans{display:block;margin-bottom:4px;font-weight:800}
+
+/* result */
+.result{text-align:center}
+.result h2{font-size:clamp(2.2rem,8vw,3.4rem);text-transform:uppercase;color:var(--gold);line-height:1}
+.big-stars{font-size:3.4rem;letter-spacing:6px;margin:10px 0}
+.big-stars span{display:inline-block;filter:grayscale(1) opacity(.3)}
+.big-stars span.on{filter:none;animation:pop .5s backwards}
+.big-stars span.on:nth-child(2){animation-delay:.25s} .big-stars span.on:nth-child(3){animation-delay:.5s}
+@keyframes pop{0%{transform:scale(0) rotate(-40deg)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+.res-score{font-family:var(--display);font-size:2.6rem;font-variant-numeric:tabular-nums}
+.res-sub{color:var(--muted)}
+.packs{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:18px 0}
+.pack{width:130px;height:170px;perspective:600px}
+.pack-in{position:relative;width:100%;height:100%;transition:transform .7s;transform-style:preserve-3d}
+.pack.open .pack-in{transform:rotateY(180deg)}
+.pack-face{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px}
+.pack-front{background:linear-gradient(135deg,var(--pc),#7A1E8F 50%,var(--imp));border:3px solid var(--gold);font-family:var(--display);font-size:1.2rem;letter-spacing:.05em;text-transform:uppercase}
+.pack-front span{font-size:2.4rem}
+.pack-back{transform:rotateY(180deg);background:var(--chalk);color:var(--ink);border:3px solid var(--gold)}
+.pack-back .e{font-size:3.4rem;line-height:1}
+.pack-back b{font-size:.95rem;line-height:1.15}
+.pack-back small{font-size:.72rem;color:#3B5A4A;font-weight:700}
+.res-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+
+/* album */
+.album-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+.stk{aspect-ratio:3/4;max-width:100%;border-radius:14px;background:var(--chalk);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px;text-align:center;border:3px solid var(--gold);box-shadow:0 6px 14px rgba(0,0,0,.35)}
+.stk .e{font-size:2.4rem;line-height:1}
+.stk b{font-size:.82rem;line-height:1.1}
+.stk small{font-size:.66rem;color:#3B5A4A;font-weight:700;line-height:1.1}
+.stk.empty{background:transparent;border:2px dashed rgba(238,247,240,.25);color:var(--muted);box-shadow:none}
+.stk.empty .e{opacity:.35}
+
+/* lesson */
+.lesson-nav{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+.lesson-dots{display:flex;gap:6px;flex:1;justify-content:center}
+.lesson-dots span{width:10px;height:10px;border-radius:50%;background:rgba(238,247,240,.2)}
+.lesson-dots span.on{background:var(--gold)}
+.slide h2{font-size:clamp(1.8rem,6vw,2.4rem);text-transform:uppercase;margin-bottom:8px}
+.slide p{margin:8px 0;max-width:62ch}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:12px 0}
+.tense{border-radius:16px;padding:14px;border:2px solid}
+.tense.i{border-color:var(--imp);background:var(--imp-bg)}
+.tense.p{border-color:var(--pc);background:var(--pc-bg)}
+.tense h3{font-size:1.5rem;text-transform:uppercase}
+.tense.i h3{color:var(--imp)} .tense.p h3{color:var(--pc)}
+.tense .role{font-weight:900;font-size:1.05rem}
+.tense em{display:block;margin-top:6px;font-weight:800}
+.ci{color:var(--imp);font-weight:900} .cp{color:var(--pc);font-weight:900} .ce{color:var(--etre);font-weight:900}
+.timeline{width:100%;height:auto;max-width:100%;display:block;margin:8px 0}
+.story{font-size:1.25rem;line-height:2.1;background:rgba(0,0,0,.22);border-radius:14px;padding:12px 14px}
+.vb{border-bottom:3px dotted var(--gold);padding:0 3px;border-radius:6px;font-weight:900}
+.vb.i{background:var(--imp-bg);color:var(--imp);border-bottom:3px solid var(--imp)}
+.vb.p{background:var(--pc-bg);color:var(--pc);border-bottom:3px solid var(--pc)}
+.vb sup{font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;margin-left:2px}
+.sorter{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.zones{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.zone{min-height:120px;border-radius:16px;padding:10px;border:3px dashed;text-align:left;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.zone.i{border-color:var(--imp);background:var(--imp-bg)} .zone.p{border-color:var(--pc);background:var(--pc-bg)}
+.zone h3{font-size:1.1rem;text-transform:uppercase}
+.zone.i h3{color:var(--imp)} .zone.p h3{color:var(--pc)}
+.zone .chip{font-size:.9rem}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.builder{display:flex;flex-direction:column;gap:10px}
+.row-chips{display:flex;flex-wrap:wrap;gap:6px}
+.steps{display:grid;gap:8px;margin-top:6px}
+.step{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.22);border-radius:12px;padding:10px 12px;font-size:1.12rem}
+.step .k{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--imp);color:var(--ink);font-weight:900;font-size:.9rem}
+.tbl-wrap{overflow-x:auto}
+table.conj{border-collapse:separate;border-spacing:0;width:100%;font-size:1.02rem;margin:8px 0}
+table.conj th,table.conj td{padding:7px 10px;text-align:left;border-bottom:1px solid rgba(238,247,240,.12)}
+table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.box{border-radius:14px;padding:10px 14px;margin:8px 0;background:rgba(0,0,0,.22);font-weight:700}
+.house{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin:12px 0}
+.flip{min-height:74px;border-radius:14px;border:2px solid var(--etre);background:rgba(255,166,64,.12);padding:8px;font-weight:900;font-size:1.05rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.flip small{font-weight:700;color:var(--etre);font-size:.9rem}
+.flip.open{background:var(--etre);color:var(--ink)} .flip.open small{color:var(--ink)}
+.acc-out{font-size:1.6rem;margin:10px 0;padding:12px 14px;border-radius:14px;background:rgba(0,0,0,.25)}
+.acc-out .end{color:var(--etre);font-weight:900;text-decoration:underline}
+.checklist{list-style:none;padding:0;margin:10px 0;display:flex;flex-direction:column;gap:8px}
+.checklist li{display:flex;gap:10px;align-items:flex-start;background:rgba(0,0,0,.22);border-radius:12px;padding:10px 12px}
+
+#fx{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.cf{position:absolute;top:-20px;width:10px;height:14px;border-radius:2px;animation:fall 1.8s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@media (max-width:520px){
+  body{font-size:16px}
+  .opts{grid-template-columns:1fr 1fr}
+  .zones{grid-template-columns:1fr}
+  .scoreboard .sb{min-width:50px;padding:3px 7px}
+  .line{font-size:1.08rem}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <button id="crest" class="crest" type="button" aria-label="Retour au parcours">
+      <span class="crest-ball">⚽</span>
+      <span><b>Coupe des Temps</b><small>Imparfait · Passé composé · Y7</small></span>
+    </button>
+    <div class="top-right">
+      <a id="backCup" class="back" href="../index.html" hidden>← Maths Cup</a>
+      <button id="soundBtn" class="icon-btn" type="button" aria-label="Son">🔊</button>
+    </div>
+  </header>
+  <section id="scr-players" class="screen"></section>
+  <section id="scr-home" class="screen" hidden></section>
+  <section id="scr-lesson" class="screen" hidden></section>
+  <section id="scr-play" class="screen" hidden></section>
+  <section id="scr-result" class="screen" hidden></section>
+  <section id="scr-album" class="screen" hidden></section>
+</div>
+<div id="toast" class="toast" hidden></div>
+<div id="fx"></div>
+
+<script id="engine">
+/* The conjugation engine and the question banks. No DOM in here, so
+   test/test-francais.js can load it in Node and check every answer. */
+(function (root) {
+  'use strict';
+  var END = ['ais', 'ais', 'ait', 'ions', 'iez', 'aient'];
+  var AVOIR = ['ai', 'as', 'a', 'avons', 'avez', 'ont'];
+  var ETRE = ['suis', 'es', 'est', 'sommes', 'êtes', 'sont'];
+  var PL = ['je', 'tu', 'il / elle', 'nous', 'vous', 'ils / elles'];
+
+  // infinitive, "nous" in the present (gives the imparfait stem), participe passé
+  var WITH_AVOIR = 'jouer,jouons,joué;regarder,regardons,regardé;marquer,marquons,marqué;gagner,gagnons,gagné;' +
+    'tirer,tirons,tiré;passer,passons,passé;chanter,chantons,chanté;siffler,sifflons,sifflé;arrêter,arrêtons,arrêté;' +
+    'habiter,habitons,habité;visiter,visitons,visité;crier,crions,crié;briller,brillons,brillé;manger,mangeons,mangé;' +
+    'plonger,plongeons,plongé;lancer,lançons,lancé;commencer,commençons,commencé;aboyer,aboyons,aboyé;' +
+    'éclater,éclatons,éclaté;nettoyer,nettoyons,nettoyé;traverser,traversons,traversé;neiger,neigeons,neigé;parler,parlons,parlé;' +
+    'finir,finissons,fini;choisir,choisissons,choisi;grandir,grandissons,grandi;réussir,réussissons,réussi;' +
+    'applaudir,applaudissons,applaudi;avoir,avons,eu;être,sommes,été;faire,faisons,fait;boire,buvons,bu;' +
+    'voir,voyons,vu;prendre,prenons,pris;dire,disons,dit;mettre,mettons,mis;lire,lisons,lu;écrire,écrivons,écrit;' +
+    'perdre,perdons,perdu;attendre,attendons,attendu;courir,courons,couru;rire,rions,ri;vivre,vivons,vécu;' +
+    'offrir,offrons,offert;pouvoir,pouvons,pu;vouloir,voulons,voulu;savoir,savons,su;recevoir,recevons,reçu;' +
+    'pleuvoir,pleuvons,plu';
+  var WITH_ETRE = 'aller,allons,allé;venir,venons,venu;partir,partons,parti;arriver,arrivons,arrivé;' +
+    'entrer,entrons,entré;sortir,sortons,sorti;monter,montons,monté;descendre,descendons,descendu;' +
+    'tomber,tombons,tombé;rester,restons,resté;naître,naissons,né;mourir,mourons,mort;devenir,devenons,devenu;' +
+    'rentrer,rentrons,rentré;revenir,revenons,revenu';
+  var V = {};
+  function load(list, aux) {
+    list.split(';').forEach(function (x) {
+      var a = x.split(',');
+      V[a[0]] = { inf: a[0], nous: a[1], pp: a[2], aux: aux };
+    });
+  }
+  load(WITH_AVOIR, 'avoir');
+  load(WITH_ETRE, 'être');
+  var IMPERSONAL = ['pleuvoir', 'neiger'];
+  var MAISON = ['aller', 'venir', 'partir', 'arriver', 'entrer', 'sortir', 'monter', 'descendre', 'tomber', 'rester', 'naître', 'mourir', 'devenir'];
+
+  function group(inf) {
+    var v = V[inf];
+    if (inf === 'aller') return 3;
+    if (/er$/.test(inf)) return 1;
+    if (/ir$/.test(inf) && /issons$/.test(v.nous)) return 2;
+    return 3;
+  }
+  function radical(inf) { return inf === 'être' ? 'ét' : V[inf].nous.slice(0, -3); }
+  function imp(inf, p) {
+    var r = radical(inf), e = END[p];
+    if (e.charAt(0) === 'i') {
+      if (/ge$/.test(r)) r = r.slice(0, -1);              // mangeais but mangions
+      else if (/ç$/.test(r)) r = r.slice(0, -1) + 'c';     // lançais but lancions
+    }
+    return r + e;
+  }
+  function agree(pp, g, plural) { return pp + (g === 'f' ? 'e' : '') + (plural ? 's' : ''); }
+  // every accepted spelling; with être and a subject of unknown gender, both are right
+  function pcForms(inf, p, g) {
+    var v = V[inf];
+    if (v.aux === 'avoir') return [AVOIR[p] + ' ' + v.pp];
+    var pl = p >= 3, gs = g ? [g] : ['m', 'f'];
+    return gs.map(function (x) { return ETRE[p] + ' ' + agree(v.pp, x, pl); });
+  }
+  function pcShow(inf, p, g) {
+    var v = V[inf];
+    if (v.aux === 'avoir' || g) return pcForms(inf, p, g)[0];
+    return ETRE[p] + ' ' + v.pp + '(e)' + (p >= 3 ? 's' : '');
+  }
+  function auxForm(inf, p) { return (V[inf].aux === 'être' ? ETRE : AVOIR)[p]; }
+
+  function explainImp(inf, p) {
+    var a = imp(inf, p);
+    if (inf === 'être') return 'Être a un radical spécial : <b>ét-</b> + <b>-' + END[p] + '</b> = <b>' + a + '</b>.';
+    var r = radical(inf);
+    var s = 'nous ' + V[inf].nous + ' → radical <b>' + r + '-</b> + <b>-' + END[p] + '</b> = <b>' + a + '</b>.';
+    if (group(inf) === 2) s += ' (2e groupe : on garde le <b>-iss-</b>.)';
+    if (/ge$/.test(r) && END[p].charAt(0) === 'i') s += ' (Devant -i, le e disparaît : nous mangions.)';
+    if (/ç$/.test(r) && END[p].charAt(0) === 'i') s += ' (Devant -i, le ç redevient c.)';
+    return s;
+  }
+  function explainPc(inf, p, g) {
+    var v = V[inf];
+    var s = '<b>' + inf + '</b> → auxiliaire <b>' + v.aux + '</b>' + (v.aux === 'être' ? ' (maison d’être)' : '') +
+      ' au présent + participe <b>' + v.pp + '</b> = <b>' + pcShow(inf, p, g) + '</b>.';
+    if (v.aux === 'être') {
+      var pl = p >= 3;
+      if (g === 'f' || pl) s += ' Accord avec le sujet : ' + (g === 'f' ? 'féminin → <b>+e</b>' : '') + (g === 'f' && pl ? ', ' : '') + (pl ? 'pluriel → <b>+s</b>' : '') + '.';
+      else if (!g) s += ' Si le sujet est une fille, on ajoute <b>-e</b>.';
+    }
+    return s;
+  }
+
+  function blank(inf, t, p, g) {
+    if (!V[inf]) throw new Error('verbe inconnu : ' + inf);
+    var accepts = t === 'imp' ? [imp(inf, p)] : pcForms(inf, p, g);
+    return {
+      type: 'type', inf: inf, t: t, p: p, g: g || null, accepts: accepts, hint: inf,
+      show: t === 'imp' ? accepts[0] : pcShow(inf, p, g),
+      why: t === 'imp' ? explainImp(inf, p) : explainPc(inf, p, g)
+    };
+  }
+  // "Hier, nous {regardions|avons regardé*} un film."  → a two-way choice, * marks the answer
+  // "Il {tomber:pc:2:m} dans l'escalier."              → a typed blank: verb, tense, person 0-5, gender
+  function parseLine(str, why) {
+    var out = [], last = 0, re = /\{([^}]+)\}/g, m;
+    while ((m = re.exec(str))) {
+      if (m.index > last) out.push(str.slice(last, m.index));
+      var inner = m[1];
+      if (inner.indexOf('|') >= 0) {
+        var raw = inner.split('|');
+        var right = raw.filter(function (o) { return /\*$/.test(o); });
+        out.push({ type: 'pick', opts: raw.map(function (o) { return o.replace(/\*$/, ''); }),
+          correct: right.length === 1 ? right[0].slice(0, -1) : null, why: why || '' });
+      } else {
+        var a = inner.split(':');
+        out.push(blank(a[0], a[1], +a[2], a[3] || null));
+      }
+      last = re.lastIndex;
+    }
+    if (last < str.length) out.push(str.slice(last));
+    return out;
+  }
+
+  function norm(s) {
+    return String(s).toLowerCase().replace(/[’‘`´]/g, "'").replace(/\s+/g, ' ').trim().replace(/[.!?]+$/, '').trim();
+  }
+  function deacc(s) { return s.normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+  var PRON = ["j'", 'je ', 'tu ', 'elles ', 'elle ', 'ils ', 'il ', 'on ', 'nous ', 'vous '];
+  function stripSubj(s) {
+    for (var i = 0; i < PRON.length; i++) {
+      if (s.indexOf(PRON[i]) === 0 && s.length > PRON[i].length) return s.slice(PRON[i].length).trim();
+    }
+    return s;
+  }
+
+  // Marks one typed answer. near = right except for accents, which earns a second try.
+  function check(given, b) {
+    var g = stripSubj(norm(given));
+    if (b.accepts.indexOf(g) >= 0) return { ok: true };
+    var dg = deacc(g);
+    if (b.accepts.some(function (a) { return deacc(a) === dg; })) return { ok: false, near: true, msg: 'Presque ! Regarde bien les accents (é, è, ê, î…).' };
+    var msg = '', w = g.split(' ');
+    if (b.t === 'aux') {
+      var other = b.inf === 'avoir' ? ETRE : AVOIR;
+      var same = b.inf === 'avoir' ? AVOIR : ETRE;
+      if (other.indexOf(g) >= 0) msg = 'Ça, c’est le verbe <b>' + (b.inf === 'avoir' ? 'être' : 'avoir') + '</b> ! Ici on veut <b>' + b.inf + '</b>.';
+      else if (same.indexOf(g) >= 0) msg = 'Bon verbe, mais pas la bonne personne.';
+    } else if (b.t === 'imp') {
+      var r = radical(b.inf), e = END[b.p];
+      if (w.length > 1 && (AVOIR.indexOf(w[0]) >= 0 || ETRE.indexOf(w[0]) >= 0)) msg = 'Ça, c’est du passé composé ! L’imparfait, c’est un seul mot : radical + terminaison.';
+      else if (dg.indexOf(deacc(r)) === 0 && b.inf !== 'être') msg = 'Bon radical ! Mais avec « ' + PL[b.p] + ' », la terminaison est <b>-' + e + '</b>.';
+      else if (dg.slice(-e.length) === e) msg = 'Bonne terminaison ! Mais le radical vient de « nous ' + V[b.inf].nous + ' » → <b>' + (b.inf === 'être' ? 'ét' : r) + '-</b>.';
+    } else if (b.t === 'pc') {
+      var v = V[b.inf];
+      if (w.length === 1) {
+        msg = dg === deacc(imp(b.inf, b.p))
+          ? 'Ça, c’est l’imparfait ! Le passé composé a deux morceaux : auxiliaire + participe passé.'
+          : 'Le passé composé a deux morceaux : auxiliaire + participe passé.';
+      } else {
+        var aux = w[0], pp = w.slice(1).join(' ');
+        var good = v.aux === 'être' ? ETRE : AVOIR, bad = v.aux === 'être' ? AVOIR : ETRE;
+        if (bad.indexOf(aux) >= 0) {
+          msg = 'Mauvais auxiliaire ! « ' + b.inf + ' » se conjugue avec <b>' + v.aux + '</b>.' +
+            (v.aux === 'être' ? ' C’est un verbe de la maison d’être.' : ' Il n’est pas dans la maison d’être.');
+        } else if (good.indexOf(aux) >= 0 && aux !== good[b.p]) {
+          msg = 'Bon auxiliaire, mauvaise personne : avec « ' + PL[b.p] + ' » on dit <b>' + good[b.p] + '</b>.';
+        } else if (aux === good[b.p]) {
+          if (['', 'e', 's', 'es'].some(function (x) { return deacc(pp) === deacc(v.pp + x); })) {
+            msg = v.aux === 'être'
+              ? 'Attention à l’accord ! Avec être, le participe s’accorde avec le sujet (fille → +e, plusieurs → +s).'
+              : 'Avec avoir, le participe ne s’accorde pas avec le sujet : on écrit <b>' + v.pp + '</b>.';
+          } else msg = 'Le participe passé de « ' + b.inf + ' » est <b>' + v.pp + '</b>.';
+        } else msg = 'L’auxiliaire, c’est <b>' + v.aux + '</b> au présent.';
+      }
+    }
+    return { ok: false, msg: msg };
+  }
+
+  // Exercise 1 style: pick the right tense in a football sentence.
+  var CHOIX = [
+    ['Hier soir, nous {regardions|avons regardé*} la finale à la télé.', '« Hier soir » : un moment précis, une action terminée → passé composé.'],
+    ['Quand il était petit, Omar {jouait*|a joué} au foot tous les jours.', '« Tous les jours » : une habitude → imparfait.'],
+    ['Il {faisait*|a fait} très chaud dans le stade.', 'On décrit le décor (la météo) → imparfait.'],
+    ['Soudain, l’attaquant {tirait|a tiré*} au but.', '« Soudain » : une action courte et précise → passé composé.'],
+    ['Chaque samedi, mon père {m’emmenait*|m’a emmené} au stade.', '« Chaque samedi » : une habitude → imparfait.'],
+    ['À la 90e minute, Léa {marquait|a marqué*} le but de la victoire.', '« À la 90e minute » : un moment précis → passé composé.'],
+    ['Le ciel {était*|a été} gris et il y avait du vent.', 'C’est une description du décor → imparfait.'],
+    ['Tout à coup, l’arbitre {sifflait|a sifflé*} un penalty.', '« Tout à coup » : une action soudaine → passé composé.'],
+    ['D’habitude, notre gardien {arrêtait*|a arrêté} tous les tirs.', '« D’habitude » : une habitude → imparfait.'],
+    ['Ce matin-là, il {pleuvait*|a plu} sur le terrain.', 'La pluie, c’est le décor de l’histoire → imparfait.'],
+    ['Un jour, nous {allions|sommes allés*} voir un grand match.', '« Un jour » : un événement unique → passé composé.'],
+    ['Après l’entraînement, les joueurs {étaient*|ont été} très fatigués.', 'On décrit comment étaient les joueurs → imparfait.'],
+    ['Le gardien {plongeait|a plongé*} et il {arrêtait|a arrêté*} le ballon.', 'Deux actions qui se suivent, chacune terminée → passé composé.'],
+    ['Quand j’étais petit, je {voulais*|ai voulu} devenir footballeur.', '« Quand j’étais petit » : une période qui dure → imparfait.'],
+    ['En 2022, l’Argentine {gagnait|a gagné*} la Coupe du monde.', 'Une date précise et une action terminée → passé composé.'],
+    ['L’équipe {perdait*|a perdu} 1-0 quand Sami {entrait|est entré*} sur le terrain.', 'Le score, c’est le décor (imparfait). L’entrée de Sami, c’est l’action qui arrive (passé composé).'],
+    ['Le stade {était*|a été} plein et les gens {criaient*|ont crié} très fort.', 'Le décor de l’histoire : la foule, le bruit → imparfait.'],
+    ['Hier, nous {finissions|avons fini*} l’entraînement à 18 heures.', '« Hier » + une heure précise → passé composé.'],
+    ['Mon frère {avait*|a eu} toujours un ballon dans son sac.', '« Toujours » : une habitude → imparfait.'],
+    ['Ce soir-là, les joueuses {arrivaient|sont arrivées*} en retard au stade.', '« Ce soir-là » : un moment précis, une action terminée → passé composé.'],
+    ['Nous {regardions*|avons regardé} le match quand la télé {tombait|est tombée*} en panne.', 'On regardait (ça dure : décor) quand la télé est tombée en panne (action soudaine).'],
+    ['Le vent {soufflait*|a soufflé} fort et le terrain {était*|a été} mouillé.', 'Deux descriptions du décor → imparfait.'],
+    ['Samedi dernier, Yasmine {voyait|a vu*} son premier vrai match.', '« Samedi dernier » : un moment précis → passé composé.'],
+    ['Tous les dimanches, nous {faisions*|avons fait} un match dans le parc.', '« Tous les dimanches » : une habitude → imparfait.'],
+    ['À la mi-temps, l’entraîneur {parlait|a parlé*} à l’équipe.', '« À la mi-temps » : un moment précis, une action → passé composé.'],
+    ['Les supporters {portaient*|ont porté} des écharpes et des drapeaux.', 'On décrit à quoi ressemblait la foule → imparfait.'],
+    ['Il {était*|a été} 20 heures et les projecteurs {brillaient*|ont brillé}.', 'L’heure et la lumière : le décor → imparfait.'],
+    ['Enfin, l’arbitre {sifflait|a sifflé*} la fin du match.', '« Enfin » : l’action finale, terminée → passé composé.']
+  ];
+
+  // Exercise 4 style: a short match report, décor in the imparfait, actions in the passé composé.
+  var STORIES = [
+    { t: 'La finale', s: 'C’était le jour de la finale. Il {faire:imp:2} beau et le stade {être:imp:2} plein. Les supporters {chanter:imp:5}. À la 80e minute, notre capitaine {tirer:pc:2} et le ballon {entrer:pc:2:m} dans le but !' },
+    { t: 'L’orage', s: 'Ce soir-là, il {pleuvoir:imp:2}. Les joueurs {avoir:imp:5} froid et le terrain {être:imp:2} glissant. Tout à coup, un éclair {traverser:pc:2} le ciel et l’arbitre {arrêter:pc:2} le match.' },
+    { t: 'Le petit gardien', s: 'Quand j’{être:imp:0} petit, je {jouer:imp:0} dans le jardin tous les jours. Mon grand-père {regarder:imp:2} toujours mes matchs. Un jour, il m’{offrir:pc:2} des gants de gardien.' },
+    { t: 'Le tournoi des filles', s: 'Samedi dernier, les filles de ma classe {aller:pc:5:f} au tournoi. Elles {être:imp:5} un peu stressées. Le soleil {briller:imp:2}. Elles {gagner:pc:5:f} trois matchs et elles {rentrer:pc:5:f} avec la coupe !' },
+    { t: 'Le chien sur le terrain', s: 'Ce matin-là, il {faire:imp:2} froid. Les tribunes {être:imp:5} vides. Soudain, un chien {sortir:pc:2:m} du vestiaire et il {courir:pc:2:m} après le ballon. Tout le monde {rire:pc:2} !' },
+    { t: 'Mon idole', s: 'Quand il {avoir:imp:2:m} dix ans, mon idole {vivre:imp:2} dans un petit village. Il {jouer:imp:2} pieds nus dans la rue. Un jour, un entraîneur le {voir:pc:2} et il {devenir:pc:2:m} professionnel.' },
+    { t: 'Le car de l’équipe', s: 'Le matin du match, nous {être:imp:3} très excités. Il {neiger:imp:2} un peu. Le car {partir:pc:2:m} à 8 heures et les joueurs {monter:pc:5:m} dedans en chantant. Nous {arriver:pc:3} au stade juste à temps.' }
+  ];
+
+  // The teacher's worksheet, word for word, so the mock exam is the real thing.
+  var EXAM_A = {
+    ex1: [
+      ['Hier soir, nous {regardions|avons regardé*} un film.', '« Hier soir » : un moment précis, une action terminée → passé composé.'],
+      ['Quand j’étais petite, je {jouais*|ai joué} souvent dehors.', '« Quand j’étais petite… souvent » : une habitude → imparfait.'],
+      ['Il {faisait*|a fait} beau quand soudain l’orage {éclatait|a éclaté*}.', '« Il faisait beau » = le décor (imparfait). « Soudain l’orage a éclaté » = l’action soudaine (passé composé).'],
+      ['Chaque matin, mon père {buvait*|a bu} un café.', '« Chaque matin » : une habitude → imparfait.'],
+      ['Hier, nous {finissions|avons fini*} nos devoirs.', '« Hier » : une action terminée → passé composé.']
+    ],
+    ex2: ['Tu {avoir:imp:1} peur du noir.', 'Nous {habiter:imp:3} à la campagne.', 'Les enfants {être:imp:5} fatigués.', 'Vous {chanter:imp:4} très fort.', 'Mes cousins {grandir:imp:5} vite.'],
+    ex3: ['J’ {manger:pc:0} une pomme.', 'Elles {partir:pc:5:f} en vacances.', 'Nous {visiter:pc:3} le musée.', 'Il {tomber:pc:2:m} dans l’escalier.', 'Tu {choisir:pc:1} un livre.'],
+    ex4: 'Ce matin-là, il {pleuvoir:imp:2}. Le ciel {être:imp:2} gris et les rues {être:imp:5} vides. Tout à coup, un chien {sortir:pc:2:m} d’une ruelle et {aboyer:pc:2:m}.'
+  };
+
+  // "La VAR": choose the tense, then say WHY. sentence, infinitive, i|p, reason, answer
+  var REASONS = {
+    hab: 'Une habitude : ça se répète',
+    dec: 'Une description : le décor, la météo, l’ambiance',
+    dur: 'Une action en cours, qui dure (et qui sera interrompue)',
+    act: 'Une action terminée, à un moment précis',
+    sou: 'Une action soudaine qui coupe le décor'
+  };
+  var VAR = [
+    ['Chaque mercredi, nous {} au foot.', 'aller', 'i', 'hab', 'allions'],
+    ['Le terrain {} boueux.', 'être', 'i', 'dec', 'était'],
+    ['Hier, Ali {} deux buts.', 'marquer', 'p', 'act', 'a marqué'],
+    ['Je {} le match quand la lumière s’est éteinte.', 'regarder', 'i', 'dur', 'regardais'],
+    ['Nous regardions le match quand un chien {} sur le terrain.', 'entrer', 'p', 'sou', 'est entré'],
+    ['Il {} nuit et les projecteurs brillaient.', 'faire', 'i', 'dec', 'faisait'],
+    ['Samedi dernier, notre équipe {} la coupe.', 'gagner', 'p', 'act', 'a gagné'],
+    ['Le gardien attachait ses crampons quand l’arbitre {}.', 'siffler', 'p', 'sou', 'a sifflé'],
+    ['Le dimanche, mon oncle {} avec nous dans le parc.', 'jouer', 'i', 'hab', 'jouait'],
+    ['Les supporters {} pendant que l’équipe s’échauffait.', 'chanter', 'i', 'dur', 'chantaient'],
+    ['En 2018, la France {} la Coupe du monde.', 'gagner', 'p', 'act', 'a gagné'],
+    ['Tout à coup, la capitaine {}.', 'tomber', 'p', 'sou', 'est tombée'],
+    ['Les tribunes {} pleines à craquer.', 'être', 'i', 'dec', 'étaient'],
+    ['Nous {} le bus depuis vingt minutes quand il est enfin arrivé.', 'attendre', 'i', 'dur', 'attendions'],
+    ['À la fin du match, les joueuses {} du terrain.', 'sortir', 'p', 'act', 'sont sorties'],
+    ['Tous les soirs, mon frère {} ses crampons.', 'nettoyer', 'i', 'hab', 'nettoyait'],
+    ['Soudain, l’orage {} et le match s’est arrêté.', 'éclater', 'p', 'sou', 'a éclaté'],
+    ['Il {} froid et le ciel était gris.', 'faire', 'i', 'dec', 'faisait']
+  ];
+
+  var api = { REASONS: REASONS, VAR: VAR, END: END, AVOIR: AVOIR, ETRE: ETRE, PL: PL, V: V, MAISON: MAISON, IMPERSONAL: IMPERSONAL,
+    group: group, radical: radical, imp: imp, pcForms: pcForms, pcShow: pcShow, auxForm: auxForm,
+    explainImp: explainImp, explainPc: explainPc, blank: blank, parseLine: parseLine,
+    norm: norm, deacc: deacc, check: check, CHOIX: CHOIX, STORIES: STORIES, EXAM_A: EXAM_A };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  root.FR = api;
+})(typeof window !== 'undefined' ? window : this);
+</script>
+
+<script>
+(function () {
+  'use strict';
+  var F = window.FR;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  /* ---------------- save (per device, one record per player) ---------------- */
+  var KEY = 'coupe-des-temps-v1';
+  function blankPlayer(n) {
+    return { name: 'Joueur ' + n, avatar: n === 1 ? '🦁' : '🦅', color: n === 1 ? '#2F7FD8' : '#D8443A',
+      pts: 0, stars: {}, stickers: [], streakBest: 0, lesson: false, matches: 0, examBest: 0 };
+  }
+  var S = null;
+  try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
+  if (!S || !S.players || S.players.length !== 2) S = { players: [blankPlayer(1), blankPlayer(2)], cur: null, sound: true };
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }
+  function P() { return S.players[S.cur]; }
+
+  /* ---------------- stickers, ranks ---------------- */
+  var STK = {
+    vestiaire: ['📋', 'Le Vestiaire', 'Leçon terminée'],
+    premier: ['⚽', 'Coup d’envoi', 'Premier match joué'],
+    serie5: ['🔥', 'Série de 5', '5 bonnes réponses de suite'],
+    serie10: ['☄️', 'Série de 10', '10 de suite'],
+    serie20: ['🌋', 'Série de 20', '20 de suite !'],
+    triple: ['🌟', 'Coup du chapeau', '3 étoiles à un niveau'],
+    exam16: ['🏅', 'Mention bien', '16/20 à un examen'],
+    exam20: ['👑', 'Sans-faute', 'Examen parfait'],
+    mille: ['💯', 'Mille points', '1000 points'],
+    ballondor: ['🏆', 'Ballon d’Or', '3 étoiles partout'],
+    gants: ['🧤', 'Gants d’or', 'Pochette'], crampons: ['👟', 'Crampons', 'Pochette'], maillot: ['🎽', 'Le maillot', 'Pochette'],
+    stade: ['🏟️', 'Le stade', 'Pochette'], kop: ['📣', 'Le kop', 'Pochette'], jaune: ['🟨', 'Carton jaune', 'Pochette'],
+    rouge: ['🟥', 'Carton rouge', 'Pochette'], corner: ['🚩', 'Le corner', 'Pochette'], chrono: ['⏱️', 'Arrêts de jeu', 'Pochette'],
+    lion: ['🦁', 'La mascotte', 'Pochette'], aigle: ['🦅', 'L’aigle', 'Pochette'], filet: ['🥅', 'Lucarne', 'Pochette'],
+    coach: ['🧢', 'Le coach', 'Pochette'], photo: ['📸', 'Photo d’équipe', 'Pochette'], tambour: ['🥁', 'Le tambour', 'Pochette'],
+    medaille: ['🥇', 'Médaille d’or', 'Pochette'], tacle: ['🦵', 'Le tacle', 'Pochette'], fusee: ['🚀', 'Frappe fusée', 'Pochette'],
+    mur: ['🧱', 'Le mur', 'Pochette'], eclair: ['⚡', 'Contre éclair', 'Pochette']
+  };
+  var ALL_STK = Object.keys(STK);
+  var POOL = ALL_STK.filter(function (k) { return STK[k][2] === 'Pochette'; });
+  var RANKS = [[0, 'Remplaçant'], [200, 'Titulaire'], [500, 'Capitaine'], [1000, 'Star de l’équipe'], [2000, 'Légende'], [3500, 'Ballon d’Or']];
+  function rank(pts) { var r = RANKS[0][1]; RANKS.forEach(function (x) { if (pts >= x[0]) r = x[1]; }); return r; }
+  function award(id) { var p = P(); if (p.stickers.indexOf(id) < 0) { p.stickers.push(id); return id; } return null; }
+
+  /* ---------------- sound & effects ---------------- */
+  var AC = null;
+  function beep(freqs, dur, type) {
+    if (!S.sound) return;
+    try {
+      AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+      var t = AC.currentTime;
+      freqs.forEach(function (f) {
+        var o = AC.createOscillator(), g = AC.createGain();
+        o.type = type || 'triangle'; o.frequency.value = f;
+        g.gain.setValueAtTime(0.09, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + dur); t += dur * 0.85;
+      });
+    } catch (e) { }
+  }
+  var sGoal = function () { beep([660, 880, 1320], 0.11, 'triangle'); };
+  var sMiss = function () { beep([240, 170], 0.2, 'sawtooth'); };
+  var sWhistle = function () { beep([1900, 2100, 1900, 2300], 0.09, 'square'); };
+  function confetti() {
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var fx = $('#fx'), cols = ['#FFD447', '#58AEFF', '#FF6157', '#3EE08A', '#EEF7F0', '#FFA640'];
+    for (var i = 0; i < 60; i++) {
+      var c = document.createElement('span'); c.className = 'cf';
+      c.style.left = Math.random() * 100 + '%'; c.style.background = pick(cols);
+      c.style.animationDelay = Math.random() * 0.6 + 's'; c.style.animationDuration = 1.4 + Math.random() * 1.2 + 's';
+      fx.appendChild(c);
+    }
+    setTimeout(function () { fx.innerHTML = ''; }, 3200);
+  }
+  var toastT = null;
+  function toast(msg) { var t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, 2200); }
+
+  function show(id) {
+    $$('.screen').forEach(function (s) { s.hidden = s.id !== 'scr-' + id; });
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------------- question generators ---------------- */
+  var SUBJ = [
+    { t: 'je', p: 0 }, { t: 'tu', p: 1 }, { t: 'il', p: 2, g: 'm' }, { t: 'elle', p: 2, g: 'f' }, { t: 'nous', p: 3 }, { t: 'vous', p: 4 },
+    { t: 'ils', p: 5, g: 'm' }, { t: 'elles', p: 5, g: 'f' }, { t: 'le gardien', p: 2, g: 'm' }, { t: 'la capitaine', p: 2, g: 'f' },
+    { t: 'le coach', p: 2, g: 'm' }, { t: 'les supporters', p: 5, g: 'm' }, { t: 'les joueuses', p: 5, g: 'f' },
+    { t: 'mon équipe', p: 2, g: 'f' }, { t: 'les attaquants', p: 5, g: 'm' }, { t: 'ma cousine', p: 2, g: 'f' }, { t: 'on', p: 2, g: 'm', noEtre: true }
+  ];
+  var VERBS = Object.keys(F.V).filter(function (v) { return F.IMPERSONAL.indexOf(v) < 0; });
+  var ETRE_VERBS = VERBS.filter(function (v) { return F.V[v].aux === 'être'; });
+  var AVOIR_VERBS = VERBS.filter(function (v) { return F.V[v].aux === 'avoir'; });
+  var VOWEL = /^[aeiouyéèêâîôûh]/i;
+
+  // one line "Subject (verb) ____" with the right elision for je
+  function genLine(t, inf) {
+    var v = F.V[inf];
+    var pool = SUBJ.filter(function (s) { return !(v.aux === 'être' && t === 'pc' && s.noEtre); });
+    var s = pick(pool);
+    var b = F.blank(inf, t, s.p, s.g);
+    var subj = s.t;
+    if (subj === 'je' && VOWEL.test(b.accepts[0])) subj = 'j’';
+    var lead = cap(subj) + (/’$/.test(subj) ? '' : ' ');
+    return { line: [lead, b], blank: b };
+  }
+  function drawVerbs(list, n) { var out = []; var bag = shuffle(list); while (out.length < n) { if (!bag.length) bag = shuffle(list); out.push(bag.pop()); } return out; }
+
+  function genImp() {
+    var tricky = ['être', 'avoir', 'faire', 'finir', 'manger', 'choisir', 'grandir', 'boire', 'voir', 'lancer', 'prendre', 'dire'];
+    var verbs = shuffle(drawVerbs(tricky, 5).concat(drawVerbs(VERBS.filter(function (v) { return tricky.indexOf(v) < 0; }), 5)));
+    return verbs.map(function (inf) {
+      var L = genLine('imp', inf);
+      var hint = inf === 'être' ? 'Être a un radical spécial : <b>ét-</b>' : 'nous ' + F.V[inf].nous + ' → radical <b>' + F.radical(inf) + '-</b>';
+      return { kind: 'multi', ask: 'Conjugue à l’imparfait', lines: [L.line], hint: hint + '<br>Terminaisons : -ais, -ais, -ait, -ions, -iez, -aient' };
+    });
+  }
+  function genPC() {
+    var verbs = shuffle(drawVerbs(ETRE_VERBS, 5).concat(drawVerbs(AVOIR_VERBS, 5)));
+    return verbs.map(function (inf) {
+      var L = genLine('pc', inf);
+      var v = F.V[inf];
+      return { kind: 'multi', ask: 'Conjugue au passé composé', lines: [L.line],
+        hint: inf + ' → auxiliaire <b>' + v.aux + '</b>' + (v.aux === 'être' ? ' (et on accorde avec le sujet !)' : '') };
+    });
+  }
+  function tableOf(verb, p) {
+    var t = verb === 'avoir' ? F.AVOIR : F.ETRE;
+    var subj = ['je', 'tu', 'il', 'nous', 'vous', 'ils'];
+    return t.map(function (f, i) { var s = (i === 0 && verb === 'avoir') ? 'j’' : subj[i] + ' '; return i === p ? '<b>' + s + f + '</b>' : s + f; }).join(', ');
+  }
+  function auxSubject(verb, p) {
+    if (p === 0) return verb === 'avoir' ? 'J’' : 'Je';
+    if (p === 2) return pick(['Il', 'Elle', 'On']);
+    if (p === 5) return pick(['Ils', 'Elles']);
+    return ['Je', 'Tu', 'Il', 'Nous', 'Vous', 'Ils'][p];
+  }
+  function genAux() {
+    var qs = [];
+    for (var i = 0; i < 10; i++) {
+      var verb = i % 2 ? 'être' : 'avoir', p = Math.floor(Math.random() * 6);
+      var table = verb === 'avoir' ? F.AVOIR : F.ETRE, other = verb === 'avoir' ? F.ETRE : F.AVOIR;
+      var correct = table[p];
+      var why = '<b>' + verb + '</b> au présent : ' + tableOf(verb, p) + '.';
+      var subj = auxSubject(verb, p);
+      if (i < 6) {
+        var wrongs = shuffle(table.filter(function (f) { return f !== correct; })).slice(0, 2).concat([pick(other.filter(function (f) { return f !== correct; }))]);
+        qs.push({ kind: 'choice', ask: 'Choisis la bonne forme', html: subj + (/’$/.test(subj) ? '' : ' ') + '<span class="gap">?</span> <span class="inf">(' + verb + ')</span>',
+          options: shuffle([correct].concat(wrongs)), correct: correct, why: function (w) { return function () { return w; }; }(why) });
+      } else {
+        qs.push({ kind: 'multi', ask: 'Écris la bonne forme du verbe ' + verb, lines: [[subj + (/’$/.test(subj) ? '' : ' '),
+          { type: 'type', t: 'aux', inf: verb, p: p, accepts: [correct], show: correct, hint: verb, why: why }]] });
+      }
+    }
+    return shuffle(qs);
+  }
+  function genGoal() {
+    var verbs = shuffle(drawVerbs(ETRE_VERBS, 5).concat(drawVerbs(AVOIR_VERBS.filter(function (v) { return v !== 'être' && v !== 'avoir'; }), 4)).concat([pick(['être', 'avoir'])]));
+    return verbs.map(function (inf) {
+      var v = F.V[inf], ans = v.aux === 'être' ? 'ÊTRE' : 'AVOIR';
+      var why;
+      if (inf === 'être' || inf === 'avoir') why = 'Piège ! <b>être</b> et <b>avoir</b> se conjuguent tous les deux avec AVOIR : j’ai été, j’ai eu.';
+      else if (v.aux === 'être') why = '<b>' + inf + '</b> est dans la maison d’être : je suis ' + v.pp + '(e).';
+      else why = '<b>' + inf + '</b> n’est pas dans la maison d’être, donc AVOIR : ' + (VOWEL.test('ai') ? 'j’ai ' : '') + v.pp + '.';
+      return { kind: 'choice', goal: true, ask: 'Tire dans le bon but : quel auxiliaire ?', html: '<div class="big-verb">' + inf + '</div><span class="inf">au passé composé</span>',
+        options: ['ÊTRE', 'AVOIR'], correct: ans, why: function () { return why; } };
+    });
+  }
+  var PPX = {
+    'être': ['étu', 'êtré', 'étais'], avoir: ['avu', 'avé', 'avi'], faire: ['faisé', 'fairé', 'faisu'], boire: ['boiru', 'buvé', 'boit'],
+    voir: ['voyé', 'voiru', 'vi'], prendre: ['prendu', 'prit', 'prené'], dire: ['disé', 'diru', 'di'], mettre: ['mettu', 'metté', 'mit'],
+    lire: ['lisé', 'liru', 'li'], 'écrire': ['écriru', 'écrivé', 'écri'], courir: ['couri', 'courié', 'courut'], rire: ['riu', 'rié', 'rit'],
+    vivre: ['vivu', 'vivé', 'vit'], offrir: ['offri', 'offru', 'offré'], pouvoir: ['pouvé', 'pouvu', 'pouvi'], vouloir: ['voulé', 'vouli', 'voulit'],
+    savoir: ['savu', 'savé', 'sait'], recevoir: ['recevu', 'recevé', 'reçi'], venir: ['veni', 'vené', 'vint'], devenir: ['deveni', 'devené', 'devint'],
+    revenir: ['reveni', 'revené', 'revint'], 'naître': ['naissu', 'naîtré', 'naît'], mourir: ['mouru', 'mouri', 'mouré'],
+    descendre: ['descendé', 'descendi', 'descend'], perdre: ['perdé', 'perdi', 'perd'], attendre: ['attendé', 'attendi', 'attend'],
+    partir: ['partu', 'parté', 'part'], sortir: ['sortu', 'sorté', 'sort']
+  };
+  function ppDistract(inf) {
+    if (PPX[inf]) return PPX[inf];
+    var stem = inf.slice(0, -2), g = F.group(inf);
+    if (g === 1) return [inf, F.imp(inf, 2), stem + 'u'];
+    if (g === 2) return [stem + 'it', stem + 'u', stem + 'é'];
+    return [stem + 'é', stem + 'i', stem + 'u'];
+  }
+  function genPP() {
+    var verbs = shuffle(drawVerbs(Object.keys(PPX), 6).concat(drawVerbs(VERBS.filter(function (v) { return !PPX[v]; }), 4)));
+    return verbs.map(function (inf) {
+      var v = F.V[inf], g = F.group(inf);
+      var rule = g === 1 ? '1er groupe (-er) → <b>-é</b>' : g === 2 ? '2e groupe (-ir, nous -issons) → <b>-i</b>' : '3e groupe : participe à apprendre par cœur';
+      var why = 'Le participe passé de <b>' + inf + '</b>, c’est <b>' + v.pp + '</b>. ' + rule + '.';
+      return { kind: 'choice', ask: 'Quel est le participe passé ?', html: '<div class="big-verb">' + inf + '</div><span class="inf">j’ai… / je suis…</span>',
+        options: shuffle([v.pp].concat(ppDistract(inf))), correct: v.pp, why: function () { return why; } };
+    });
+  }
+  function genChoix() {
+    return shuffle(F.CHOIX).slice(0, 10).map(function (c) {
+      return { kind: 'multi', ask: 'Imparfait ou passé composé ? Choisis.', lines: [F.parseLine(c[0], c[1])] };
+    });
+  }
+  // La VAR: tense first, then the reason, so they learn WHEN to use each tense
+  function genVar() {
+    var qs = [];
+    shuffle(F.VAR).slice(0, 5).forEach(function (it) {
+      var isImp = it[2] === 'i', ans = isImp ? 'IMPARFAIT' : 'PASSÉ COMPOSÉ';
+      var withGap = it[0].replace('{}', '<span class="gap">?</span> <span class="inf">(' + it[1] + ')</span>');
+      var filled = it[0].replace('{}', '<b class="' + (isImp ? 'ci' : 'cp') + '">' + it[4] + '</b>');
+      var reason = F.REASONS[it[3]];
+      qs.push({ kind: 'choice', tense: true, ask: '📺 La VAR : quel temps ?', html: withGap, options: ['IMPARFAIT', 'PASSÉ COMPOSÉ'], correct: ans,
+        why: function () { return '« ' + filled + ' » : ' + reason.toLowerCase() + ' → <b>' + ans.toLowerCase() + '</b>.'; } });
+      var others = shuffle(Object.keys(F.REASONS).filter(function (k) { return k !== it[3]; })).slice(0, 2).map(function (k) { return F.REASONS[k]; });
+      qs.push({ kind: 'choice', reasons: true, ask: '📺 La VAR : pourquoi ce temps ?', html: filled, options: shuffle([reason].concat(others)), correct: reason,
+        why: function () {
+          return isImp ? 'L’imparfait sert au décor : les habitudes, les descriptions et les actions qui durent.'
+            : 'Le passé composé sert aux actions : terminées, à un moment précis, ou soudaines.';
+        } });
+    });
+    return qs;
+  }
+  // L'accord du participe passé: être agrees with the subject, avoir does not (+ 2 bonus 5e items)
+  var ACC_SUBJ = [['Les joueuses', 'f', true], ['Les supporters', 'm', true], ['La capitaine', 'f', false], ['Le gardien', 'm', false], ['Mes cousines', 'f', true], ['Les arbitres', 'm', true], ['Ma sœur', 'f', false]];
+  var ACC_BONUS = [
+    ['La coupe ? Les joueurs l’ont ', 'gagner', 'gagnée', 'Bonus 5e : avec avoir, on accorde seulement si le COD est placé <b>avant</b> le verbe. Ici <b>l’</b> = la coupe (féminin) → gagnée.'],
+    ['Les buts que nous avons ', 'marquer', 'marqués', 'Bonus 5e : <b>que</b> remplace « les buts » (masculin pluriel), placé avant avoir → marqués.'],
+    ['Ces médailles, la capitaine les a ', 'recevoir', 'reçues', 'Bonus 5e : <b>les</b> = ces médailles (féminin pluriel), placé avant avoir → reçues.']
+  ];
+  function accOpts(pp) { return shuffle([pp, pp + 'e', pp + 's', pp + 'es']); }
+  function genAccord() {
+    var qs = [];
+    drawVerbs(ETRE_VERBS, 5).forEach(function (inf) {
+      var s = pick(ACC_SUBJ), v = F.V[inf], right = v.pp + (s[1] === 'f' ? 'e' : '') + (s[2] ? 's' : '');
+      var lbl = (s[1] === 'f' ? 'féminin' : 'masculin') + ' ' + (s[2] ? 'pluriel' : 'singulier');
+      qs.push({ kind: 'choice', ask: 'Choisis la bonne orthographe', html: s[0] + ' ' + (s[2] ? 'sont' : 'est') + ' <span class="gap">?</span> <span class="inf">(' + inf + ')</span>',
+        options: accOpts(v.pp), correct: right,
+        why: function () { return 'Avec <b>être</b>, le participe s’accorde avec le sujet. « ' + s[0] + ' » est ' + lbl + ' → <b>' + right + '</b>.'; } });
+    });
+    drawVerbs(['gagner', 'marquer', 'jouer', 'regarder', 'chanter', 'finir', 'applaudir', 'perdre'], 3).forEach(function (inf) {
+      var s = pick(ACC_SUBJ.filter(function (x) { return x[1] === 'f' || x[2]; })), v = F.V[inf];
+      qs.push({ kind: 'choice', ask: 'Choisis la bonne orthographe', html: s[0] + ' ' + (s[2] ? 'ont' : 'a') + ' <span class="gap">?</span> <span class="inf">(' + inf + ')</span>',
+        options: accOpts(v.pp), correct: v.pp,
+        why: function () { return 'Avec <b>avoir</b>, le participe ne s’accorde pas avec le sujet : ' + s[0].toLowerCase() + ' ' + (s[2] ? 'ont' : 'a') + ' <b>' + v.pp + '</b>.'; } });
+    });
+    shuffle(ACC_BONUS).slice(0, 2).forEach(function (b) {
+      var pp = F.V[b[1]].pp;
+      qs.push({ kind: 'choice', ask: '⭐ Bonus : le piège du COD', html: b[0] + '<span class="gap">?</span> <span class="inf">(' + b[1] + ')</span>',
+        options: accOpts(pp), correct: b[2], why: function () { return b[3]; } });
+    });
+    return shuffle(qs.slice(0, 8)).concat(qs.slice(8));
+  }
+  function storyQ(st) { return { kind: 'multi', ask: 'Complète le texte : imparfait pour le décor, passé composé pour l’action', title: '📰 ' + st.t, lines: [F.parseLine(st.s)] }; }
+  function genTexte() { return shuffle(F.STORIES).slice(0, 2).map(storyQ); }
+  var EX_COL = ['#2E9E4F', '#2F7FD8', '#D8443A', '#8E3FB0'];
+  var EX_T = ['1 · Entoure la bonne forme', '2 · Conjugue à l’imparfait', '3 · Conjugue au passé composé. Attention à l’accord avec être !', '4 · Complète le texte : imparfait pour le décor, passé composé pour l’action'];
+  function exPage(i, lines) { return { kind: 'multi', title: EX_T[i], tag: EX_COL[i], numbered: lines.length > 1, lines: lines }; }
+  function examA() {
+    var E = F.EXAM_A;
+    return [
+      exPage(0, E.ex1.map(function (c) { return F.parseLine(c[0], c[1]); })),
+      exPage(1, E.ex2.map(function (s) { return F.parseLine(s); })),
+      exPage(2, E.ex3.map(function (s) { return F.parseLine(s); })),
+      exPage(3, [F.parseLine(E.ex4)])
+    ];
+  }
+  function examB() {
+    return [
+      exPage(0, shuffle(F.CHOIX).slice(0, 5).map(function (c) { return F.parseLine(c[0], c[1]); })),
+      exPage(1, drawVerbs(VERBS, 5).map(function (v) { return genLine('imp', v).line; })),
+      exPage(2, shuffle(drawVerbs(ETRE_VERBS, 3).concat(drawVerbs(AVOIR_VERBS, 2))).map(function (v) { return genLine('pc', v).line; })),
+      exPage(3, [F.parseLine(pick(F.STORIES).s)])
+    ];
+  }
+
+  var LEVELS = [
+    { id: 'lecon', n: '0', name: 'Le vestiaire', sub: 'La leçon : imparfait ou passé composé ?', icon: '📋', lesson: true },
+    { id: 'aux', n: '1', name: 'Échauffement', sub: 'Avoir et être au présent', icon: '🏃', gen: genAux },
+    { id: 'goal', n: '2', name: 'Le bon but', sub: 'Être ou avoir ? Tire dans le bon but', icon: '🥅', gen: genGoal },
+    { id: 'pp', n: '3', name: 'Participes passés', sub: 'joué, fini, pris, venu…', icon: '🎯', gen: genPP },
+    { id: 'imp', n: '4', name: 'Le décor', sub: 'Conjugue à l’imparfait', icon: '🏟️', gen: genImp },
+    { id: 'pc', n: '5', name: 'L’action', sub: 'Conjugue au passé composé', icon: '⚡', gen: genPC },
+    { id: 'accord', n: '6', name: 'L’accord', sub: 'parti, partie, partis ou parties ?', icon: '🧩', gen: genAccord },
+    { id: 'var', n: '7', name: 'La VAR', sub: 'Quel temps, et pourquoi ?', icon: '📺', gen: genVar },
+    { id: 'choix', n: '8', name: 'Imparfait ou passé composé ?', sub: 'Choisis le bon temps dans la phrase', icon: '⚖️', gen: genChoix },
+    { id: 'texte', n: '9', name: 'Le match raconté', sub: 'Complète l’histoire', icon: '📰', gen: genTexte },
+    { id: 'examA', n: '10', name: 'Examen blanc : la fiche', sub: 'Les 4 exercices de la fiche du prof', icon: '📝', gen: examA, exam: true },
+    { id: 'examB', n: '11', name: 'Finale surprise', sub: 'Un examen tout neuf à chaque fois', icon: '🏆', gen: examB, exam: true }
+  ];
+  function levelById(id) { return LEVELS.filter(function (l) { return l.id === id; })[0]; }
+  function starStr(n) { return '★★★'.slice(0, n) + '☆☆☆'.slice(0, 3 - n); }
+
+  /* ---------------- players screen ---------------- */
+  var AVATARS = ['🦁', '🦅', '🐯', '🐺', '🦈', '🐉', '🐆', '🦊', '⚡', '🔥', '🚀', '🐎'];
+  var COLORS = ['#2F7FD8', '#D8443A', '#1F9D55', '#8E3FB0', '#E08A1E', '#14958F'];
+  function renderPlayers(editing) {
+    var html = '<h1 class="hero-title">Qui entre sur <span>le terrain ?</span></h1>' +
+      '<p class="lead">Chaque joueur a ses points, ses étoiles et son album de stickers. Objectif : maîtriser l’imparfait et le passé composé avant l’examen.</p><div class="jerseys">';
+    S.players.forEach(function (p, i) {
+      html += '<div class="jersey"><button class="jersey-main" style="--c:' + p.color + '" data-i="' + i + '" type="button">' +
+        '<span class="j-av">' + p.avatar + '</span><b class="j-name">' + esc(p.name) + '</b>' +
+        '<small>' + rank(p.pts) + ' · ' + p.pts + ' pts · ' + p.stickers.length + ' stickers</small><span class="btn">Jouer ▶</span></button>' +
+        '<button class="j-edit" data-e="' + i + '" type="button">✏️ Changer le nom et la mascotte</button></div>';
+    });
+    html += '</div>';
+    if (editing != null) {
+      var p = S.players[editing];
+      html += '<div class="card edit-box"><label for="nameInput"><b>Prénom</b></label>' +
+        '<input id="nameInput" maxlength="16" value="' + esc(p.name) + '" autocomplete="off">' +
+        '<div class="avatars" id="avPick">' + AVATARS.map(function (a) { return '<button type="button" class="' + (a === p.avatar ? 'on' : '') + '" data-a="' + a + '">' + a + '</button>'; }).join('') + '</div>' +
+        '<div class="avatars" id="colPick">' + COLORS.map(function (c) { return '<button type="button" aria-label="couleur" class="' + (c === p.color ? 'on' : '') + '" data-c="' + c + '" style="background:' + c + '"></button>'; }).join('') + '</div>' +
+        '<button class="btn" id="saveName" type="button">Enregistrer</button></div>';
+    }
+    html += '<p class="note">Les prénoms restent sur cet appareil, ils ne sont envoyés nulle part.</p>';
+    var el = $('#scr-players'); el.innerHTML = html;
+    $$('.jersey-main', el).forEach(function (b) { b.onclick = function () { S.cur = +b.dataset.i; save(); sWhistle(); goHome(); }; });
+    $$('.j-edit', el).forEach(function (b) { b.onclick = function () { renderPlayers(+b.dataset.e); var i = $('#nameInput'); if (i) i.focus(); }; });
+    if (editing != null) {
+      var p2 = S.players[editing], av = p2.avatar, col = p2.color;
+      $$('#avPick button').forEach(function (b) { b.onclick = function () { av = b.dataset.a; $$('#avPick button').forEach(function (x) { x.classList.toggle('on', x === b); }); }; });
+      $$('#colPick button').forEach(function (b) { b.onclick = function () { col = b.dataset.c; $$('#colPick button').forEach(function (x) { x.classList.toggle('on', x === b); }); }; });
+      $('#saveName').onclick = function () { var n = $('#nameInput').value.trim(); if (n) p2.name = n; p2.avatar = av; p2.color = col; save(); renderPlayers(); };
+    }
+    show('players');
+  }
+
+  /* ---------------- home ---------------- */
+  var EXAM_DAY = new Date(2026, 10, 23, 8, 0, 0);
+  function countdown() {
+    var now = new Date();
+    var d = Math.ceil((new Date(EXAM_DAY.getFullYear(), EXAM_DAY.getMonth(), EXAM_DAY.getDate()) - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 864e5);
+    if (d < 0) return '';
+    var label = d === 0 ? 'Jour J' : 'J-' + d;
+    return '<div class="countdown"><b>' + label + '</b><span>' + (d === 0 ? 'C’est aujourd’hui ! Respire, relis le décor et l’action, et fonce.' : 'Examen de français lundi 23 novembre. Un match par jour et tu es prêt.') + '</span></div>';
+  }
+  function goHome() { if (S.cur == null) { renderPlayers(); return; } renderHome(); show('home'); }
+  function renderHome() {
+    var p = P();
+    var next = LEVELS.filter(function (l) { return l.lesson ? !p.lesson : !(p.stars[l.id] > 0); })[0];
+    var html = '<div class="player-bar"><span class="avatar" style="--c:' + p.color + '">' + p.avatar + '</span>' +
+      '<div class="pb-txt"><b>' + esc(p.name) + '</b><small>' + rank(p.pts) + ' · ' + p.pts + ' pts · meilleure série ' + p.streakBest + '</small></div>' +
+      '<button class="btn ghost sm" id="swap" type="button">Changer de joueur</button></div>' + countdown();
+    html += '<h2 class="sec">Le parcours</h2><ol class="path">';
+    LEVELS.forEach(function (l) {
+      var st = l.lesson ? '' : starStr(p.stars[l.id] || 0);
+      if (l.lesson) st = p.lesson ? '✅' : '';
+      if (l.exam && p.stars[l.id]) st += '';
+      html += '<li><button type="button" class="lvl' + (l === next ? ' next' : '') + (l.exam ? ' exam' : '') + '" data-id="' + l.id + '">' +
+        '<span class="lvl-n">' + l.n + '</span><span class="lvl-ic">' + l.icon + '</span>' +
+        '<span class="lvl-txt"><b>' + l.name + '</b><small>' + l.sub + (l.exam && p.examBest ? ' · record ' + p.examBest + '/20' : '') + '</small></span>' +
+        '<span class="lvl-st">' + st + '</span></button></li>';
+    });
+    html += '</ol><div class="home-foot"><button class="btn" id="albumBtn" type="button">📒 Mon album · ' + p.stickers.length + '/' + ALL_STK.length + '</button></div>';
+    var other = S.players[1 - S.cur];
+    var rows = S.players.slice().sort(function (a, b) { return b.pts - a.pts; });
+    html += '<div class="card board"><h3>Classement de la maison</h3>' + rows.map(function (q, i) {
+      var stars = Object.keys(q.stars).reduce(function (s, k) { return s + q.stars[k]; }, 0);
+      return '<div class="board-row"><span>' + (i === 0 && q.pts > 0 ? '🥇' : '🥈') + '</span><span class="avatar" style="--c:' + q.color + '">' + q.avatar + '</span>' +
+        '<span class="nm">' + esc(q.name) + ' · ' + stars + '★ · ' + q.stickers.length + ' stickers</span><span class="pt">' + q.pts + '</span></div>';
+    }).join('') + '</div>';
+    if (other.pts > p.pts) html += '<p class="note">' + esc(other.name) + ' a ' + (other.pts - p.pts) + ' points d’avance. À toi de remonter !</p>';
+    var el = $('#scr-home'); el.innerHTML = html;
+    $('#swap').onclick = function () { renderPlayers(); };
+    $('#albumBtn').onclick = renderAlbum;
+    $$('.lvl', el).forEach(function (b) { b.onclick = function () { var l = levelById(b.dataset.id); if (l.lesson) startLesson(); else startLevel(l); }; });
+  }
+
+  /* ---------------- album ---------------- */
+  function renderAlbum() {
+    var p = P();
+    var html = '<div class="play-top"><button class="icon-btn" id="albBack" type="button" aria-label="Retour">←</button><div class="ptitle"><b>Album de ' + esc(p.name) + '</b><small>' + p.stickers.length + ' / ' + ALL_STK.length + ' stickers</small></div></div>' +
+      '<p class="lead">Les stickers spéciaux se gagnent avec des exploits. Les autres sortent des pochettes surprises (7/10 ou plus à un match).</p><div class="album-grid">';
+    ALL_STK.forEach(function (k) {
+      var s = STK[k], has = p.stickers.indexOf(k) >= 0;
+      html += has ? '<div class="stk"><span class="e">' + s[0] + '</span><b>' + s[1] + '</b><small>' + s[2] + '</small></div>'
+        : '<div class="stk empty"><span class="e">?</span><b>' + (s[2] === 'Pochette' ? 'Pochette' : s[1]) + '</b><small>' + (s[2] === 'Pochette' ? '' : s[2]) + '</small></div>';
+    });
+    html += '</div>';
+    $('#scr-album').innerHTML = html;
+    $('#albBack').onclick = goHome;
+    show('album');
+  }
+
+  /* ---------------- match ---------------- */
+  var M = null, lastInput = null;
+  function startLevel(l) {
+    M = { lvl: l, qs: l.gen(), i: 0, score: 0, total: 0, streak: 0, pts: 0, results: [], newStk: [] };
+    var el = $('#scr-play');
+    el.innerHTML = '<div class="play-top"><button class="icon-btn" id="quit" type="button" aria-label="Quitter">✕</button>' +
+      '<div class="ptitle"><b>' + l.icon + ' ' + l.name + '</b><small id="qcount"></small></div>' +
+      '<div class="scoreboard"><div class="sb"><b id="sbScore">0</b><small>buts</small></div><div class="sb"><b id="sbStreak">0</b><small>série 🔥</small></div></div></div>' +
+      '<div id="quitBar" class="quit-bar" hidden><span>Quitter le match ? Les points gagnés sont gardés.</span><button class="btn sm" id="quitYes" type="button">Oui, quitter</button><button class="btn ghost sm" id="quitNo" type="button">Non, je continue</button></div>' +
+      '<div class="dots" id="dots"></div>' +
+      '<div id="pitch" class="pitch"><span id="ball" class="ball">⚽</span><div class="goal"><span class="keeper">🧤</span></div></div>' +
+      '<div id="qcard" class="qcard"></div><div id="fb" class="feedback" hidden></div>';
+    $('#quit').onclick = function () { $('#quitBar').hidden = false; };
+    $('#quitNo').onclick = function () { $('#quitBar').hidden = true; };
+    $('#quitYes').onclick = function () { save(); goHome(); };
+    show('play');
+    sWhistle();
+    renderQ();
+  }
+  function blanksOf(q) { var out = []; q.lines.forEach(function (l) { l.forEach(function (s) { if (typeof s !== 'string') out.push(s); }); }); return out; }
+  function renderQ() {
+    var q = M.qs[M.i], n = M.qs.length;
+    $('#qcount').textContent = (M.lvl.exam ? 'Exercice ' : 'Question ') + (M.i + 1) + ' / ' + n;
+    $('#dots').innerHTML = M.qs.map(function (_, i) { return '<span class="' + (i < M.results.length ? M.results[i] : i === M.i ? 'cur' : '') + '"></span>'; }).join('');
+    var pitch = $('#pitch'); pitch.className = 'pitch';
+    pitch.style.setProperty('--x', 'calc(14px + ' + (M.i / n * 55) + '%)');
+    $('#fb').hidden = true;
+    var card = $('#qcard'); card.innerHTML = '';
+    if (q.title) { var t = document.createElement('div'); t.className = 'ex-title'; if (q.tag) t.style.setProperty('--tag', q.tag); t.textContent = q.title; card.appendChild(t); }
+    if (q.ask) { var a = document.createElement('div'); a.className = 'q-ask'; a.textContent = q.ask; card.appendChild(a); }
+    if (q.kind === 'choice') renderChoice(q, card); else renderMulti(q, card);
+  }
+  function renderChoice(q, card) {
+    var pr = document.createElement('div'); pr.className = 'q-prompt'; pr.innerHTML = q.html; card.appendChild(pr);
+    var grid = document.createElement('div'); grid.className = 'opts' + (q.goal || q.tense ? ' goals' : '') + (q.reasons ? ' reasons' : '');
+    var done = false;
+    q.options.forEach(function (o) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'opt';
+      if (q.goal) { b.classList.add(o === 'ÊTRE' ? 'etre' : 'avoir'); b.innerHTML = o + '<small>' + (o === 'ÊTRE' ? 'je suis…' : 'j’ai…') + '</small>'; }
+      else if (q.tense) { b.classList.add(o === 'IMPARFAIT' ? 'timp' : 'tpc'); b.innerHTML = o + '<small>' + (o === 'IMPARFAIT' ? 'le décor 🏟️' : 'l’action ⚡') + '</small>'; }
+      else b.textContent = o;
+      b.onclick = function () {
+        if (done) return; done = true;
+        var ok = o === q.correct;
+        $$('.opt', grid).forEach(function (x, i) { x.disabled = true; if (q.options[i] === q.correct) x.classList.add('right'); else if (x === b) x.classList.add('wrong'); });
+        grade(ok ? 1 : 0, 1, [ok ? q.why(o) : '<span class="fb-ans">Réponse : <b>' + q.correct + '</b></span>' + q.why(o)]);
+      };
+      grid.appendChild(b);
+    });
+    card.appendChild(grid);
+  }
+  var ACCENTS = ['é', 'è', 'ê', 'à', 'â', 'î', 'ï', 'ô', 'û', 'ç', '’'];
+  function renderMulti(q, card) {
+    var list = document.createElement('div'); list.className = 'lines';
+    var hasTyped = false;
+    q.lines.forEach(function (segs, li) {
+      var line = document.createElement('p'); line.className = 'line';
+      if (q.numbered) { var nm = document.createElement('span'); nm.className = 'num'; nm.textContent = (li + 1) + '.'; line.appendChild(nm); }
+      segs.forEach(function (sg) {
+        if (typeof sg === 'string') { line.appendChild(document.createTextNode(sg)); return; }
+        sg.done = false; sg.retried = false; sg.val = null; sg.ok = false; sg.msg = '';
+        if (sg.type === 'pick') {
+          var w = document.createElement('span'); w.className = 'pick';
+          sg.opts.forEach(function (o) {
+            var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = o;
+            b.onclick = function () { if (sg.done) return; sg.val = o; $$('.chip', w).forEach(function (c) { c.classList.toggle('on', c === b); }); };
+            w.appendChild(b);
+          });
+          sg.el = w; line.appendChild(w);
+        } else {
+          hasTyped = true;
+          var wrap = document.createElement('span'); wrap.className = 'typed';
+          var inf = document.createElement('span'); inf.className = 'inf'; inf.textContent = '(' + sg.hint + ')'; wrap.appendChild(inf);
+          var inp = document.createElement('input'); inp.className = 'blank'; inp.type = 'text';
+          inp.setAttribute('autocomplete', 'off'); inp.setAttribute('autocapitalize', 'off'); inp.setAttribute('autocorrect', 'off'); inp.setAttribute('spellcheck', 'false');
+          inp.setAttribute('aria-label', 'Conjugue ' + sg.hint);
+          inp.style.width = Math.max(7, sg.show.length + 3) + 'ch';
+          inp.onfocus = function () { lastInput = inp; };
+          inp.onkeydown = function (e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              var all = $$('input.blank:not([disabled])', card), idx = all.indexOf(inp);
+              var empty = all.filter(function (x) { return !x.value.trim(); });
+              if (empty.length && idx < all.length - 1) (all[idx + 1].value.trim() ? empty[0] : all[idx + 1]).focus();
+              else validate(q, card);
+            }
+          };
+          sg.el = inp; wrap.appendChild(inp); line.appendChild(wrap);
+        }
+      });
+      list.appendChild(line);
+    });
+    card.appendChild(list);
+    if (hasTyped) {
+      var bar = document.createElement('div'); bar.className = 'accent-bar';
+      ACCENTS.forEach(function (c) {
+        var b = document.createElement('button'); b.type = 'button'; b.textContent = c;
+        b.onmousedown = function (e) { e.preventDefault(); };
+        b.onclick = function () {
+          var i = lastInput || $('input.blank:not([disabled])', card); if (!i || i.disabled) return;
+          var s = i.selectionStart == null ? i.value.length : i.selectionStart, e2 = i.selectionEnd == null ? s : i.selectionEnd;
+          i.value = i.value.slice(0, s) + c + i.value.slice(e2); i.focus(); i.setSelectionRange(s + 1, s + 1);
+        };
+        bar.appendChild(b);
+      });
+      card.appendChild(bar);
+    }
+    var acts = document.createElement('div'); acts.className = 'q-actions';
+    var go = document.createElement('button'); go.type = 'button'; go.className = 'btn'; go.id = 'validate'; go.textContent = 'Valider ⚽';
+    go.onclick = function () { validate(q, card); };
+    acts.appendChild(go);
+    if (q.hint) {
+      var hb = document.createElement('button'); hb.type = 'button'; hb.className = 'btn ghost sm'; hb.textContent = '💡 Indice';
+      hb.onclick = function () { var h = $('.hint', card); if (h) { h.hidden = !h.hidden; return; } h = document.createElement('div'); h.className = 'hint'; h.innerHTML = q.hint; card.appendChild(h); };
+      acts.appendChild(hb);
+    }
+    card.appendChild(acts);
+    var first = $('input.blank', card);
+    if (first && window.matchMedia && matchMedia('(pointer:fine)').matches) first.focus();
+  }
+  function validate(q, card) {
+    var blanks = blanksOf(q), open = blanks.filter(function (b) { return !b.done; });
+    if (!open.length) return;
+    var empty = open.filter(function (b) { return b.type === 'pick' ? !b.val : !b.el.value.trim(); })[0];
+    if (empty) { toast('Il manque encore une réponse !'); if (empty.type === 'type') empty.el.focus(); else { empty.el.classList.remove('shake'); void empty.el.offsetWidth; empty.el.classList.add('shake'); } return; }
+    var nearAny = false;
+    open.forEach(function (b) {
+      if (b.type === 'pick') {
+        b.ok = b.val === b.correct; b.done = true;
+        $$('.chip', b.el).forEach(function (c) { if (c.textContent === b.correct) c.classList.add('right'); else if (c.textContent === b.val) c.classList.add('wrong'); c.disabled = true; });
+        if (!b.ok) b.msg = '<span class="fb-ans">Réponse : <b>' + b.correct + '</b></span>' + b.why;
+      } else {
+        var r = F.check(b.el.value, b);
+        if (r.ok) { b.ok = true; b.done = true; }
+        else if (r.near && !b.retried) { b.retried = true; nearAny = true; b.el.classList.add('near'); }
+        else { b.ok = false; b.done = true; b.msg = '<span class="fb-ans">« ' + esc(b.el.value.trim()) + ' » → <b>' + b.show + '</b></span>' + (r.msg ? r.msg + ' ' : '') + b.why; }
+        if (b.done) {
+          b.el.classList.remove('near'); b.el.classList.add(b.ok ? 'right' : 'wrong'); b.el.disabled = true;
+          if (!b.ok) { var fx = document.createElement('span'); fx.className = 'fix'; fx.textContent = b.show; b.el.parentNode.appendChild(fx); }
+        }
+      }
+    });
+    if (nearAny) {
+      toast('Presque ! Vérifie les accents (en orange) et valide encore.');
+      var n1 = $('input.blank.near', card); if (n1) n1.focus();
+      return;
+    }
+    var okN = blanks.filter(function (b) { return b.ok; }).length;
+    var msgs = blanks.filter(function (b) { return !b.ok && b.msg; }).map(function (b) { return b.msg; });
+    if (!msgs.length && blanks.length === 1 && blanks[0].why) msgs = [blanks[0].type === 'pick' ? blanks[0].why : blanks[0].why];
+    var v = $('#validate'); if (v) v.disabled = true;
+    grade(okN, blanks.length, msgs);
+  }
+  function grade(ok, tot, msgs) {
+    var p = P();
+    M.score += ok; M.total += tot;
+    var gained = 0;
+    for (var i = 0; i < tot; i++) {
+      if (i < ok) { M.streak++; gained += 10 + (M.streak >= 3 ? 5 : 0); } else M.streak = 0;
+    }
+    if (ok < tot) M.streak = 0;
+    p.pts += gained; M.pts += gained;
+    if (M.streak > p.streakBest) p.streakBest = M.streak;
+    [[5, 'serie5'], [10, 'serie10'], [20, 'serie20']].forEach(function (s) { if (M.streak >= s[0]) { var a = award(s[1]); if (a) { M.newStk.push(a); toast('Nouveau sticker : ' + STK[a][0] + ' ' + STK[a][1] + ' !'); } } });
+    var res = ok === tot ? 'w' : ok > 0 ? 'd' : 'l';
+    M.results.push(res);
+    save();
+    $('#sbScore').textContent = M.score; $('#sbStreak').textContent = M.streak;
+    var pitch = $('#pitch'); pitch.className = 'pitch ' + (res === 'l' ? 'save' : 'shoot');
+    if (res === 'l') sMiss(); else sGoal();
+    var fb = $('#fb');
+    fb.className = 'feedback' + (res === 'l' ? ' bad' : res === 'd' ? ' mid' : '');
+    var cheers = ['BUT !', 'Golazo !', 'En pleine lucarne !', 'Quelle frappe !', 'Imparable !'];
+    var title = res === 'w' ? pick(cheers) + (M.streak >= 3 ? ' 🔥' : '') : res === 'd' ? 'Presque : ' + ok + ' / ' + tot : 'Arrêt du gardien 🧤';
+    var last = M.i >= M.qs.length - 1;
+    fb.innerHTML = '<div class="fb-title">' + title + (gained ? '<span class="fb-pts">+' + gained + '</span>' : '') + '</div>' +
+      (msgs.length ? '<ul class="fb-list">' + msgs.map(function (m) { return '<li>' + m + '</li>'; }).join('') + '</ul>' : '') +
+      '<button class="btn" id="nextBtn" type="button">' + (last ? 'Coup de sifflet final 🏁' : 'Suivant ▶') + '</button>';
+    fb.hidden = false;
+    $('#nextBtn').onclick = next;
+    setTimeout(function () { fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 60);
+  }
+  function next() { M.i++; if (M.i >= M.qs.length) finish(); else { renderQ(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' || (e.target && e.target.tagName === 'INPUT')) return;
+    var fb = $('#fb');
+    if (fb && !fb.hidden && !$('#scr-play').hidden) { e.preventDefault(); next(); }
+  });
+
+  function finish() {
+    var p = P(), l = M.lvl, ratio = M.total ? M.score / M.total : 0;
+    var stars = l.exam ? (ratio >= 0.95 ? 3 : ratio >= 0.8 ? 2 : ratio >= 0.6 ? 1 : 0) : (ratio >= 1 ? 3 : ratio >= 0.8 ? 2 : ratio >= 0.6 ? 1 : 0);
+    var oldStars = p.stars[l.id] || 0;
+    if (stars > oldStars) p.stars[l.id] = stars;
+    p.matches++;
+    var bonus = ratio === 1 ? 50 : 0; p.pts += bonus; M.pts += bonus;
+    var note = Math.round(ratio * 20 * 2) / 2;
+    if (l.exam && note > p.examBest) p.examBest = note;
+    var got = M.newStk.slice();
+    function add(id) { var a = award(id); if (a) got.push(a); }
+    add('premier');
+    if (stars === 3) add('triple');
+    if (l.exam && note >= 16) add('exam16');
+    if (l.exam && ratio === 1) add('exam20');
+    if (p.pts >= 1000) add('mille');
+    if (LEVELS.every(function (x) { return x.lesson || p.stars[x.id] === 3; })) add('ballondor');
+    var packs = [];
+    var nPacks = ratio === 1 ? 2 : ratio >= 0.7 ? 1 : 0;
+    for (var i = 0; i < nPacks; i++) {
+      var left = POOL.filter(function (k) { return p.stickers.indexOf(k) < 0; });
+      if (left.length) { var k = pick(left); p.stickers.push(k); packs.push(k); }
+      else { p.pts += 30; M.pts += 30; packs.push(null); }
+    }
+    save();
+    var headline = stars === 3 ? 'Victoire éclatante !' : stars === 2 ? 'Belle victoire !' : stars === 1 ? 'Match gagné !' : 'Match nul… on rejoue ?';
+    var idx = LEVELS.indexOf(l), nxt = LEVELS[idx + 1];
+    var html = '<div class="card result"><h2>' + headline + '</h2>' +
+      '<div class="big-stars">' + [0, 1, 2].map(function (i) { return '<span class="' + (i < stars ? 'on' : '') + '">⭐</span>'; }).join('') + '</div>' +
+      '<div class="res-score">' + M.score + ' / ' + M.total + '</div>' +
+      '<div class="res-sub">' + (l.exam ? 'Note : <b>' + note + ' / 20</b> · ' : '') + '+' + M.pts + ' points' + (bonus ? ' (dont 50 de bonus sans-faute)' : '') + ' · total ' + p.pts + '</div>';
+    if (packs.length) {
+      html += '<p class="res-sub" style="margin-top:16px">' + (packs.length > 1 ? 'Deux pochettes surprises ! Touche pour ouvrir.' : 'Une pochette surprise ! Touche pour l’ouvrir.') + '</p><div class="packs">' +
+        packs.map(function (k) {
+          var s = k ? STK[k] : ['🔁', 'Doublon', '+30 points'];
+          return '<button type="button" class="pack"><div class="pack-in"><div class="pack-face pack-front"><span>🎁</span>Pochette</div>' +
+            '<div class="pack-face pack-back"><span class="e">' + s[0] + '</span><b>' + s[1] + '</b><small>' + (k ? 'Nouveau sticker !' : s[2]) + '</small></div></div></button>';
+        }).join('') + '</div>';
+    } else if (ratio < 0.7) {
+      html += '<p class="res-sub" style="margin-top:12px">Il faut 7/10 pour gagner une pochette surprise. Tu y es presque.</p>';
+    }
+    if (got.length) {
+      html += '<p class="res-sub" style="margin-top:12px">Stickers spéciaux gagnés :</p><div class="packs">' + got.map(function (k) { var s = STK[k]; return '<div class="stk" style="width:110px"><span class="e">' + s[0] + '</span><b>' + s[1] + '</b><small>' + s[2] + '</small></div>'; }).join('') + '</div>';
+    }
+    if (stars < 3 && !l.exam) html += '<p class="note">Il faut un sans-faute pour 3 étoiles.</p>';
+    html += '<div class="res-actions"><button class="btn" id="again" type="button">Rejouer 🔁</button>' +
+      (nxt ? '<button class="btn ghost" id="nextLvl" type="button">' + nxt.icon + ' ' + nxt.name + ' ▶</button>' : '') +
+      '<button class="btn ghost" id="toHome" type="button">Parcours</button></div></div>';
+    var el = $('#scr-result'); el.innerHTML = html;
+    $$('.pack', el).forEach(function (b) { b.onclick = function () { if (!b.classList.contains('open')) { b.classList.add('open'); sGoal(); } }; });
+    $('#again').onclick = function () { startLevel(l); };
+    if (nxt) $('#nextLvl').onclick = function () { if (nxt.lesson) startLesson(); else startLevel(nxt); };
+    $('#toHome').onclick = goHome;
+    show('result');
+    sWhistle();
+    if (stars >= 2) confetti();
+  }
+
+  /* ---------------- the lesson ---------------- */
+  var SLIDES = [slideRoles, slideSpot, slideSignals, slideImp, slidePC, slideMaison, slideAccord, slideRecap];
+  var slideI = 0;
+  function startLesson() { slideI = 0; renderSlide(); show('lesson'); }
+  function renderSlide() {
+    var el = $('#scr-lesson');
+    el.innerHTML = '<div class="play-top"><button class="icon-btn" id="lsBack" type="button" aria-label="Retour">←</button><div class="ptitle"><b>📋 Le vestiaire</b><small>La causerie du coach · ' + (slideI + 1) + ' / ' + SLIDES.length + '</small></div></div>' +
+      '<div class="card slide" id="slide"></div>' +
+      '<div class="lesson-nav"><button class="btn ghost" id="lsPrev" type="button"' + (slideI === 0 ? ' disabled' : '') + '>◀</button>' +
+      '<div class="lesson-dots">' + SLIDES.map(function (_, i) { return '<span class="' + (i === slideI ? 'on' : '') + '"></span>'; }).join('') + '</div>' +
+      (slideI < SLIDES.length - 1 ? '<button class="btn" id="lsNext" type="button">Suivant ▶</button>' : '') + '</div>';
+    $('#lsBack').onclick = goHome;
+    $('#lsPrev').onclick = function () { if (slideI > 0) { slideI--; renderSlide(); window.scrollTo(0, 0); } };
+    var n = $('#lsNext'); if (n) n.onclick = function () { slideI++; renderSlide(); window.scrollTo(0, 0); };
+    SLIDES[slideI]($('#slide'));
+  }
+  function slideRoles(el) {
+    el.innerHTML = '<h2>Deux temps, deux postes</h2>' +
+      '<p>Pour raconter un match au passé, on a besoin de deux temps qui jouent ensemble, comme deux joueurs de la même équipe.</p>' +
+      '<div class="two"><div class="tense i"><h3>L’imparfait</h3><div class="role">= le décor 🏟️</div>' +
+      '<p>Ce qui <b>dure</b> : la météo, l’ambiance, les descriptions, les habitudes.</p><em>« Il pleuvait. Le stade était plein. »</em></div>' +
+      '<div class="tense p"><h3>Le passé composé</h3><div class="role">= l’action ⚡</div>' +
+      '<p>Ce qui <b>arrive</b> à un moment précis et qui est <b>terminé</b>.</p><em>« Soudain, Karim a marqué ! »</em></div></div>' +
+      '<svg class="timeline" viewBox="0 0 640 150" role="img" aria-label="Une longue bande bleue pour l’imparfait, un éclair rouge pour le passé composé">' +
+      '<path d="M20 70 Q 60 50 100 70 T 180 70 T 260 70 T 340 70 T 420 70 T 500 70 T 580 70 T 620 70" fill="none" stroke="#58AEFF" stroke-width="14" stroke-linecap="round" opacity=".85"/>' +
+      '<text x="24" y="28" fill="#58AEFF" font-family="Nunito, sans-serif" font-weight="800" font-size="17">Il pleuvait… les supporters chantaient…</text>' +
+      '<path d="M412 6 L392 70 L410 70 L394 134 L432 58 L412 58 L428 6 Z" fill="#FF6157"/>' +
+      '<text x="442" y="128" fill="#FF6157" font-family="Nunito, sans-serif" font-weight="900" font-size="18">… quand il a marqué !</text></svg>' +
+      '<p class="note">Le bleu continue derrière, l’éclair rouge tombe une fois. Garde cette image en tête.</p>';
+  }
+  function slideSpot(el) {
+    var W = [['Il ', ''], ['faisait', 'i'], [' nuit, le stade ', ''], ['était', 'i'], [' plein et les supporters ', ''], ['chantaient', 'i'],
+      [' quand, à la 89e minute, notre capitaine ', ''], ['a tiré', 'p'], [' et ', ''], ['a marqué', 'p'], [' !', '']];
+    el.innerHTML = '<h2>Trouve les verbes</h2><p>Touche les 5 verbes conjugués. Chacun va prendre sa couleur : <span class="ci">décor</span> ou <span class="cp">action</span>.</p>' +
+      '<p class="story" id="spot">' + W.map(function (w, i) { return w[1] ? '<button type="button" class="vb" data-k="' + w[1] + '">' + w[0] + '</button>' : w[0]; }).join('') + '</p><p id="spotMsg" class="note">0 / 5 trouvés</p>';
+    var found = 0;
+    $$('.vb', el).forEach(function (b) {
+      b.onclick = function () {
+        if (b.classList.contains('i') || b.classList.contains('p')) return;
+        var k = b.dataset.k; b.classList.add(k); b.innerHTML += '<sup>' + (k === 'i' ? 'décor' : 'action') + '</sup>'; found++; sGoal();
+        $('#spotMsg').innerHTML = found < 5 ? found + ' / 5 trouvés' : '<b>Bravo !</b> 3 verbes de décor à l’<span class="ci">imparfait</span> (la nuit, le stade, les chants) et 2 actions au <span class="cp">passé composé</span> (le tir, le but).';
+      };
+    });
+  }
+  function slideSignals(el) {
+    var words = shuffle([['chaque samedi', 'i'], ['d’habitude', 'i'], ['souvent', 'i'], ['toujours', 'i'], ['quand j’étais petit', 'i'],
+      ['soudain', 'p'], ['hier', 'p'], ['tout à coup', 'p'], ['un jour', 'p'], ['à la 90e minute', 'p']]);
+    el.innerHTML = '<h2>Les mots-signaux</h2><p>Certains mots annoncent le temps à utiliser. Touche un mot, puis touche la bonne case.</p>' +
+      '<div class="sorter" id="pool">' + words.map(function (w) { return '<button type="button" class="chip" data-k="' + w[1] + '">' + w[0] + '</button>'; }).join('') + '</div>' +
+      '<div class="zones"><button type="button" class="zone i" data-z="i"><h3>Imparfait</h3><small>habitude, durée</small></button><button type="button" class="zone p" data-z="p"><h3>Passé composé</h3><small>moment précis, soudain</small></button></div><p class="note" id="sigMsg"></p>';
+    var sel = null, left = words.length;
+    $$('#pool .chip', el).forEach(function (c) { c.onclick = function () { sel = c; $$('#pool .chip', el).forEach(function (x) { x.classList.toggle('on', x === c); }); }; });
+    $$('.zone', el).forEach(function (z) {
+      z.onclick = function () {
+        if (!sel) { toast('Touche d’abord un mot.'); return; }
+        if (sel.dataset.k === z.dataset.z) { sel.classList.remove('on'); sel.onclick = null; z.appendChild(sel); sel = null; left--; sGoal();
+          $('#sigMsg').innerHTML = left ? '' : '<b>Parfait !</b> Habitude ou durée → imparfait. Moment précis ou soudain → passé composé.'; }
+        else { z.classList.remove('shake'); void z.offsetWidth; z.classList.add('shake'); sMiss();
+          $('#sigMsg').textContent = sel.dataset.k === 'i' ? '« ' + sel.textContent + ' » parle de quelque chose qui se répète ou qui dure.' : '« ' + sel.textContent + ' » montre un moment précis.'; }
+      };
+    });
+  }
+  function slideImp(el) {
+    var verbs = ['jouer', 'finir', 'faire', 'manger', 'être', 'avoir'], subj = ['je', 'tu', 'il / elle', 'nous', 'vous', 'ils / elles'];
+    var cur = { v: 'jouer', p: 0 };
+    el.innerHTML = '<h2>Fabriquer l’imparfait</h2><p>Une recette en 3 étapes. Choisis un verbe et une personne.</p>' +
+      '<div class="builder"><div class="row-chips" id="bv">' + verbs.map(function (v) { return '<button type="button" class="chip" data-v="' + v + '">' + v + '</button>'; }).join('') + '</div>' +
+      '<div class="row-chips" id="bp">' + subj.map(function (s, i) { return '<button type="button" class="chip" data-p="' + i + '">' + s + '</button>'; }).join('') + '</div>' +
+      '<div class="steps" id="bsteps"></div></div>' +
+      '<div class="tbl-wrap"><table class="conj"><tr><th>Sujet</th><th>Terminaison</th></tr>' + subj.map(function (s, i) { return '<tr><td>' + s + '</td><td class="ci">-' + F.END[i] + '</td></tr>'; }).join('') + '</table></div>' +
+      '<div class="box">✅ Les terminaisons sont <b>les mêmes pour tous les verbes</b>.</div>' +
+      '<div class="box">⚠️ 2e groupe (finir, choisir, grandir) : on garde <b>-iss-</b> : je fin<b>iss</b>ais.</div>' +
+      '<div class="box">💡 <b>Être</b> est le seul verbe spécial : radical <b>ét-</b> (j’étais).</div>';
+    function draw() {
+      $$('#bv .chip', el).forEach(function (c) { c.classList.toggle('on', c.dataset.v === cur.v); });
+      $$('#bp .chip', el).forEach(function (c) { c.classList.toggle('on', +c.dataset.p === cur.p); });
+      var v = F.V[cur.v], r = F.radical(cur.v), a = F.imp(cur.v, cur.p);
+      var s = cur.p === 0 && VOWEL.test(a) ? 'j’' : ['je ', 'tu ', 'il ', 'nous ', 'vous ', 'ils '][cur.p];
+      $('#bsteps').innerHTML =
+        '<div class="step"><span class="k">1</span><span>' + (cur.v === 'être' ? 'Être ne suit pas la règle : son radical est spécial.' : 'Je pars de « nous » au présent : <b>nous ' + v.nous + '</b>') + '</span></div>' +
+        '<div class="step"><span class="k">2</span><span>' + (cur.v === 'être' ? 'Radical : <b class="ci">ét-</b>' : 'J’enlève -ons : radical <b class="ci">' + r + '-</b>') + '</span></div>' +
+        '<div class="step"><span class="k">3</span><span>J’ajoute la terminaison : <b>' + s + '<span class="ci">' + a + '</span></b>' + (cur.v === 'manger' && F.END[cur.p][0] === 'i' ? ' (devant -i, plus besoin du e)' : '') + '</span></div>';
+    }
+    $$('#bv .chip', el).forEach(function (c) { c.onclick = function () { cur.v = c.dataset.v; draw(); }; });
+    $$('#bp .chip', el).forEach(function (c) { c.onclick = function () { cur.p = +c.dataset.p; draw(); }; });
+    draw();
+  }
+  function slidePC(el) {
+    var subj = ['je / j’', 'tu', 'il / elle / on', 'nous', 'vous', 'ils / elles'];
+    var ex = [['manger', '1er groupe → -é'], ['jouer', '1er groupe → -é'], ['finir', '2e groupe → -i'], ['choisir', '2e groupe → -i'], ['voir', '3e groupe → -u'], ['boire', '3e groupe → -u'], ['prendre', '3e groupe → -is'], ['faire', '3e groupe → -it'], ['dire', '3e groupe → -it']];
+    el.innerHTML = '<h2>Fabriquer le passé composé</h2>' +
+      '<div class="box" style="font-size:1.15rem">Auxiliaire <span class="ce">être</span> ou <span class="cp">avoir</span> <b>au présent</b> + <b>participe passé</b></div>' +
+      '<div class="tbl-wrap"><table class="conj"><tr><th></th><th class="ce">Être</th><th class="cp">Avoir</th></tr>' +
+      subj.map(function (s, i) { return '<tr><td>' + s + '</td><td><span class="ce">' + F.ETRE[i] + '</span> allé(e)' + (i >= 3 ? 's' : '') + '</td><td><span class="cp">' + F.AVOIR[i] + '</span> joué</td></tr>'; }).join('') + '</table></div>' +
+      '<p><b>Le participe passé</b> : touche un verbe.</p><div class="row-chips" id="ppc">' + ex.map(function (e) { return '<button type="button" class="chip" data-v="' + e[0] + '" data-r="' + e[1] + '">' + e[0] + '</button>'; }).join('') + '</div>' +
+      '<div class="acc-out" id="ppo">manger → <b class="cp">mangé</b> <small class="note">1er groupe → -é</small></div>';
+    $$('#ppc .chip', el).forEach(function (c) { c.onclick = function () { $$('#ppc .chip', el).forEach(function (x) { x.classList.toggle('on', x === c); }); $('#ppo').innerHTML = c.dataset.v + ' → <b class="cp">' + F.V[c.dataset.v].pp + '</b> <small class="note">' + c.dataset.r + '</small>'; }; });
+  }
+  function slideMaison(el) {
+    var pairs = ['aller', 'venir', 'partir', 'arriver', 'entrer', 'sortir', 'monter', 'descendre', 'naître', 'mourir', 'tomber', 'rester', 'devenir'];
+    el.innerHTML = '<h2>La maison d’être 🏠</h2><p>Seulement 13 verbes prennent <span class="ce">être</span>. Ce sont surtout des verbes de <b>mouvement</b> : on entre, on sort, on monte, on descend… Touche une carte pour la retourner.</p>' +
+      '<div class="house">' + pairs.map(function (v) { return '<button type="button" class="flip" data-v="' + v + '">' + v + '<small>touche-moi</small></button>'; }).join('') + '</div>' +
+      '<div class="box">Astuce : ils vont souvent par paires. aller ↔ venir · partir ↔ arriver · entrer ↔ sortir · monter ↔ descendre · naître ↔ mourir. Plus tomber, rester, devenir (et rentrer, revenir).</div>' +
+      '<div class="box">⚠️ <b>Tous les autres verbes</b> prennent <span class="cp">avoir</span>. Même être et avoir eux-mêmes : j’<b>ai été</b>, j’<b>ai eu</b>.</div>';
+    $$('.flip', el).forEach(function (b) { b.onclick = function () { var v = b.dataset.v; b.classList.toggle('open'); b.innerHTML = b.classList.contains('open') ? 'je suis ' + F.V[v].pp + '(e)<small>' + v + '</small>' : v + '<small>touche-moi</small>'; }; });
+  }
+  function slideAccord(el) {
+    var subs = [['Le gardien', 'm', false], ['La gardienne', 'f', false], ['Les joueurs', 'm', true], ['Les joueuses', 'f', true]];
+    var verbs = ['partir', 'arriver', 'tomber', 'sortir'];
+    var cur = { s: 1, v: 'partir' };
+    el.innerHTML = '<h2>L’accord avec être</h2><p>Avec <span class="ce">être</span>, le participe passé s’accorde avec le sujet, comme un adjectif : <b>+e</b> pour le féminin, <b>+s</b> pour le pluriel.</p>' +
+      '<div class="row-chips" id="as">' + subs.map(function (s, i) { return '<button type="button" class="chip" data-i="' + i + '">' + s[0] + '</button>'; }).join('') + '</div>' +
+      '<div class="row-chips" id="av" style="margin-top:8px">' + verbs.map(function (v) { return '<button type="button" class="chip" data-v="' + v + '">' + v + '</button>'; }).join('') + '</div>' +
+      '<div class="acc-out" id="aout"></div>' +
+      '<div class="box">Avec <span class="cp">avoir</span>, pas d’accord avec le sujet : <b>Les joueuses ont gagné.</b> (jamais « gagnées » ici)</div>' +
+      '<div class="box">⭐ <b>Bonus, pour aller plus loin (programme de 5e)</b> : avec avoir, on accorde seulement quand le COD (la chose gagnée, marquée…) est placé <b>avant</b> le verbe. « La coupe ? Ils l’<b>ont gagnée</b>. » : l’ = la coupe, féminin. « Les buts que nous avons <b>marqués</b>. » Si le COD est après, on n’accorde pas : « Ils ont gagné la coupe. »</div>' +
+      '<div class="box">🕵️ Le truc du détective : pose la question « <b>Qui</b> est parti ? » → les joueuses → féminin pluriel → parti<b>es</b>.</div>';
+    function draw() {
+      $$('#as .chip', el).forEach(function (c) { c.classList.toggle('on', +c.dataset.i === cur.s); });
+      $$('#av .chip', el).forEach(function (c) { c.classList.toggle('on', c.dataset.v === cur.v); });
+      var s = subs[cur.s], pp = F.V[cur.v].pp, end = (s[1] === 'f' ? 'e' : '') + (s[2] ? 's' : '');
+      $('#aout').innerHTML = s[0] + ' <span class="ce">' + (s[2] ? 'sont' : 'est') + '</span> ' + pp + '<span class="end">' + end + '</span>' + (end ? '' : ' <small class="note">(masculin singulier : rien à ajouter)</small>');
+    }
+    $$('#as .chip', el).forEach(function (c) { c.onclick = function () { cur.s = +c.dataset.i; draw(); }; });
+    $$('#av .chip', el).forEach(function (c) { c.onclick = function () { cur.v = c.dataset.v; draw(); }; });
+    draw();
+  }
+  function slideRecap(el) {
+    el.innerHTML = '<h2>Récap avant le match</h2><ul class="checklist">' +
+      '<li>🏟️ <span><span class="ci">Imparfait</span> = le décor, ce qui dure, les habitudes. Radical de « nous » + -ais, -ais, -ait, -ions, -iez, -aient.</span></li>' +
+      '<li>⚡ <span><span class="cp">Passé composé</span> = l’action terminée, à un moment précis. Auxiliaire au présent + participe passé.</span></li>' +
+      '<li>🏠 <span>13 verbes dans la maison d’<span class="ce">être</span>. Tous les autres : <span class="cp">avoir</span>.</span></li>' +
+      '<li>➕ <span>Avec être, on accorde : elles sont parti<b>es</b>. Avec avoir, non : elles ont joué.</span></li>' +
+      '<li>🔎 <span>Mots-signaux : chaque, souvent, d’habitude → imparfait. Hier, soudain, tout à coup, un jour → passé composé.</span></li></ul>' +
+      '<button class="btn" id="lessonDone" type="button">J’ai compris, je file à l’échauffement ▶</button>';
+    $('#lessonDone').onclick = function () {
+      var p = P(), first = !p.lesson; p.lesson = true; if (first) p.pts += 50;
+      var a = award('vestiaire'); save();
+      if (a) { toast('Sticker gagné : 📋 Le Vestiaire ! +50 points'); confetti(); sGoal(); }
+      startLevel(LEVELS[1]);
+    };
+  }
+
+  /* ---------------- boot ---------------- */
+  $('#crest').onclick = goHome;
+  function soundIcon() { $('#soundBtn').textContent = S.sound ? '🔊' : '🔇'; }
+  $('#soundBtn').onclick = function () { S.sound = !S.sound; save(); soundIcon(); };
+  soundIcon();
+  if (/\/examen-de-francais\//.test(location.pathname)) $('#backCup').hidden = false;
+  if (S.cur == null) renderPlayers(); else goHome();
+})();
+</script>
+</body>
+</html>

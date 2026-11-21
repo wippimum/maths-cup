@@ -871,7 +871,7 @@
   function init() {
     applyTeam(); refreshHeader(); glossSetup();
     // The year buttons on the landing screen, and the way back to it.
-    document.querySelectorAll('.year-card').forEach((btn) => {
+    document.querySelectorAll('.year-card[data-year]').forEach((btn) => {
       btn.onclick = () => {
         const y = Number(btn.getAttribute('data-year'));
         // Years 2 and 4 are separate apps rather than sets of topic tiles. The choice is
