@@ -60,7 +60,7 @@ b{font-weight:900}
 /* players */
 .hero-title{font-size:clamp(2.1rem,7vw,3.2rem);line-height:1;color:var(--chalk);text-transform:uppercase}
 .hero-title span{color:var(--gold)}
-.jerseys{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.jerseys{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
 .jersey{display:flex;flex-direction:column;gap:8px}
 .jersey-main{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 16px 18px;border-radius:22px;background:linear-gradient(160deg,var(--c),color-mix(in srgb,var(--c) 45%,#000));border:3px solid rgba(255,255,255,.25);box-shadow:0 10px 26px rgba(0,0,0,.45);text-align:center}
 .j-av{font-size:3.4rem;line-height:1;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
@@ -265,6 +265,33 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
 .checklist{list-style:none;padding:0;margin:10px 0;display:flex;flex-direction:column;gap:8px}
 .checklist li{display:flex;gap:10px;align-items:flex-start;background:rgba(0,0,0,.22);border-radius:12px;padding:10px 12px}
 
+.tabs{display:flex;gap:8px;margin-top:16px}
+.tab{flex:1;padding:10px;border-radius:14px;border:2px solid var(--edge);background:var(--turf);font-weight:900;font-size:1rem;line-height:1.2}
+.tab small{display:block;font-weight:700;font-size:.78rem;opacity:.85}
+.tab.on{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+.lv-head{font-family:var(--display);color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin:10px 0 0 64px;font-size:1.05rem}
+.passage{background:rgba(0,0,0,.24);border-radius:14px;padding:10px 14px;margin-bottom:14px;border:1px solid rgba(238,247,240,.12)}
+.passage summary{cursor:pointer;font-weight:900;font-size:1.05rem}
+.passage summary small{font-weight:600;color:var(--muted);font-size:.78rem}
+.read{font-size:1.06rem;line-height:1.7;margin:10px 0;font-weight:600;max-width:68ch}
+.read-tools{display:flex;gap:8px;flex-wrap:wrap}
+.gloss{margin-top:8px;color:var(--gold);font-size:.95rem}
+.story.find{font-size:1.1rem;line-height:1.95;font-weight:600}
+.tok{cursor:pointer;border-radius:5px}
+.tok:hover{background:rgba(255,255,255,.08)}
+.tok.vi{background:var(--imp-bg);color:var(--imp);font-weight:900;box-shadow:inset 0 -3px 0 var(--imp)}
+.tok.vp{background:var(--pc-bg);color:var(--pc);font-weight:900;box-shadow:inset 0 -3px 0 var(--pc)}
+.tok.reveal{outline:2px dashed currentColor;outline-offset:1px}
+.tok.miss{background:rgba(255,97,87,.35)}
+.open-ans,#writeBox{width:100%;font:inherit;font-size:1.08rem;font-weight:700;color:var(--chalk);background:var(--night);border:2px solid var(--edge);border-radius:12px;padding:10px 12px;resize:vertical;line-height:1.5;margin-bottom:8px}
+.open-ans:focus,#writeBox:focus{border-color:var(--gold);outline:none}
+.selfcheck{margin-top:12px;padding:12px 14px;border-radius:14px;border:2px dashed var(--near);background:rgba(255,181,71,.08)}
+.w-prompt{margin:10px 0;font-size:1.05rem}
+.preview{min-height:3em;padding:12px 14px;border-radius:12px;background:rgba(0,0,0,.25);line-height:1.8;font-weight:600;white-space:pre-wrap;margin:6px 0 10px}
+.preview .vi,.hint .vi{color:var(--imp);font-weight:900;background:var(--imp-bg);border-radius:4px}
+.preview .vp,.hint .vp{color:var(--pc);font-weight:900;background:var(--pc-bg);border-radius:4px}
+.preview .wn{color:var(--etre);font-weight:900;background:rgba(255,166,64,.18);border-radius:4px;box-shadow:inset 0 -2px 0 var(--etre)}
+.w-check li{opacity:.75}.w-check li.ok{opacity:1;border:1px solid var(--good)}
 #fx{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
 .cf{position:absolute;top:-20px;width:10px;height:14px;border-radius:2px;animation:fall 1.8s linear forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
@@ -298,6 +325,7 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
   <section id="scr-play" class="screen" hidden></section>
   <section id="scr-result" class="screen" hidden></section>
   <section id="scr-album" class="screen" hidden></section>
+  <section id="scr-write" class="screen" hidden></section>
 </div>
 <div id="toast" class="toast" hidden></div>
 <div id="fx"></div>
@@ -323,11 +351,11 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
     'voir,voyons,vu;prendre,prenons,pris;dire,disons,dit;mettre,mettons,mis;lire,lisons,lu;écrire,écrivons,écrit;' +
     'perdre,perdons,perdu;attendre,attendons,attendu;courir,courons,couru;rire,rions,ri;vivre,vivons,vécu;' +
     'offrir,offrons,offert;pouvoir,pouvons,pu;vouloir,voulons,voulu;savoir,savons,su;recevoir,recevons,reçu;' +
-    'pleuvoir,pleuvons,plu';
+    'pleuvoir,pleuvons,plu;tenir,tenons,tenu;remercier,remercions,remercié;donner,donnons,donné;dormir,dormons,dormi;sonner,sonnons,sonné;apporter,apportons,apporté;souffler,soufflons,soufflé;ranger,rangeons,rangé;récupérer,récupérons,récupéré;adorer,adorons,adoré;sauter,sautons,sauté;décider,décidons,décidé;cuisiner,cuisinons,cuisiné;casser,cassons,cassé;ajouter,ajoutons,ajouté;oublier,oublions,oublié;envahir,envahissons,envahi;sourire,sourions,souri;préparer,préparons,préparé;clignoter,clignotons,clignoté;recommencer,recommençons,recommencé;porter,portons,porté;lever,levons,levé;pédaler,pédalons,pédalé;dépasser,dépassons,dépassé;taper,tapons,tapé;allumer,allumons,allumé;raconter,racontons,raconté;mesurer,mesurons,mesuré;poser,posons,posé;toucher,touchons,touché;expliquer,expliquons,expliqué;continuer,continuons,continué;marcher,marchons,marché;trouver,trouvons,trouvé;cesser,cessons,cessé;connaître,connaissons,connu;retentir,retentissons,retenti;proposer,proposons,proposé;trembler,tremblons,tremblé;fermer,fermons,fermé;respirer,respirons,respiré;comprendre,comprenons,compris;accompagner,accompagnons,accompagné;sentir,sentons,senti;acheter,achetons,acheté;remarquer,remarquons,remarqué;éviter,évitons,évité;frapper,frappons,frappé;hurler,hurlons,hurlé;grimper,grimpons,grimpé;agiter,agitons,agité;réparer,réparons,réparé;fouiller,fouillons,fouillé;découvrir,découvrons,découvert;indiquer,indiquons,indiqué;creuser,creusons,creusé;heurter,heurtons,heurté;tricoter,tricotons,tricoté;écouter,écoutons,écouté;défiler,défilons,défilé;organiser,organisons,organisé;répéter,répétons,répété;annoncer,annonçons,annoncé;retrouver,retrouvons,retrouvé;saluer,saluons,salué;lâcher,lâchons,lâché;disparaître,disparaissons,disparu;battre,battons,battu;chercher,cherchons,cherché;appeler,appelons,appelé;entendre,entendons,entendu;serrer,serrons,serré;garder,gardons,gardé;apercevoir,apercevons,aperçu;suivre,suivons,suivi;montrer,montrons,montré;ouvrir,ouvrons,ouvert;abandonner,abandonnons,abandonné;nager,nageons,nagé;danser,dansons,dansé;aimer,aimons,aimé;pleurer,pleurons,pleuré;construire,construisons,construit;rigoler,rigolons,rigolé;rêver,rêvons,rêvé;dessiner,dessinons,dessiné;pêcher,pêchons,pêché;attraper,attrapons,attrapé';
   var WITH_ETRE = 'aller,allons,allé;venir,venons,venu;partir,partons,parti;arriver,arrivons,arrivé;' +
     'entrer,entrons,entré;sortir,sortons,sorti;monter,montons,monté;descendre,descendons,descendu;' +
     'tomber,tombons,tombé;rester,restons,resté;naître,naissons,né;mourir,mourons,mort;devenir,devenons,devenu;' +
-    'rentrer,rentrons,rentré;revenir,revenons,revenu';
+    'rentrer,rentrons,rentré;revenir,revenons,revenu;remonter,remontons,remonté;retourner,retournons,retourné';
   var V = {};
   function load(list, aux) {
     list.split(';').forEach(function (x) {
@@ -565,7 +593,69 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
     ['Il {} froid et le ciel était gris.', 'faire', 'i', 'dec', 'faisait']
   ];
 
-  var api = { REASONS: REASONS, VAR: VAR, END: END, AVOIR: AVOIR, ETRE: ETRE, PL: PL, V: V, MAISON: MAISON, IMPERSONAL: IMPERSONAL,
+
+  // ---- the writing checker: finds imparfait and passé composé in free text, flags slips ----
+  var SKIP = ['pas', 'jamais', 'plus', 'beaucoup', 'bien', 'déjà', 'vite', 'enfin', 'aussi', 'toujours', 'encore', 'trop', 'mal', 'rien', 'tous', 'tout', 'vraiment', 'souvent', 'très'];
+  var TRANS_OK = ['sortir', 'monter', 'descendre', 'rentrer', 'passer', 'retourner', 'remonter'];
+  var IMPF = null, PPF = null;
+  function forms() {
+    if (IMPF) return;
+    IMPF = {}; PPF = {};
+    Object.keys(V).forEach(function (inf) {
+      for (var p = 0; p < 6; p++) IMPF[imp(inf, p)] = inf;
+      ['', 'e', 's', 'es'].forEach(function (x) { if (!PPF[V[inf].pp + x]) PPF[V[inf].pp + x] = inf; });
+    });
+  }
+  var LINKS = ['tout a coup', 'soudain', 'ensuite', 'puis', 'apres', 'a la fin', 'enfin', "d'abord", 'finalement', 'le soir', 'a midi', 'le matin', 'pendant que', 'quand', 'mais', 'alors'];
+  function analyze(text) {
+    forms();
+    var words = [], re = /[A-Za-zÀ-ÖØ-öø-ÿœŒ]+/g, m;
+    while ((m = re.exec(text))) words.push({ w: m[0].toLowerCase(), s: m.index, e: m.index + m[0].length });
+    var res = { imp: [], pc: [], warn: [], sentences: 0, links: [] };
+    for (var i = 0; i < words.length; i++) {
+      var w = words[i].w, prev = i > 0 ? words[i - 1].w : '', prev2 = i > 1 ? words[i - 2].w : '';
+      var isAux = AVOIR.indexOf(w) >= 0 || ETRE.indexOf(w) >= 0;
+      if (isAux) {
+        var j = i + 1, k = 0;
+        while (j < words.length && k < 2 && SKIP.indexOf(words[j].w) >= 0) { j++; k++; }
+        if (j < words.length && PPF[words[j].w]) {
+          var pw = words[j].w, inf = PPF[pw], v = V[inf], auxT = ETRE.indexOf(w) >= 0 ? 'être' : 'avoir';
+          var si = i - 1; if (si >= 0 && (words[si].w === 'ne' || words[si].w === 'n')) si--;
+          var subj = si >= 0 ? words[si].w : '';
+          var hit = { s: words[i].s, e: words[j].e, inf: inf }, counted = true;
+          if (auxT === 'avoir' && v.aux === 'être' && TRANS_OK.indexOf(inf) < 0) {
+            res.warn.push({ s: hit.s, e: hit.e, msg: '« ' + inf + ' » est dans la maison d’être : on écrit <b>' + (subj === 'j' || subj === 'je' ? 'je suis' : 'il est') + ' ' + v.pp + '</b>, pas « ' + w + ' ' + pw + ' ».' });
+          }
+          if (auxT === 'être' && v.aux === 'avoir') counted = false;   // "il est fini": an adjective, not a passé composé
+          if (auxT === 'être' && v.aux === 'être') {
+            var b = v.pp, need = null;
+            if (subj === 'elle') need = [b + 'e'];
+            else if (subj === 'elles') need = [b + 'es'];
+            else if (subj === 'ils') need = [b + 's'];
+            else if (subj === 'il') need = [b];
+            else if (subj === 'nous') need = [b + 's', b + 'es'];
+            else if (subj === 'je' || subj === 'j' || subj === 'tu') need = [b, b + 'e'];
+            if (need && need.indexOf(pw) < 0) res.warn.push({ s: hit.s, e: hit.e, msg: 'Accord avec être : ' + subj + ' ' + w + ' <b>' + need[0] + '</b>' + (need.length > 1 ? ' (ou ' + need[1] + ')' : '') + '.' });
+          }
+          if (auxT === 'avoir' && pw !== v.pp && ['il', 'elle', 'ils', 'elles', 'nous', 'vous', 'je', 'j', 'tu', 'on'].indexOf(subj) >= 0)
+            res.warn.push({ s: hit.s, e: hit.e, msg: 'Avec avoir, pas d’accord avec le sujet : ' + w + ' <b>' + v.pp + '</b>.' });
+          if (counted) res.pc.push(hit);
+          i = j; continue;
+        }
+        if (w === 'est' && prev === 'c') res.warn.push({ s: words[i - 1].s, e: words[i].e, msg: 'Au passé, on raconte avec <b>c’était</b>, pas « c’est ».' });
+        if (w === 'a' && prev === 'y' && prev2 === 'il') res.warn.push({ s: words[i - 2].s, e: words[i].e, msg: 'Au passé, on écrit <b>il y avait</b> (décor) ou <b>il y a eu</b> (action).' });
+        continue;
+      }
+      if (w === 'fait' && (prev === 'il' || prev === 'elle')) { res.warn.push({ s: words[i - 1].s, e: words[i].e, msg: 'Au passé : <b>' + prev + ' faisait</b> (le décor).' }); continue; }
+      if (IMPF[w] && !(w === 'avions' && prev !== 'nous')) res.imp.push({ s: words[i].s, e: words[i].e, inf: IMPF[w] });
+    }
+    res.sentences = text.split(/[.!?…]+/).filter(function (x) { return x.trim().split(/\s+/).filter(Boolean).length >= 3; }).length;
+    var flat = ' ' + deacc(text.toLowerCase()).replace(/[’]/g, "'").replace(/[^a-z' ]+/g, ' ').replace(/\s+/g, ' ') + ' ';
+    res.links = LINKS.filter(function (l) { return flat.indexOf(' ' + l + ' ') >= 0; });
+    return res;
+  }
+
+  var api = { analyze: analyze, REASONS: REASONS, VAR: VAR, END: END, AVOIR: AVOIR, ETRE: ETRE, PL: PL, V: V, MAISON: MAISON, IMPERSONAL: IMPERSONAL,
     group: group, radical: radical, imp: imp, pcForms: pcForms, pcShow: pcShow, auxForm: auxForm,
     explainImp: explainImp, explainPc: explainPc, blank: blank, parseLine: parseLine,
     norm: norm, deacc: deacc, check: check, CHOIX: CHOIX, STORIES: STORIES, EXAM_A: EXAM_A };
@@ -574,6 +664,208 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
 })(typeof window !== 'undefined' ? window : this);
 </script>
 
+<script id="textes">
+/* Module 2: 22 original reading texts (6e/5e level, French as a foreign language, A2).
+   [i:…] marks a verb in the imparfait, [p:…] a verb in the passé composé.
+   q: multiple choice, * marks the answer · vf: true/false with the line that proves it
+   o: open question, keywords (groups split by |, alternatives by ,), model answer
+   f: which tense to hunt in the text · c: two sentences to conjugate · g: useful words */
+(function (FR) {
+  FR.TEXTS = [
+  { id: 'parc', t: 'Samedi au parc', e: '🌳', n: 1,
+    x: 'Il [i:était] dix heures. Le soleil [i:brillait] et il [i:faisait] chaud. Karim et sa sœur Leïla [i:étaient] au parc avec leur chien, Nougat. Les enfants [i:jouaient] près du lac et leurs parents [i:lisaient] sous un arbre. Tout à coup, Nougat [p:a vu] un canard. Il [p:a couru] très vite et il [p:est tombé] dans l’eau ! Karim [p:a ri], mais Leïla [p:a eu] peur. Le père [p:a sorti] le chien du lac. Après, la famille [p:a mangé] un pique-nique : des sandwichs, des pommes et du jus d’orange. Nougat [i:était] trempé, mais il [i:était] content. À cinq heures, ils [p:sont rentrés] à la maison, fatigués mais heureux.',
+    g: 'lac = lake · canard = duck · trempé = soaking wet · fatigués = tired',
+    q: ['Quelle heure était-il au début de l’histoire ?|Dix heures*|Cinq heures|Midi', 'Qui est Nougat ?|Le chien de Karim et Leïla*|Le père de Karim|Un canard du lac', 'Qu’est-ce que la famille a mangé ?|Des sandwichs, des pommes et du jus d’orange*|Des pizzas et des gâteaux|Rien du tout'],
+    vf: [['Leïla a ri quand Nougat est tombé.', 0, 'Faux : Karim a ri, mais Leïla a eu peur.'], ['Les parents lisaient sous un arbre.', 1, 'Vrai : « leurs parents lisaient sous un arbre ».']],
+    o: ['Pourquoi Nougat est-il tombé dans l’eau ?', 'canard,couru,courir', 'Parce qu’il a couru après un canard.'],
+    f: 'i', c: ['Le soleil {briller:imp:2} et il faisait chaud.', 'À cinq heures, ils {rentrer:pc:5:m} à la maison.'] },
+
+  { id: 'foot', t: 'Le match de foot', e: '⚽', n: 1,
+    x: 'Hier après-midi, il y [i:avait] un match de foot à l’école. Le ciel [i:était] gris et il [i:pleuvait] un peu. Les joueurs [i:portaient] leurs maillots bleus. Adam et ses amis [i:étaient] nerveux parce que le match [i:était] important. À trois heures, l’arbitre [p:a sifflé] et le match [p:a commencé]. D’abord, l’autre équipe [p:a marqué] un but. Les spectateurs [i:étaient] déçus, mais Adam [p:n’a pas abandonné]. À la fin du match, il [p:a couru] très vite, il [p:a passé] le ballon à son ami Marwan, et Marwan [p:a marqué] ! Le score final [i:était] un partout. Les garçons [i:étaient] fatigués mais fiers. Le soir, Adam [p:a raconté] le match à toute sa famille.',
+    g: 'arbitre = referee · déçus = disappointed · fiers = proud · un partout = one all',
+    q: ['Où était le match ?|À l’école*|Au stade de la ville|Dans le parc', 'Qui a marqué le dernier but ?|Marwan*|Adam|L’arbitre', 'Quel était le score final ?|Un partout (1-1)*|Deux à zéro|Zéro à zéro'],
+    vf: [['Il faisait très beau.', 0, 'Faux : le ciel était gris et il pleuvait un peu.'], ['Le soir, Adam a raconté le match à sa famille.', 1, 'Vrai : c’est la dernière phrase.']],
+    o: ['Pourquoi les garçons étaient-ils nerveux ?', 'important', 'Parce que le match était important.'],
+    f: 'p', c: ['Les joueurs {porter:imp:5} leurs maillots bleus.', 'À trois heures, l’arbitre {siffler:pc:2:m}.'] },
+
+  { id: 'plage', t: 'Une journée à la plage', e: '🏖️', n: 1,
+    x: 'Dimanche dernier, ma famille et moi [p:sommes allés] à la plage. Il [i:faisait] très beau et l’eau [i:était] chaude. Mon frère et moi [i:jouions] avec un ballon pendant que ma mère [i:lisait] son livre. À midi, nous [p:avons mangé] des sandwichs sous un parasol. Soudain, mon frère [p:a vu] un petit crabe ! Il [p:a couru] vers le crabe, mais il [p:est tombé] dans le sable. Nous [p:avons ri] très fort. Le soir, nous [i:étions] fatigués mais très contents.',
+    g: 'parasol = beach umbrella · crabe = crab · sable = sand',
+    q: ['Où est allée la famille ?|À la plage*|À la montagne|Au cinéma', 'Que faisait la mère ?|Elle lisait un livre*|Elle nageait|Elle dormait', 'Qu’est-ce que le frère a vu ?|Un petit crabe*|Un requin|Un bateau'],
+    vf: [['L’eau était froide.', 0, 'Faux : l’eau était chaude.'], ['Ils ont mangé à midi sous un parasol.', 1, 'Vrai.']],
+    o: ['Pourquoi le frère est-il tombé ?', 'crabe,couru,courir', 'Parce qu’il a couru vers le crabe.'],
+    f: 'p', c: ['Mon frère et moi {jouer:imp:3} avec un ballon.', 'Soudain, mon frère {voir:pc:2:m} un petit crabe.'] },
+
+  { id: 'chat', t: 'Le chat perdu', e: '🐈', n: 1,
+    x: 'Mercredi soir, il [i:pleuvait] et il [i:faisait] froid. Inès [i:était] triste parce que son chat, Pacha, [i:était] dehors depuis le matin. Elle [i:regardait] par la fenêtre toutes les cinq minutes. À huit heures, quelqu’un [p:a sonné] à la porte. Inès [p:a ouvert] : c’[i:était] la voisine ! Elle [i:tenait] Pacha dans ses bras. Le chat [i:était] mouillé et il [i:avait] faim. Inès [p:a remercié] la voisine et elle [p:a donné] un bon repas à Pacha. Ce soir-là, le chat [p:a dormi] sur son lit.',
+    g: 'voisine = neighbour · mouillé = wet · remercier = to thank',
+    q: ['Quel temps faisait-il ?|Il pleuvait et il faisait froid*|Il faisait chaud|Il neigeait', 'Qui a sonné à la porte ?|La voisine*|Le père d’Inès|Un policier', 'Où a dormi Pacha ?|Sur le lit d’Inès*|Dans le jardin|Chez la voisine'],
+    vf: [['Pacha était dehors depuis le matin.', 1, 'Vrai.'], ['Le chat était sec et il n’avait pas faim.', 0, 'Faux : il était mouillé et il avait faim.']],
+    o: ['Pourquoi Inès était-elle triste ?', 'chat,pacha,dehors,perdu', 'Parce que son chat était dehors depuis le matin.'],
+    f: 'i', c: ['Elle {regarder:imp:2:f} par la fenêtre.', 'Inès {ouvrir:pc:2:f} la porte.'] },
+
+  { id: 'anniv', t: 'L’anniversaire de Lina', e: '🎂', n: 1,
+    x: 'Samedi, c’[i:était] l’anniversaire de Lina. Elle [i:avait] douze ans. La maison [i:était] pleine de ballons et de guirlandes. Ses amis [p:sont arrivés] à trois heures. D’abord, ils [p:ont joué] à cache-cache dans le jardin. Ensuite, la mère de Lina [p:a apporté] un énorme gâteau au chocolat. Tout le monde [p:a chanté] « Joyeux anniversaire ». Lina [p:a soufflé] les bougies et elle [p:a ouvert] ses cadeaux. Elle [i:était] très heureuse. Le soir, ses amis [p:sont partis] et Lina [p:a rangé] sa chambre.',
+    g: 'guirlandes = streamers · cache-cache = hide-and-seek · bougies = candles · souffler = to blow',
+    q: ['Quel âge avait Lina ?|Douze ans*|Dix ans|Quinze ans', 'À quoi ont joué les enfants d’abord ?|À cache-cache*|Au football|Aux cartes', 'Quel gâteau a apporté la mère ?|Un gâteau au chocolat*|Une tarte aux pommes|Un gâteau à la fraise'],
+    vf: [['Les amis sont arrivés à trois heures.', 1, 'Vrai.'], ['Lina était triste ce jour-là.', 0, 'Faux : elle était très heureuse.']],
+    o: ['Qu’est-ce que Lina a fait le soir ?', 'range,chambre', 'Elle a rangé sa chambre.'],
+    f: 'p', c: ['Elle {avoir:imp:2:f} douze ans.', 'Ses amis {arriver:pc:5:m} à trois heures.'] },
+
+  { id: 'neige', t: 'La première neige', e: '❄️', n: 1,
+    x: 'Ce matin-là, Noah [p:a ouvert] les volets et il [p:a crié] : « De la neige ! » Tout [i:était] blanc. Les arbres et les voitures [i:étaient] couverts de neige. Il [i:faisait] très froid, mais le ciel [i:était] bleu. Noah et sa petite sœur [p:sont sortis] dans le jardin. Ils [p:ont fait] un grand bonhomme de neige. Ensuite, ils [p:ont lancé] des boules de neige sur leur père ! À midi, ils [p:sont rentrés] à la maison. Ils [i:avaient] les mains rouges, mais ils [i:étaient] ravis.',
+    g: 'volets = shutters · bonhomme de neige = snowman · ravis = delighted',
+    q: ['Qu’a crié Noah ?|« De la neige ! »*|« Au secours ! »|« Bon anniversaire ! »', 'Comment était le ciel ?|Bleu*|Gris|Noir', 'Qu’ont-ils fait dans le jardin ?|Un bonhomme de neige*|Une cabane|Un pique-nique'],
+    vf: [['Il faisait chaud.', 0, 'Faux : il faisait très froid.'], ['Ils ont lancé des boules de neige sur leur père.', 1, 'Vrai.']],
+    o: ['Comment étaient les enfants à midi ?', 'ravi,content,heureux,rouge,froid', 'Ils avaient les mains rouges, mais ils étaient ravis.'],
+    f: 'i', c: ['Tout {être:imp:2:m} blanc.', 'Noah et sa petite sœur {sortir:pc:5:m} dans le jardin.'] },
+
+  { id: 'zoo', t: 'La sortie au zoo', e: '🦁', n: 1,
+    x: 'Jeudi, la classe de Mme Martin [p:est allée] au zoo. Le car [p:est parti] à huit heures. Pendant le voyage, les élèves [i:chantaient] et ils [i:riaient]. Au zoo, il y [i:avait] beaucoup d’animaux. Les lions [i:dormaient] au soleil et les singes [i:sautaient] partout. Soudain, un singe [p:a pris] la casquette de Tom ! Tout le monde [p:a ri]. Le gardien [p:a récupéré] la casquette avec un bâton. À la fin de la journée, les élèves [i:étaient] fatigués, mais ils [p:ont adoré] cette sortie.',
+    g: 'car = coach · singes = monkeys · casquette = cap · bâton = stick',
+    q: ['À quelle heure est parti le car ?|À huit heures*|À midi|À dix heures', 'Que faisaient les lions ?|Ils dormaient au soleil*|Ils mangeaient|Ils sautaient partout', 'Qu’a pris le singe ?|La casquette de Tom*|Le sandwich de Tom|Le sac de la maîtresse'],
+    vf: [['Pendant le voyage, les élèves chantaient.', 1, 'Vrai.'], ['Les élèves n’ont pas aimé la sortie.', 0, 'Faux : ils ont adoré cette sortie.']],
+    o: ['Comment le gardien a-t-il récupéré la casquette ?', 'baton', 'Avec un bâton.'],
+    f: 'p', c: ['Les singes {sauter:imp:5} partout.', 'Le car {partir:pc:2:m} à huit heures.'] },
+
+  { id: 'gateau', t: 'Le gâteau raté', e: '🍰', n: 1,
+    x: 'Dimanche, Sami [i:voulait] faire une surprise à sa mère. Il [p:a décidé] de préparer un gâteau. Il [i:était] un peu stressé parce qu’il ne [i:cuisinait] jamais. D’abord, il [p:a cassé] trois œufs dans un bol. Ensuite, il [p:a ajouté] la farine et le sucre. Malheureusement, il [p:a oublié] le gâteau dans le four ! Une odeur de brûlé [p:a envahi] la cuisine. Sa mère [p:est arrivée] en courant. Elle [p:a regardé] le gâteau noir et elle [p:a souri]. Ensemble, ils [p:ont préparé] des crêpes.',
+    g: 'farine = flour · four = oven · brûlé = burnt · crêpes = pancakes',
+    q: ['Pourquoi Sami voulait-il faire un gâteau ?|Pour faire une surprise à sa mère*|Pour un concours|Parce qu’il avait faim', 'Combien d’œufs a-t-il cassés ?|Trois*|Deux|Six', 'Qu’ont-ils préparé à la fin ?|Des crêpes*|Un autre gâteau|Des sandwichs'],
+    vf: [['Sami cuisinait souvent.', 0, 'Faux : il ne cuisinait jamais.'], ['La mère a souri en voyant le gâteau noir.', 1, 'Vrai.']],
+    o: ['Quelle erreur Sami a-t-il faite ?', 'oubli,four,brul', 'Il a oublié le gâteau dans le four.'],
+    f: 'p', c: ['Il {être:imp:2:m} un peu stressé.', 'Sa mère {arriver:pc:2:f} en courant.'] },
+
+  { id: 'cinema', t: 'La panne au cinéma', e: '🎬', n: 2,
+    x: 'Vendredi soir, Yasmine et son cousin Omar [p:sont allés] au cinéma. La salle [i:était] pleine et tout le monde [i:mangeait] du pop-corn. Le film [i:racontait] l’histoire d’un dragon qui [i:vivait] dans la montagne. Les enfants [i:regardaient] l’écran sans bouger. Au milieu du film, l’écran [p:est devenu] noir et les lumières [p:ont clignoté]. Une panne ! Les spectateurs [p:ont attendu] vingt minutes. Enfin, le film [p:a recommencé] et tout le monde [p:a applaudi]. À la sortie, Omar [p:a dit] : « C’[i:était] le meilleur film de l’année ! »',
+    g: 'salle = cinema hall · écran = screen · panne = breakdown · clignoter = to flicker',
+    q: ['Avec qui Yasmine est-elle allée au cinéma ?|Avec son cousin Omar*|Avec sa mère|Avec sa classe', 'De quoi parlait le film ?|D’un dragon qui vivait dans la montagne*|D’un pirate|D’une école de magie', 'Combien de temps les spectateurs ont-ils attendu ?|Vingt minutes*|Deux heures|Cinq minutes'],
+    vf: [['La salle était presque vide.', 0, 'Faux : la salle était pleine.'], ['Tout le monde a applaudi quand le film a recommencé.', 1, 'Vrai.']],
+    o: ['Que s’est-il passé au milieu du film ?', 'panne,noir,eteint,clignot', 'L’écran est devenu noir : il y a eu une panne.'],
+    f: 'i', c: ['Les enfants {regarder:imp:5} l’écran sans bouger.', 'L’écran {devenir:pc:2:m} noir.'] },
+
+  { id: 'velo', t: 'La course de vélo', e: '🚲', n: 2,
+    x: 'L’été dernier, il y [i:avait] une course de vélo dans le village de Léo. Il [i:faisait] très chaud et les routes [i:étaient] sèches. Léo [i:avait] un vieux vélo rouge, mais il [i:était] très motivé. Au départ, vingt enfants [i:attendaient] le signal. Le maire [p:a levé] un drapeau et la course [p:a commencé]. Léo [p:a pédalé] de toutes ses forces. Dans la dernière montée, il [p:a dépassé] deux garçons. Il [p:est arrivé] deuxième ! Ses parents [p:ont crié] de joie et le maire [p:a donné] une médaille d’argent à Léo.',
+    g: 'course = race · montée = uphill climb · dépasser = to overtake · argent = silver',
+    q: ['Comment était le vélo de Léo ?|Vieux et rouge*|Neuf et bleu|Petit et vert', 'Combien d’enfants attendaient le signal ?|Vingt*|Dix|Cent', 'Quelle médaille Léo a-t-il reçue ?|Une médaille d’argent*|Une médaille d’or|Une médaille de bronze'],
+    vf: [['Les routes étaient mouillées.', 0, 'Faux : les routes étaient sèches.'], ['Léo a dépassé deux garçons dans la dernière montée.', 1, 'Vrai.']],
+    o: ['Qui a donné le signal du départ ?', 'maire', 'Le maire : il a levé un drapeau.'],
+    f: 'p', c: ['Il {faire:imp:2} très chaud.', 'Il {arriver:pc:2:m} deuxième !'] },
+
+  { id: 'desert', t: 'Une nuit dans le désert', e: '🏜️', n: 2,
+    x: 'Pendant les vacances, la famille de Maya [p:est partie] camper dans le désert. L’après-midi, le sable [i:était] brûlant et le soleil [i:tapait] fort. Les enfants [i:portaient] des chapeaux et ils [i:buvaient] beaucoup d’eau. Le soir, le père [p:a allumé] un feu. Toute la famille [p:a mangé] autour du feu et le grand-père [p:a raconté] des histoires. Plus tard, Maya [p:a levé] les yeux : le ciel [i:était] rempli d’étoiles. Elle [p:a vu] une étoile filante et elle [p:a fait] un vœu. Cette nuit-là, elle [p:a dormi] sous la tente, très heureuse.',
+    g: 'brûlant = scorching · étoile filante = shooting star · vœu = wish · tente = tent',
+    q: ['Où la famille est-elle partie camper ?|Dans le désert*|À la montagne|Au bord d’un lac', 'Qui a raconté des histoires ?|Le grand-père*|Maya|La mère', 'Qu’a vu Maya dans le ciel ?|Une étoile filante*|Un avion|Une lune rouge'],
+    vf: [['L’après-midi, le sable était froid.', 0, 'Faux : le sable était brûlant.'], ['Maya a dormi sous la tente.', 1, 'Vrai.']],
+    o: ['Pourquoi les enfants portaient-ils des chapeaux ?', 'soleil,chaud,brul', 'Parce que le soleil tapait fort.'],
+    f: 'i', c: ['Les enfants {boire:imp:5} beaucoup d’eau.', 'Le soir, le père {allumer:pc:2:m} un feu.'] },
+
+  { id: 'musee', t: 'L’alarme du musée', e: '🦖', n: 2,
+    x: 'Mardi, la classe de 6e B [p:a visité] le musée d’histoire. Dans la grande salle, il y [i:avait] un squelette de dinosaure. Il [i:mesurait] douze mètres ! Les élèves [i:prenaient] des photos et ils [i:posaient] des questions au guide. Tout à coup, une alarme [p:a sonné]. Tout le monde [p:a eu] peur. Les gardiens [p:sont arrivés] en courant. En fait, un petit garçon [p:a touché] une statue égyptienne ! Le guide [p:a expliqué] les règles du musée. Après cette aventure, les élèves [p:ont continué] la visite en silence.',
+    g: 'squelette = skeleton · mesurer = to measure · gardiens = guards · règles = rules',
+    q: ['Quel musée la classe a-t-elle visité ?|Le musée d’histoire*|Le musée d’art moderne|Le musée de la mer', 'Combien mesurait le dinosaure ?|Douze mètres*|Deux mètres|Cent mètres', 'Pourquoi l’alarme a-t-elle sonné ?|Un garçon a touché une statue*|Il y avait un incendie|Un dinosaure est tombé'],
+    vf: [['Les élèves posaient des questions au guide.', 1, 'Vrai.'], ['Après l’alarme, les élèves sont rentrés à l’école.', 0, 'Faux : ils ont continué la visite en silence.']],
+    o: ['Comment ont réagi les élèves quand l’alarme a sonné ?', 'peur', 'Ils ont eu peur.'],
+    f: 'p', c: ['Il y {avoir:imp:2} un squelette de dinosaure.', 'Les gardiens {arriver:pc:5:m} en courant.'] },
+
+  { id: 'orage', t: 'L’orage en montagne', e: '⛰️', n: 2,
+    x: 'En juillet, Paul et son oncle [i:faisaient] une randonnée en montagne. Le matin, le ciel [i:était] clair et les oiseaux [i:chantaient]. Ils [i:marchaient] depuis trois heures quand de gros nuages noirs [p:sont arrivés]. Le vent [p:a soufflé] très fort et la pluie [p:a commencé] à tomber. Paul [i:avait] un peu peur. Heureusement, son oncle [p:a trouvé] une petite cabane. Ils [p:sont restés] à l’abri pendant une heure. Quand l’orage [p:a cessé], ils [p:ont vu] un magnifique arc-en-ciel au-dessus de la vallée.',
+    g: 'randonnée = hike · nuages = clouds · à l’abri = sheltered · arc-en-ciel = rainbow',
+    q: ['Avec qui Paul faisait-il une randonnée ?|Avec son oncle*|Avec son père|Avec sa classe', 'Depuis combien de temps marchaient-ils quand les nuages sont arrivés ?|Trois heures*|Une heure|Dix minutes', 'Qu’ont-ils vu après l’orage ?|Un arc-en-ciel*|Un ours|Un avion'],
+    vf: [['Le matin, le ciel était clair.', 1, 'Vrai.'], ['Ils sont restés dans la cabane toute la nuit.', 0, 'Faux : ils sont restés à l’abri pendant une heure.']],
+    o: ['Où se sont-ils abrités ?', 'cabane', 'Dans une petite cabane.'],
+    f: 'i', c: ['Les oiseaux {chanter:imp:5}.', 'Ils {rester:pc:5:m} à l’abri pendant une heure.'] },
+
+  { id: 'college', t: 'Le premier jour au collège', e: '🏫', n: 2,
+    x: 'Le premier jour au collège, Adam [i:était] très nerveux. Le collège [i:était] immense et il ne [i:connaissait] personne. Dans la cour, les grands [i:parlaient] fort et ils [i:riaient]. À huit heures, la sonnerie [p:a retenti]. Adam [p:est entré] dans la classe et il [p:a choisi] une place près de la fenêtre. Un garçon [p:est venu] à côté de lui. Il [p:a dit] : « Salut, je m’appelle Hugo ! » Les deux garçons [p:ont parlé] de football toute la récréation. Le soir, Adam [p:a raconté] sa journée à ses parents. Il [i:était] content : il [i:avait] déjà un ami !',
+    g: 'cour = playground · sonnerie = bell · récréation = break time',
+    q: ['Comment se sentait Adam le premier jour ?|Très nerveux*|Très calme|En colère', 'Où Adam s’est-il assis ?|Près de la fenêtre*|Au fond de la classe|Près du tableau', 'De quoi les garçons ont-ils parlé ?|De football*|De jeux vidéo|De leurs devoirs'],
+    vf: [['Adam connaissait beaucoup d’élèves.', 0, 'Faux : il ne connaissait personne.'], ['Le soir, Adam était content.', 1, 'Vrai : il avait déjà un ami.']],
+    o: ['Comment s’appelle le nouvel ami d’Adam ?', 'hugo', 'Il s’appelle Hugo.'],
+    f: 'p', c: ['Le collège {être:imp:2:m} immense.', 'Adam {entrer:pc:2:m} dans la classe.'] },
+
+  { id: 'piscine', t: 'Le défi de la piscine', e: '🏊', n: 2,
+    x: 'Pendant des mois, Clara [i:avait] peur de l’eau profonde. Chaque mercredi, elle [i:allait] à la piscine avec son club, mais elle [i:restait] toujours dans le petit bassin. Un jour, son entraîneur [p:a proposé] un défi : sauter du plongeoir. Clara [i:tremblait]. Elle [p:est montée] lentement à l’échelle. En haut, elle [p:a fermé] les yeux, elle [p:a respiré] profondément et elle [p:a sauté] ! Quand elle [p:est remontée] à la surface, tous ses amis [i:applaudissaient]. Ce jour-là, Clara [p:a gagné] un nouveau surnom : « la championne ».',
+    g: 'bassin = pool · plongeoir = diving board · échelle = ladder · surnom = nickname',
+    q: ['De quoi Clara avait-elle peur ?|De l’eau profonde*|Des poissons|De son entraîneur', 'Quel était le défi ?|Sauter du plongeoir*|Nager dix longueurs|Plonger sans lunettes', 'Quel surnom a-t-elle gagné ?|La championne*|La sirène|La fusée'],
+    vf: [['Chaque mercredi, Clara allait dans le grand bassin.', 0, 'Faux : elle restait toujours dans le petit bassin.'], ['Ses amis applaudissaient quand elle est remontée.', 1, 'Vrai.']],
+    o: ['Qu’a fait Clara en haut du plongeoir, avant de sauter ?', 'ferme,yeux,respir', 'Elle a fermé les yeux et elle a respiré profondément.'],
+    f: 'i', c: ['Elle {rester:imp:2:f} toujours dans le petit bassin.', 'Elle {monter:pc:2:f} lentement à l’échelle.'] },
+
+  { id: 'marche', t: 'Le marché du samedi', e: '🍊', n: 2,
+    x: 'Le samedi, grand-mère Fatima [i:allait] toujours au marché. Ce samedi-là, Nadia [p:a décidé] de l’accompagner. Le marché [i:était] très animé : les vendeurs [i:criaient] les prix et ça [i:sentait] bon les épices et le pain chaud. Grand-mère [p:a acheté] des tomates, des oranges et un melon. Soudain, Nadia [p:a remarqué] un petit chat sous une table. Il [i:avait] l’air perdu. Le marchand de fromage [p:a expliqué] que le chat [i:vivait] au marché. Nadia [p:a donné] un morceau de fromage au chat. Sur le chemin du retour, elle [i:souriait].',
+    g: 'animé = lively · épices = spices · marchand = seller · avoir l’air = to look',
+    q: ['Quand grand-mère allait-elle au marché ?|Le samedi*|Le dimanche|Tous les jours', 'Qu’a acheté grand-mère ?|Des tomates, des oranges et un melon*|Du poisson et du pain|Des fleurs', 'Qu’a donné Nadia au chat ?|Un morceau de fromage*|Du lait|Un morceau de pain'],
+    vf: [['Le marché était calme et silencieux.', 0, 'Faux : il était très animé, les vendeurs criaient.'], ['Le chat vivait au marché.', 1, 'Vrai.']],
+    o: ['Où Nadia a-t-elle vu le petit chat ?', 'table', 'Sous une table.'],
+    f: 'p', c: ['Les vendeurs {crier:imp:5} les prix.', 'Grand-mère {acheter:pc:2:f} des tomates.'] },
+
+  { id: 'phare', t: 'Le gardien du phare', e: '🗼', n: 3,
+    x: 'Autrefois, un vieil homme [i:vivait] seul dans un phare, au bout d’une île. Chaque soir, il [i:montait] les cent marches de l’escalier et il [i:allumait] la grande lampe. Grâce à lui, les bateaux [i:évitaient] les rochers. Une nuit de tempête, les vagues [i:frappaient] les murs et le vent [i:hurlait]. Tout à coup, la lampe [p:a cessé] de briller. Le vieil homme [p:a pris] une lanterne et il [p:a grimpé] sur le toit. Pendant toute la nuit, il [p:a agité] sa lanterne. Au matin, un petit bateau de pêcheurs [p:est arrivé] au port sans un seul accident. Les pêcheurs [p:ont remercié] le gardien et ils [p:ont réparé] la lampe ensemble.',
+    g: 'phare = lighthouse · marches = steps · rochers = rocks · vagues = waves · hurler = to howl',
+    q: ['Où vivait le vieil homme ?|Dans un phare, au bout d’une île*|Dans un bateau|Dans un village de montagne', 'Combien de marches avait l’escalier ?|Cent*|Mille|Dix', 'Qu’a fait le gardien quand la lampe a cessé de briller ?|Il a agité une lanterne sur le toit*|Il est allé dormir|Il a appelé la police'],
+    vf: [['Grâce au gardien, les bateaux évitaient les rochers.', 1, 'Vrai.'], ['Le bateau des pêcheurs a eu un accident.', 0, 'Faux : il est arrivé au port sans un seul accident.']],
+    o: ['Quel temps faisait-il cette nuit-là ?', 'tempete,vent,vague,hurl', 'Il y avait une tempête : les vagues frappaient les murs et le vent hurlait.'],
+    f: 'i', c: ['Chaque soir, il {monter:imp:2:m} les cent marches.', 'Un petit bateau de pêcheurs {arriver:pc:2:m} au port.'] },
+
+  { id: 'tresor', t: 'La carte au trésor', e: '🗺️', n: 3,
+    x: 'Pendant les vacances, Lucas et sa cousine Emma [i:fouillaient] le grenier de leur grand-père. Il y [i:faisait] sombre et l’air [i:sentait] la poussière. Dans une vieille malle, Emma [p:a découvert] une carte jaunie. Sur la carte, une croix rouge [i:indiquait] un endroit près du grand chêne du jardin. Les enfants [p:ont pris] une pelle et ils [p:ont couru] dans le jardin. Ils [p:ont creusé] pendant une heure. Enfin, la pelle [p:a heurté] quelque chose de dur : une petite boîte en métal ! À l’intérieur, ils [p:ont trouvé] des photos anciennes et une lettre de leur grand-père. Ce n’[i:était] pas de l’or, mais pour eux, c’[i:était] un vrai trésor.',
+    g: 'grenier = attic · poussière = dust · malle = trunk · chêne = oak tree · pelle = spade · creuser = to dig',
+    q: ['Où fouillaient les enfants ?|Dans le grenier de leur grand-père*|Dans la cave|Dans une bibliothèque', 'Qu’indiquait la croix rouge ?|Un endroit près du grand chêne*|La maison du voisin|Le chemin de l’école', 'Qu’ont-ils trouvé dans la boîte ?|Des photos anciennes et une lettre*|Des pièces d’or|Une clé mystérieuse'],
+    vf: [['Les enfants ont creusé pendant une heure.', 1, 'Vrai.'], ['Ils étaient déçus parce qu’il n’y avait pas d’or.', 0, 'Faux : pour eux, c’était un vrai trésor.']],
+    o: ['Où Emma a-t-elle trouvé la carte ?', 'malle,grenier', 'Dans une vieille malle, au grenier.'],
+    f: 'p', c: ['Il y {faire:imp:2} sombre.', 'Emma {découvrir:pc:2:f} une carte jaunie.'] },
+
+  { id: 'train', t: 'Le train de nuit', e: '🚆', n: 3,
+    x: 'L’hiver dernier, Sofia [p:a pris] le train de nuit pour aller chez sa tante, à Nice. Le train [p:est parti] de Paris à dix heures du soir. Dans le compartiment, il y [i:avait] quatre couchettes. Une vieille dame [i:tricotait] en silence et un jeune homme [i:écoutait] de la musique. Sofia [i:regardait] les lumières des villes qui [i:défilaient] par la fenêtre. Vers minuit, elle [p:a fermé] les yeux. Le matin, quand elle [p:a ouvert] le rideau, elle [p:a découvert] la mer bleue et les palmiers. Sa tante [i:attendait] sur le quai avec un grand sourire. Sofia [p:a couru] vers elle.',
+    g: 'couchettes = sleeping berths · tricoter = to knit · défiler = to stream past · quai = platform',
+    q: ['Où allait Sofia ?|Chez sa tante, à Nice*|Chez sa grand-mère, à Paris|En colonie de vacances', 'Que faisait la vieille dame ?|Elle tricotait*|Elle dormait|Elle lisait le journal', 'Qu’a vu Sofia le matin ?|La mer bleue et les palmiers*|La neige sur les montagnes|Une gare vide'],
+    vf: [['Le train est parti à dix heures du soir.', 1, 'Vrai.'], ['La tante de Sofia n’était pas à la gare.', 0, 'Faux : elle attendait sur le quai avec un grand sourire.']],
+    o: ['Combien de couchettes y avait-il dans le compartiment ?', 'quatre,4', 'Il y avait quatre couchettes.'],
+    f: 'i', c: ['Un jeune homme {écouter:imp:2:m} de la musique.', 'Le train {partir:pc:2:m} de Paris à dix heures.'] },
+
+  { id: 'concert', t: 'Le concert de l’école', e: '🎹', n: 3,
+    x: 'En décembre, l’école de Rayan [p:a organisé] un grand concert. Depuis des semaines, les élèves [i:répétaient] chaque vendredi. Rayan [i:jouait] du piano et sa meilleure amie, Zoé, [i:chantait]. Le soir du concert, la salle [i:était] pleine : les parents [i:attendaient] avec impatience. Rayan [i:avait] les mains moites. Quand la directrice [p:a annoncé] leurs noms, Rayan et Zoé [p:sont montés] sur scène. Au début, Rayan [p:a fait] une fausse note. Zoé [p:a continué] à chanter avec un sourire, et Rayan [p:a retrouvé] son calme. À la fin, le public [p:a applaudi] très fort. Ils [p:ont salué] et ils [i:étaient] fiers d’eux.',
+    g: 'répéter = to rehearse · moites = sweaty · fausse note = wrong note · saluer = to bow',
+    q: ['Quand les élèves répétaient-ils ?|Chaque vendredi*|Chaque lundi|Tous les jours', 'De quel instrument jouait Rayan ?|Du piano*|De la guitare|Du violon', 'Quelle erreur Rayan a-t-il faite ?|Une fausse note*|Il a oublié la chanson|Il est tombé sur scène'],
+    vf: [['La salle était presque vide.', 0, 'Faux : la salle était pleine.'], ['Zoé a continué à chanter avec un sourire.', 1, 'Vrai.']],
+    o: ['Comment se sentait Rayan avant de monter sur scène ?', 'moite,stress,nerveu,peur', 'Il était stressé : il avait les mains moites.'],
+    f: 'p', c: ['Les élèves {répéter:imp:5} chaque vendredi.', 'Rayan et Zoé {monter:pc:5:m} sur scène.'] },
+
+  { id: 'fete', t: 'Perdu à la fête foraine', e: '🎡', n: 3,
+    x: 'Dimanche, toute la famille [p:est allée] à la fête foraine. Il y [i:avait] des manèges, de la musique et une odeur de barbe à papa. Les lumières [i:clignotaient] partout. Malik [i:tenait] la main de son petit frère, Ilyes. Devant la grande roue, Malik [p:a lâché] sa main pour acheter un ticket. Quelques secondes plus tard, Ilyes [p:a disparu] ! Le cœur de Malik [i:battait] très fort. Il [p:a cherché] partout et il [p:a appelé] son frère. Finalement, il [p:a entendu] un rire familier : Ilyes [i:attendait] devant le stand de barbe à papa ! Malik [p:a serré] son frère dans ses bras. Après cette frayeur, il [p:a gardé] sa main jusqu’au soir.',
+    g: 'fête foraine = funfair · manèges = rides · barbe à papa = candyfloss · lâcher = to let go · frayeur = fright',
+    q: ['Où est allée la famille ?|À la fête foraine*|Au zoo|À la plage', 'Pourquoi Malik a-t-il lâché la main de son frère ?|Pour acheter un ticket*|Pour manger une crêpe|Pour parler à un ami', 'Où était Ilyes ?|Devant le stand de barbe à papa*|Dans la grande roue|Avec ses parents'],
+    vf: [['Malik a cherché partout et il a appelé son frère.', 1, 'Vrai.'], ['Après cette frayeur, Malik a laissé son frère seul.', 0, 'Faux : il a gardé sa main jusqu’au soir.']],
+    o: ['Qu’est-ce qu’on sentait à la fête foraine ?', 'barbe a papa', 'Une odeur de barbe à papa.'],
+    f: 'i', c: ['Les lumières {clignoter:imp:5} partout.', 'Toute la famille {aller:pc:2:f} à la fête foraine.'] },
+
+  { id: 'dauphins', t: 'Les dauphins', e: '🐬', n: 3,
+    x: 'Le dernier jour des vacances, Hugo et son père [p:ont fait] une sortie en bateau. La mer [i:était] calme et l’eau [i:brillait] sous le soleil. Le capitaine [i:connaissait] tous les secrets de la côte. Il [i:montrait] aux passagers les petites îles et les oiseaux marins. Tout à coup, Hugo [p:a aperçu] des ailerons gris près du bateau. Des dauphins ! Ils [i:sautaient] et ils [i:jouaient] autour du bateau. Hugo [p:a pris] des dizaines de photos. Les dauphins [p:ont suivi] le bateau pendant dix minutes, puis ils [p:ont disparu] sous l’eau. Ce soir-là, Hugo [p:a écrit] dans son journal : « Le plus beau jour de ma vie ! »',
+    g: 'côte = coast · ailerons = fins · dauphins = dolphins · suivre = to follow · journal = diary',
+    q: ['Avec qui Hugo a-t-il fait la sortie en bateau ?|Avec son père*|Avec sa classe|Avec sa sœur', 'Qu’a aperçu Hugo ?|Des dauphins*|Une baleine|Un requin', 'Combien de temps les dauphins ont-ils suivi le bateau ?|Dix minutes*|Une heure|Une minute'],
+    vf: [['La mer était agitée.', 0, 'Faux : la mer était calme.'], ['Le soir, Hugo a écrit dans son journal.', 1, 'Vrai.']],
+    o: ['Que faisaient les dauphins autour du bateau ?', 'saut,jou', 'Ils sautaient et ils jouaient.'],
+    f: 'p', c: ['La mer {être:imp:2:f} calme.', 'Hugo {prendre:pc:2:m} des dizaines de photos.'] }
+  ];
+
+  // Expression écrite: practice subjects (not the real exam question)
+  FR.PROMPTS = [
+    ['Ta journée extraordinaire', 'Une sortie, un match, une surprise… Raconte une journée spéciale.'],
+    ['Le match le plus fou', 'Raconte un match incroyable que tu as joué ou regardé.'],
+    ['La sortie scolaire', 'Ta classe est partie en sortie. Qu’est-ce qui s’est passé ?'],
+    ['L’animal surprise', 'Un animal a fait quelque chose d’étonnant. Raconte.'],
+    ['La panne de courant', 'Un soir, toutes les lumières se sont éteintes. Raconte la soirée.'],
+    ['Le premier jour', 'Raconte ton premier jour dans une nouvelle école ou un nouveau club.'],
+    ['L’anniversaire surprise', 'Tu as préparé (ou reçu) une surprise d’anniversaire. Raconte.'],
+    ['Un jour de vacances', 'Raconte une journée de vacances : à la mer, dans le désert, à la montagne…'],
+    ['Le jour où j’ai eu peur', 'Raconte un moment où tu as eu très peur, et comment ça s’est fini.'],
+    ['La rencontre', 'Un jour, tu as rencontré ton joueur ou ta joueuse préféré(e). Raconte.']
+  ];
+  FR.STARTERS = ['C’était un samedi matin.', 'Il faisait…', 'Il y avait…', 'J’étais…', 'Tout à coup,', 'Ensuite,', 'Puis,', 'À la fin,', 'Le soir,', 'C’était une journée…'];
+  FR.MODEL = 'Dimanche dernier, ma famille et moi sommes allés à la plage. Il faisait très beau et l’eau était chaude. Mon frère et moi jouions avec un ballon pendant que ma mère lisait son livre. À midi, nous avons mangé des sandwichs sous un parasol. Soudain, mon frère a vu un petit crabe ! Il a couru vers le crabe, mais il est tombé dans le sable, et nous avons beaucoup ri. Le soir, nous étions fatigués mais très contents. C’était une journée parfaite.';
+})(window.FR);
+</script>
 <script>
 (function () {
   'use strict';
@@ -587,13 +879,27 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
 
   /* ---------------- save (per device, one record per player) ---------------- */
   var KEY = 'coupe-des-temps-v1';
-  function blankPlayer(n) {
-    return { name: 'Joueur ' + n, avatar: n === 1 ? '🦁' : '🦅', color: n === 1 ? '#2F7FD8' : '#D8443A',
-      pts: 0, stars: {}, stickers: [], streakBest: 0, lesson: false, matches: 0, examBest: 0 };
+  // The public site says "Joueur 1/2/3". Names come from the family link (#noms=A,B,C)
+  // or are typed once on the device; the private copy fills DEFAULT_NAMES itself.
+  var DEFAULT_NAMES = ['Joueur 1', 'Joueur 2', 'Joueur 3'];
+  var DEF_AV = ['🦁', '🦅', '🦄'], DEF_COL = ['#2F7FD8', '#D8443A', '#8E3FB0'];
+  function blankPlayer(i) {
+    return { name: DEFAULT_NAMES[i], avatar: DEF_AV[i], color: DEF_COL[i],
+      pts: 0, stars: {}, stickers: [], streakBest: 0, lesson: false, matches: 0, examBest: 0, draft: '', writings: 0, wp: 0 };
   }
   var S = null;
   try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
-  if (!S || !S.players || S.players.length !== 2) S = { players: [blankPlayer(1), blankPlayer(2)], cur: null, sound: true };
+  if (!S || !S.players || !S.players.length) S = { players: [0, 1, 2].map(blankPlayer), cur: null, sound: true, module: 1 };
+  while (S.players.length < 3) S.players.push(blankPlayer(S.players.length));
+  S.players.forEach(function (p, i) { if (/^Joueur \d$/.test(p.name)) p.name = DEFAULT_NAMES[i]; });
+  try {
+    var hm = decodeURIComponent(location.hash || '').match(/^#noms=(.+)$/);
+    if (hm) {
+      hm[1].split(',').slice(0, 3).forEach(function (n, i) { n = n.trim().slice(0, 16); if (n) S.players[i].name = n; });
+      history.replaceState(null, '', location.pathname + location.search);
+    }
+  } catch (e) { }
+  if (!S.module) S.module = 1;
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }
   function P() { return S.players[S.cur]; }
 
@@ -608,7 +914,11 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
     exam16: ['🏅', 'Mention bien', '16/20 à un examen'],
     exam20: ['👑', 'Sans-faute', 'Examen parfait'],
     mille: ['💯', 'Mille points', '1000 points'],
-    ballondor: ['🏆', 'Ballon d’Or', '3 étoiles partout'],
+    ballondor: ['🏆', 'Ballon d’Or', '3 étoiles partout (module 1)'],
+    lecteur: ['📖', 'Lecteur', '5 textes réussis'],
+    biblio: ['📚', 'Rat de bibliothèque', 'Les 22 textes réussis'],
+    plume: ['✍️', 'Plume d’or', 'Une rédaction parfaite'],
+    ecrivain: ['🖋️', 'Écrivain', '3 rédactions parfaites'],
     gants: ['🧤', 'Gants d’or', 'Pochette'], crampons: ['👟', 'Crampons', 'Pochette'], maillot: ['🎽', 'Le maillot', 'Pochette'],
     stade: ['🏟️', 'Le stade', 'Pochette'], kop: ['📣', 'Le kop', 'Pochette'], jaune: ['🟨', 'Carton jaune', 'Pochette'],
     rouge: ['🟥', 'Carton rouge', 'Pochette'], corner: ['🚩', 'Le corner', 'Pochette'], chrono: ['⏱️', 'Arrêts de jeu', 'Pochette'],
@@ -863,7 +1173,44 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
     { id: 'examA', n: '10', name: 'Examen blanc : la fiche', sub: 'Les 4 exercices de la fiche du prof', icon: '📝', gen: examA, exam: true },
     { id: 'examB', n: '11', name: 'Finale surprise', sub: 'Un examen tout neuf à chaque fois', icon: '🏆', gen: examB, exam: true }
   ];
-  function levelById(id) { return LEVELS.filter(function (l) { return l.id === id; })[0]; }
+  LEVELS.forEach(function (l) { l.mod = 1; });
+
+  /* ---------------- module 2: reading comprehension + writing ---------------- */
+  function plain(x) { return x.replace(/\[[ip]:([^\]]+)\]/g, '$1'); }
+  var R_I = 'Décrire le décor : le temps, les lieux, les sentiments, les habitudes (ce qui dure)';
+  var R_P = 'Raconter les actions : ce qui s’est passé une fois, à un moment précis, et qui est fini';
+  var R_X = 'Parler de ce qui va se passer demain';
+  function textQs(T) {
+    var qcm = T.q.map(function (s) {
+      var a = s.split('|'), opts = a.slice(1), right = opts.filter(function (o) { return /\*$/.test(o); })[0].slice(0, -1);
+      return { kind: 'choice', passage: T, ask: '📖 Compréhension', html: a[0], options: shuffle(opts.map(function (o) { return o.replace(/\*$/, ''); })), correct: right,
+        why: function () { return 'Dans le texte : « ' + right + ' ».'; } };
+    });
+    var vf = T.vf.map(function (v) {
+      return { kind: 'choice', passage: T, ask: '📖 Vrai ou faux ?', html: '« ' + v[0] + ' »', options: ['VRAI', 'FAUX'], correct: v[1] ? 'VRAI' : 'FAUX', why: function () { return v[2]; } };
+    });
+    var open = { kind: 'open', passage: T, ask: '✍️ Réponds en français, en une phrase courte', html: T.o[0], kw: T.o[1], model: T.o[2] };
+    var n = T.n === 1 ? 2 : 3, isI = T.f === 'i';
+    var find = { kind: 'find', passage: T, tense: T.f, n: n, ask: '🔎 Trouve dans le texte ' + n + ' verbes ' + (isI ? 'à l’imparfait' : 'au passé composé') + '. Touche-les.' };
+    var verbs = (T.x.match(isI ? /\[i:([^\]]+)\]/g : /\[p:([^\]]+)\]/g) || []).map(function (m) { return m.slice(3, -1); });
+    var ex = verbs.filter(function (v, i, a) { return a.indexOf(v) === i; }).slice(0, 3).join(', ');
+    var why = { kind: 'choice', reasons: true, passage: T, ask: '🤔 Pourquoi ce temps ?',
+      html: 'Dans ce texte, les verbes ' + (isI ? '<span class="ci">à l’imparfait</span>' : '<span class="cp">au passé composé</span>') + ' (' + ex + '…) servent à :',
+      options: shuffle([R_I, R_P, R_X]), correct: isI ? R_I : R_P,
+      why: function () { return isI ? 'L’imparfait, c’est le décor : la météo, les lieux, les sentiments, les habitudes.' : 'Le passé composé, ce sont les actions : elles arrivent une fois, à un moment précis, et elles sont finies.'; } };
+    var conj = { kind: 'multi', ask: '🙈 Le texte est caché : conjugue comme dans l’histoire', lines: T.c.map(function (s) { return F.parseLine(s); }), numbered: true };
+    return [qcm[0], vf[0], qcm[1], open, find, why, qcm[2], vf[1], conj];
+  }
+  var LV_NAME = ['', 'Niveau 1 · facile', 'Niveau 2 · moyen', 'Niveau 3 · 5e'];
+  var LEVELS2 = F.TEXTS.map(function (T, i) {
+    return { id: 't-' + T.id, n: String(i + 1), name: T.t, sub: LV_NAME[T.n], icon: T.e, lv: T.n, mod: 2, gen: function () { return textQs(T); } };
+  });
+  LEVELS2.push({ id: 'ecrit', n: '✍', name: 'Expression écrite', sub: 'Raconte une journée : le décor + les actions', icon: '✍️', writing: true, mod: 2 });
+  LEVELS2.push({ id: 'epreuve', n: '★', name: 'Épreuve blanche', sub: 'Un texte surprise, puis une rédaction', icon: '🏆', mod: 2, writeAfter: true,
+    gen: function () { var p = P(); var pool = F.TEXTS.filter(function (T) { return !(p.stars['t-' + T.id] >= 3); }); return textQs(pick(pool.length ? pool : F.TEXTS)); } });
+  function levelById(id) { return LEVELS.concat(LEVELS2).filter(function (l) { return l.id === id; })[0]; }
+  function listOf(l) { return l.mod === 2 ? LEVELS2 : LEVELS; }
+  function openLevel(l) { if (l.lesson) startLesson(); else if (l.writing) startWriting(); else startLevel(l); }
   function starStr(n) { return '★★★'.slice(0, n) + '☆☆☆'.slice(0, 3 - n); }
 
   /* ---------------- players screen ---------------- */
@@ -911,34 +1258,38 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
   }
   function goHome() { if (S.cur == null) { renderPlayers(); return; } renderHome(); show('home'); }
   function renderHome() {
-    var p = P();
-    var next = LEVELS.filter(function (l) { return l.lesson ? !p.lesson : !(p.stars[l.id] > 0); })[0];
+    var p = P(), mod = S.module === 2 ? 2 : 1, list = mod === 2 ? LEVELS2 : LEVELS;
+    var next = list.filter(function (l) { return l.lesson ? !p.lesson : !(p.stars[l.id] > 0); })[0];
     var html = '<div class="player-bar"><span class="avatar" style="--c:' + p.color + '">' + p.avatar + '</span>' +
       '<div class="pb-txt"><b>' + esc(p.name) + '</b><small>' + rank(p.pts) + ' · ' + p.pts + ' pts · meilleure série ' + p.streakBest + '</small></div>' +
-      '<button class="btn ghost sm" id="swap" type="button">Changer de joueur</button></div>' + countdown();
-    html += '<h2 class="sec">Le parcours</h2><ol class="path">';
-    LEVELS.forEach(function (l) {
-      var st = l.lesson ? '' : starStr(p.stars[l.id] || 0);
-      if (l.lesson) st = p.lesson ? '✅' : '';
-      if (l.exam && p.stars[l.id]) st += '';
-      html += '<li><button type="button" class="lvl' + (l === next ? ' next' : '') + (l.exam ? ' exam' : '') + '" data-id="' + l.id + '">' +
+      '<button class="btn ghost sm" id="swap" type="button">Changer de joueur</button></div>' + countdown() +
+      '<div class="tabs" role="tablist"><button type="button" role="tab" class="tab' + (mod === 1 ? ' on' : '') + '" data-m="1">⚽ Module 1<small>Conjugaison</small></button>' +
+      '<button type="button" role="tab" class="tab' + (mod === 2 ? ' on' : '') + '" data-m="2">📖 Module 2<small>Compréhension + écrit</small></button></div>';
+    if (mod === 2) html += '<div class="box">Le test de lundi : <b>une compréhension écrite</b> et <b>une expression écrite</b>. Lis, réponds, chasse les verbes, puis écris ta rédaction. Touche 🔊 pour écouter un texte.</div>';
+    html += '<h2 class="sec">' + (mod === 2 ? '22 textes à lire' : 'Le parcours') + '</h2><ol class="path">';
+    var lastLv = 0;
+    list.forEach(function (l) {
+      if (mod === 2 && l.lv && l.lv !== lastLv) { html += '<li class="lv-head">' + LV_NAME[l.lv] + '</li>'; lastLv = l.lv; }
+      if (mod === 2 && l.writing) html += '<li class="lv-head">Pour le jour J</li>';
+      var st = l.lesson ? (p.lesson ? '✅' : '') : starStr(p.stars[l.id] || 0);
+      html += '<li><button type="button" class="lvl' + (l === next ? ' next' : '') + (l.exam || l.writing || l.writeAfter ? ' exam' : '') + '" data-id="' + l.id + '">' +
         '<span class="lvl-n">' + l.n + '</span><span class="lvl-ic">' + l.icon + '</span>' +
         '<span class="lvl-txt"><b>' + l.name + '</b><small>' + l.sub + (l.exam && p.examBest ? ' · record ' + p.examBest + '/20' : '') + '</small></span>' +
         '<span class="lvl-st">' + st + '</span></button></li>';
     });
     html += '</ol><div class="home-foot"><button class="btn" id="albumBtn" type="button">📒 Mon album · ' + p.stickers.length + '/' + ALL_STK.length + '</button></div>';
-    var other = S.players[1 - S.cur];
     var rows = S.players.slice().sort(function (a, b) { return b.pts - a.pts; });
     html += '<div class="card board"><h3>Classement de la maison</h3>' + rows.map(function (q, i) {
       var stars = Object.keys(q.stars).reduce(function (s, k) { return s + q.stars[k]; }, 0);
-      return '<div class="board-row"><span>' + (i === 0 && q.pts > 0 ? '🥇' : '🥈') + '</span><span class="avatar" style="--c:' + q.color + '">' + q.avatar + '</span>' +
+      return '<div class="board-row"><span>' + (q.pts > 0 ? ['🥇', '🥈', '🥉'][i] : '·') + '</span><span class="avatar" style="--c:' + q.color + '">' + q.avatar + '</span>' +
         '<span class="nm">' + esc(q.name) + ' · ' + stars + '★ · ' + q.stickers.length + ' stickers</span><span class="pt">' + q.pts + '</span></div>';
     }).join('') + '</div>';
-    if (other.pts > p.pts) html += '<p class="note">' + esc(other.name) + ' a ' + (other.pts - p.pts) + ' points d’avance. À toi de remonter !</p>';
+    if (rows[0] !== p && rows[0].pts > p.pts) html += '<p class="note">' + esc(rows[0].name) + ' a ' + (rows[0].pts - p.pts) + ' points d’avance. À toi de remonter !</p>';
     var el = $('#scr-home'); el.innerHTML = html;
     $('#swap').onclick = function () { renderPlayers(); };
     $('#albumBtn').onclick = renderAlbum;
-    $$('.lvl', el).forEach(function (b) { b.onclick = function () { var l = levelById(b.dataset.id); if (l.lesson) startLesson(); else startLevel(l); }; });
+    $$('.tab', el).forEach(function (t) { t.onclick = function () { S.module = +t.dataset.m; save(); renderHome(); }; });
+    $$('.lvl', el).forEach(function (b) { b.onclick = function () { openLevel(levelById(b.dataset.id)); }; });
   }
 
   /* ---------------- album ---------------- */
@@ -971,7 +1322,7 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
       '<div id="qcard" class="qcard"></div><div id="fb" class="feedback" hidden></div>';
     $('#quit').onclick = function () { $('#quitBar').hidden = false; };
     $('#quitNo').onclick = function () { $('#quitBar').hidden = true; };
-    $('#quitYes').onclick = function () { save(); goHome(); };
+    $('#quitYes').onclick = function () { hush(); save(); goHome(); };
     show('play');
     sWhistle();
     renderQ();
@@ -987,7 +1338,11 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
     var card = $('#qcard'); card.innerHTML = '';
     if (q.title) { var t = document.createElement('div'); t.className = 'ex-title'; if (q.tag) t.style.setProperty('--tag', q.tag); t.textContent = q.title; card.appendChild(t); }
     if (q.ask) { var a = document.createElement('div'); a.className = 'q-ask'; a.textContent = q.ask; card.appendChild(a); }
-    if (q.kind === 'choice') renderChoice(q, card); else renderMulti(q, card);
+    if (q.passage && q.kind !== 'find') card.appendChild(passageEl(q.passage));
+    if (q.kind === 'choice') renderChoice(q, card);
+    else if (q.kind === 'open') renderOpen(q, card);
+    else if (q.kind === 'find') renderFind(q, card);
+    else renderMulti(q, card);
   }
   function renderChoice(q, card) {
     var pr = document.createElement('div'); pr.className = 'q-prompt'; pr.innerHTML = q.html; card.appendChild(pr);
@@ -1009,6 +1364,106 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
     card.appendChild(grid);
   }
   var ACCENTS = ['é', 'è', 'ê', 'à', 'â', 'î', 'ï', 'ô', 'û', 'ç', '’'];
+  function accentBar(scope) {
+    var bar = document.createElement('div'); bar.className = 'accent-bar';
+    ACCENTS.forEach(function (c) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = c;
+      b.onmousedown = function (e) { e.preventDefault(); };
+      b.onclick = function () {
+        var i = (lastInput && scope.contains(lastInput) && !lastInput.disabled) ? lastInput : $('input.blank:not([disabled]), textarea:not([disabled])', scope);
+        if (!i) return;
+        var s0 = i.selectionStart == null ? i.value.length : i.selectionStart, e0 = i.selectionEnd == null ? s0 : i.selectionEnd;
+        i.value = i.value.slice(0, s0) + c + i.value.slice(e0); i.focus(); i.setSelectionRange(s0 + 1, s0 + 1);
+        i.dispatchEvent(new Event('input'));
+      };
+      bar.appendChild(b);
+    });
+    return bar;
+  }
+  function say(text) {
+    try {
+      var ss = window.speechSynthesis;
+      if (!ss) { toast('La lecture à voix haute n’est pas disponible ici.'); return; }
+      if (ss.speaking) { ss.cancel(); return; }
+      var u = new SpeechSynthesisUtterance(text); u.lang = 'fr-FR'; u.rate = 0.9;
+      var v = ss.getVoices().filter(function (x) { return /^fr/i.test(x.lang); })[0]; if (v) u.voice = v;
+      ss.speak(u);
+    } catch (e) { toast('La lecture à voix haute n’est pas disponible ici.'); }
+  }
+  function hush() { try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) { } }
+  function passageEl(T) {
+    var d = document.createElement('details'); d.className = 'passage'; d.open = !M || M.readOpen !== false;
+    d.addEventListener('toggle', function () { if (M) M.readOpen = d.open; });
+    d.innerHTML = '<summary>' + T.e + ' ' + esc(T.t) + ' <small>(touche pour cacher ou montrer)</small></summary><p class="read">' + esc(plain(T.x)) + '</p>' +
+      '<div class="read-tools"><button type="button" class="btn ghost sm" data-say>🔊 Écouter</button><button type="button" class="btn ghost sm" data-gl>📘 Mots utiles</button></div><div class="gloss" hidden>' + esc(T.g) + '</div>';
+    $('[data-say]', d).onclick = function () { say(plain(T.x)); };
+    $('[data-gl]', d).onclick = function () { var g = $('.gloss', d); g.hidden = !g.hidden; };
+    return d;
+  }
+  function renderOpen(q, card) {
+    var pr = document.createElement('div'); pr.className = 'q-prompt'; pr.innerHTML = q.html; card.appendChild(pr);
+    var ta = document.createElement('textarea'); ta.className = 'open-ans'; ta.id = 'openAns'; ta.rows = 2;
+    ta.setAttribute('aria-label', 'Ta réponse'); ta.placeholder = 'Réponds avec une petite phrase…';
+    ta.onfocus = function () { lastInput = ta; };
+    card.appendChild(ta); card.appendChild(accentBar(card));
+    var acts = document.createElement('div'); acts.className = 'q-actions';
+    var go = document.createElement('button'); go.type = 'button'; go.className = 'btn'; go.textContent = 'Valider ⚽';
+    acts.appendChild(go); card.appendChild(acts);
+    go.onclick = function () {
+      var v = ta.value.trim();
+      if (!v) { toast('Écris ta réponse d’abord !'); ta.focus(); return; }
+      ta.disabled = true; go.disabled = true;
+      var flat = F.deacc(v.toLowerCase());
+      var ok = q.kw.split('|').every(function (g) { return g.split(',').some(function (a) { return flat.indexOf(F.deacc(a)) >= 0; }); });
+      var tip = v.split(/\s+/).length < 3 ? ' Astuce : au test, réponds avec une petite phrase complète.' : '';
+      var model = 'Corrigé : <b>' + esc(q.model) + '</b>';
+      if (ok) { grade(1, 1, [model + tip]); return; }
+      var box = document.createElement('div'); box.className = 'selfcheck';
+      box.innerHTML = '<p>Compare avec le corrigé : <b>' + esc(q.model) + '</b></p><p class="note">As-tu écrit la même idée, avec d’autres mots ?</p>';
+      var yes = document.createElement('button'); yes.type = 'button'; yes.className = 'btn sm'; yes.textContent = 'Oui, même idée ✔';
+      var no = document.createElement('button'); no.type = 'button'; no.className = 'btn ghost sm'; no.textContent = 'Non, je n’avais pas trouvé';
+      yes.onclick = function () { box.remove(); grade(1, 1, ['Bien vu ! ' + model + tip]); };
+      no.onclick = function () { box.remove(); grade(0, 1, [model + ' Relis le texte : la réponse s’y trouve.']); };
+      var row = document.createElement('div'); row.className = 'q-actions'; row.appendChild(yes); row.appendChild(no); box.appendChild(row);
+      card.appendChild(box);
+    };
+  }
+  var WORD = /^[A-Za-zÀ-ÖØ-öø-ÿœŒ]+$/;
+  function renderFind(q, card) {
+    var T = q.passage, target = q.tense, found = 0, errors = 0, done = false;
+    var label = target === 'i' ? 'à l’imparfait' : 'au passé composé';
+    var box = document.createElement('div'); box.className = 'story find';
+    function tok(w, k) { var sp = document.createElement('span'); sp.className = 'tok'; sp.textContent = w; sp.dataset.k = k; return sp; }
+    T.x.split(/(\[[ip]:[^\]]+\])/).forEach(function (pt) {
+      var m = pt.match(/^\[([ip]):([^\]]+)\]$/);
+      if (m) { box.appendChild(tok(m[2], m[1])); return; }
+      pt.split(/([A-Za-zÀ-ÖØ-öø-ÿœŒ]+)/).forEach(function (w) { if (!w) return; box.appendChild(WORD.test(w) ? tok(w, '') : document.createTextNode(w)); });
+    });
+    var status = document.createElement('p'); status.className = 'note'; status.textContent = '0 / ' + q.n + ' trouvés';
+    var give = document.createElement('button'); give.type = 'button'; give.className = 'btn ghost sm'; give.textContent = 'Je donne ma langue au chat 🐱';
+    card.appendChild(box); card.appendChild(status); card.appendChild(give);
+    function end(win) {
+      done = true; give.disabled = true;
+      $$('.tok', box).forEach(function (sp) { if (sp.dataset.k === target && !sp.classList.contains('hit')) sp.classList.add('reveal', target === 'i' ? 'vi' : 'vp'); });
+      var all = $$('.tok', box).filter(function (sp) { return sp.dataset.k === target; }).map(function (sp) { return sp.textContent; })
+        .filter(function (v, i, a) { return a.indexOf(v) === i; }).join(', ');
+      var head = win ? '' : found >= q.n ? 'Trouvé, mais avec ' + errors + ' erreurs. ' : 'Les voici en couleur dans le texte. ';
+      grade(win ? 1 : 0, 1, [head + 'Tous les verbes ' + label + ' du texte : <b>' + all + '</b>.']);
+    }
+    box.onclick = function (e) {
+      var t = e.target;
+      if (done || !t.classList || !t.classList.contains('tok') || t.classList.contains('hit')) return;
+      if (t.dataset.k === target) { t.classList.add('hit', target === 'i' ? 'vi' : 'vp'); found++; beep([880], 0.08, 'triangle'); }
+      else {
+        errors++; t.classList.remove('shake'); void t.offsetWidth; t.classList.add('shake', 'miss');
+        setTimeout(function () { t.classList.remove('miss'); }, 800);
+        toast(t.dataset.k ? '« ' + t.textContent + ' » est ' + (t.dataset.k === 'i' ? 'à l’imparfait (le décor).' : 'au passé composé (une action).') : '« ' + t.textContent + ' » n’est pas un verbe ' + label + '.');
+      }
+      status.textContent = found + ' / ' + q.n + ' trouvés' + (errors ? ' · erreurs : ' + errors : '');
+      if (found >= q.n) end(errors <= 1);
+    };
+    give.onclick = function () { if (!done) end(false); };
+  }
   function renderMulti(q, card) {
     var list = document.createElement('div'); list.className = 'lines';
     var hasTyped = false;
@@ -1050,20 +1505,7 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
       list.appendChild(line);
     });
     card.appendChild(list);
-    if (hasTyped) {
-      var bar = document.createElement('div'); bar.className = 'accent-bar';
-      ACCENTS.forEach(function (c) {
-        var b = document.createElement('button'); b.type = 'button'; b.textContent = c;
-        b.onmousedown = function (e) { e.preventDefault(); };
-        b.onclick = function () {
-          var i = lastInput || $('input.blank:not([disabled])', card); if (!i || i.disabled) return;
-          var s = i.selectionStart == null ? i.value.length : i.selectionStart, e2 = i.selectionEnd == null ? s : i.selectionEnd;
-          i.value = i.value.slice(0, s) + c + i.value.slice(e2); i.focus(); i.setSelectionRange(s + 1, s + 1);
-        };
-        bar.appendChild(b);
-      });
-      card.appendChild(bar);
-    }
+    if (hasTyped) card.appendChild(accentBar(card));
     var acts = document.createElement('div'); acts.className = 'q-actions';
     var go = document.createElement('button'); go.type = 'button'; go.className = 'btn'; go.id = 'validate'; go.textContent = 'Valider ⚽';
     go.onclick = function () { validate(q, card); };
@@ -1139,7 +1581,7 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
     $('#nextBtn').onclick = next;
     setTimeout(function () { fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 60);
   }
-  function next() { M.i++; if (M.i >= M.qs.length) finish(); else { renderQ(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
+  function next() { hush(); M.i++; if (M.i >= M.qs.length) finish(); else { renderQ(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Enter' || (e.target && e.target.tagName === 'INPUT')) return;
     var fb = $('#fb');
@@ -1163,6 +1605,9 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
     if (l.exam && ratio === 1) add('exam20');
     if (p.pts >= 1000) add('mille');
     if (LEVELS.every(function (x) { return x.lesson || p.stars[x.id] === 3; })) add('ballondor');
+    var readOk = F.TEXTS.filter(function (T) { return p.stars['t-' + T.id] > 0; }).length;
+    if (readOk >= 5) add('lecteur');
+    if (readOk === F.TEXTS.length) add('biblio');
     var packs = [];
     var nPacks = ratio === 1 ? 2 : ratio >= 0.7 ? 1 : 0;
     for (var i = 0; i < nPacks; i++) {
@@ -1172,7 +1617,7 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
     }
     save();
     var headline = stars === 3 ? 'Victoire éclatante !' : stars === 2 ? 'Belle victoire !' : stars === 1 ? 'Match gagné !' : 'Match nul… on rejoue ?';
-    var idx = LEVELS.indexOf(l), nxt = LEVELS[idx + 1];
+    var lst = listOf(l), idx = lst.indexOf(l), nxt = l.writeAfter ? null : lst[idx + 1];
     var html = '<div class="card result"><h2>' + headline + '</h2>' +
       '<div class="big-stars">' + [0, 1, 2].map(function (i) { return '<span class="' + (i < stars ? 'on' : '') + '">⭐</span>'; }).join('') + '</div>' +
       '<div class="res-score">' + M.score + ' / ' + M.total + '</div>' +
@@ -1192,16 +1637,97 @@ table.conj th{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;colo
     }
     if (stars < 3 && !l.exam) html += '<p class="note">Il faut un sans-faute pour 3 étoiles.</p>';
     html += '<div class="res-actions"><button class="btn" id="again" type="button">Rejouer 🔁</button>' +
+      (l.writeAfter ? '<button class="btn ghost" id="toWrite" type="button">✍️ Maintenant, l’expression écrite ▶</button>' : '') +
       (nxt ? '<button class="btn ghost" id="nextLvl" type="button">' + nxt.icon + ' ' + nxt.name + ' ▶</button>' : '') +
       '<button class="btn ghost" id="toHome" type="button">Parcours</button></div></div>';
     var el = $('#scr-result'); el.innerHTML = html;
     $$('.pack', el).forEach(function (b) { b.onclick = function () { if (!b.classList.contains('open')) { b.classList.add('open'); sGoal(); } }; });
     $('#again').onclick = function () { startLevel(l); };
-    if (nxt) $('#nextLvl').onclick = function () { if (nxt.lesson) startLesson(); else startLevel(nxt); };
+    if (nxt) $('#nextLvl').onclick = function () { openLevel(nxt); };
+    if (l.writeAfter) $('#toWrite').onclick = startWriting;
     $('#toHome').onclick = goHome;
     show('result');
     sWhistle();
     if (stars >= 2) confetti();
+  }
+
+  /* ---------------- expression écrite ---------------- */
+  function writeChecks(r) {
+    return [
+      [r.sentences >= 6, 'Au moins 6 phrases (' + r.sentences + ')'],
+      [r.imp.length >= 2, 'Au moins 2 verbes à l’imparfait pour le décor (' + r.imp.length + ')'],
+      [r.pc.length >= 3, 'Au moins 3 verbes au passé composé pour les actions (' + r.pc.length + ')'],
+      [r.links.length >= 2, 'Au moins 2 mots de liaison : tout à coup, ensuite, à la fin… (' + r.links.length + ')'],
+      [r.warn.length === 0 && r.sentences > 0, r.warn.length ? r.warn.length + ' point(s) à vérifier, en orange' : 'Aucune erreur repérée par le coach']
+    ];
+  }
+  function highlight(text, r) {
+    var marks = r.warn.map(function (w) { return { s: w.s, e: w.e, c: 'wn' }; })
+      .concat(r.pc.map(function (x) { return { s: x.s, e: x.e, c: 'vp' }; }), r.imp.map(function (x) { return { s: x.s, e: x.e, c: 'vi' }; }))
+      .sort(function (a, b) { return a.s - b.s || (a.c === 'wn' ? -1 : 1); });
+    var out = '', at = 0;
+    marks.forEach(function (m) { if (m.s < at) return; out += esc(text.slice(at, m.s)) + '<span class="' + m.c + '">' + esc(text.slice(m.s, m.e)) + '</span>'; at = m.e; });
+    return out + esc(text.slice(at));
+  }
+  var draftT = null;
+  function startWriting() {
+    hush();
+    var p = P(); if (p.wp == null) p.wp = 0;
+    var el = $('#scr-write');
+    el.innerHTML = '<div class="play-top"><button class="icon-btn" id="wBack" type="button" aria-label="Retour">←</button><div class="ptitle"><b>✍️ Expression écrite</b><small>6 à 8 phrases · le décor à l’imparfait, les actions au passé composé</small></div></div>' +
+      '<div class="card"><div class="q-ask">Choisis ton sujet (entraînement, pas le vrai sujet du test)</div><div class="row-chips" id="wSubj">' +
+      F.PROMPTS.map(function (pr, i) { return '<button type="button" class="chip' + (i === p.wp ? ' on' : '') + '" data-i="' + i + '">' + pr[0] + '</button>'; }).join('') + '</div>' +
+      '<p class="w-prompt" id="wPrompt"></p>' +
+      '<div class="two"><div class="tense i"><h3>1 · Le décor</h3><p>Imparfait : l’heure, la météo, le lieu, tes sentiments.</p><em>C’était samedi. Il faisait beau. J’étais…</em></div>' +
+      '<div class="tense p"><h3>2 · Les actions</h3><p>Passé composé : ce qui s’est passé, une fois.</p><em>Tout à coup, j’ai vu… Ensuite, nous sommes allés…</em></div></div>' +
+      '<div class="box">3 · La fin : un bilan, un sentiment. <em>C’était une journée inoubliable.</em> Avant d’écrire, pense à 2 choses du décor et 3 actions.</div>' +
+      '<div class="q-ask" style="margin-top:12px">Touche pour ajouter un début de phrase</div><div class="row-chips" id="wStart">' +
+      F.STARTERS.map(function (s) { return '<button type="button" class="chip">' + s + '</button>'; }).join('') + '</div>' +
+      '<label class="q-ask" for="writeBox" style="display:block;margin-top:14px">Ton texte</label><textarea id="writeBox" rows="9" placeholder="C’était…"></textarea><div id="wAcc"></div>' +
+      '<div class="q-ask">Le coach relit en direct : <span class="ci">imparfait</span> · <span class="cp">passé composé</span> · <span class="ce">à vérifier</span></div>' +
+      '<div class="preview" id="wPrev"></div><ul class="checklist w-check" id="wCheck"></ul><ul class="fb-list" id="wWarn"></ul>' +
+      '<div class="q-actions"><button class="btn" id="wDone" type="button">J’ai fini ✅</button><button class="btn ghost sm" id="wModel" type="button">👀 Voir un modèle</button></div>' +
+      '<div id="wModelBox" class="hint" hidden></div><div id="wResult"></div></div>';
+    var ta = $('#writeBox'); ta.value = p.draft || '';
+    ta.onfocus = function () { lastInput = ta; };
+    $('#wAcc').appendChild(accentBar(el));
+    function prompt() { $('#wPrompt').innerHTML = '<b>' + F.PROMPTS[p.wp][0] + '</b> : ' + F.PROMPTS[p.wp][1]; }
+    function live() {
+      var r = F.analyze(ta.value);
+      $('#wPrev').innerHTML = ta.value.trim() ? highlight(ta.value, r) : '<span class="note">Ton texte apparaîtra ici, en couleur.</span>';
+      $('#wCheck').innerHTML = writeChecks(r).map(function (c) { return '<li class="' + (c[0] ? 'ok' : '') + '">' + (c[0] ? '✅' : '⬜') + ' <span>' + c[1] + '</span></li>'; }).join('');
+      $('#wWarn').innerHTML = r.warn.map(function (w) { return '<li>🟧 ' + w.msg + '</li>'; }).join('');
+      return r;
+    }
+    ta.oninput = function () { p.draft = ta.value; clearTimeout(draftT); draftT = setTimeout(save, 600); live(); };
+    $$('#wSubj .chip', el).forEach(function (c) { c.onclick = function () { p.wp = +c.dataset.i; save(); $$('#wSubj .chip', el).forEach(function (x) { x.classList.toggle('on', x === c); }); prompt(); }; });
+    $$('#wStart .chip', el).forEach(function (c) {
+      c.onclick = function () {
+        var at = ta.selectionStart == null ? ta.value.length : ta.selectionStart, before = ta.value.slice(0, at);
+        var ins = (before && !/\s$/.test(before) ? ' ' : '') + c.textContent.replace(/…$/, '') + (/…$/.test(c.textContent) ? '' : ' ');
+        ta.value = before + ins + ta.value.slice(at); ta.focus(); ta.setSelectionRange(at + ins.length, at + ins.length); ta.oninput();
+      };
+    });
+    $('#wModel').onclick = function () { var b = $('#wModelBox'); b.hidden = !b.hidden; b.innerHTML = '<b>Un modèle</b> (pour comparer, pas pour copier) :<br>' + highlight(F.MODEL, F.analyze(F.MODEL)); };
+    $('#wBack').onclick = goHome;
+    $('#wDone').onclick = function () {
+      var r = live(), c = writeChecks(r), ok = c.filter(function (x) { return x[0]; }).length;
+      if (ta.value.trim().split(/\s+/).length < 25) { toast('Écris au moins 6 phrases avant de valider.'); return; }
+      var stars = ok >= 5 ? 3 : ok >= 4 ? 2 : ok >= 3 ? 1 : 0;
+      var fresh = p.lastW !== ta.value, pts = fresh ? ok * 20 : 0;
+      if (fresh) { p.lastW = ta.value; p.pts += pts; }
+      if (stars > (p.stars.ecrit || 0)) p.stars.ecrit = stars;
+      var got = [];
+      if (ok === 5 && fresh) { p.writings = (p.writings || 0) + 1; if (award('plume')) got.push('plume'); if (p.writings >= 3 && award('ecrivain')) got.push('ecrivain'); }
+      save();
+      var msg = ok === 5 ? 'Rédaction parfaite ! Le coach n’a rien trouvé à redire.' : ok >= 3 ? 'Bon texte. Regarde les cases vides pour aller chercher les 3 étoiles.' : 'Bon début. Complète les cases vides, puis valide encore.';
+      $('#wResult').innerHTML = '<div class="feedback' + (ok >= 4 ? '' : ok >= 3 ? ' mid' : ' bad') + '"><div class="fb-title">' + ['☆☆☆', '★☆☆', '★★☆', '★★★'][stars] +
+        (pts ? '<span class="fb-pts">+' + pts + '</span>' : '') + '</div><p>' + msg + (fresh ? '' : ' (Points déjà comptés pour ce texte.)') + '</p>' +
+        (got.length ? '<p>Nouveau sticker : ' + got.map(function (k) { return STK[k][0] + ' ' + STK[k][1]; }).join(', ') + ' !</p>' : '') + '</div>';
+      if (ok >= 4) { confetti(); sGoal(); } else sMiss();
+      $('#wResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+    prompt(); live(); show('write');
   }
 
   /* ---------------- the lesson ---------------- */

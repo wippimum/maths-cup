@@ -134,8 +134,8 @@ files) for the Year 7 French exam: **imparfait vs passé composé**. It is reach
 Year 7 menu (🇫🇷 button) and from the year chooser. Built from the class revision sheet and
 the class exercise sheet.
 
-- **Two players on one device.** Each has their own points, stars and sticker album. Names
-  are typed on the device, never written into the repo (`test-build.js` checks this page too).
+- Each player has their own points, stars and sticker album. Names are never written into
+  the repo (`test-build.js` checks this page too).
 - **12 stations:** the lesson (8 interactive slides: décor vs action, signal words, imparfait
   builder, passé composé, la maison d'être, agreement with être + a "bonus 5e" note on avoir
   with a COD placed before), avoir/être au présent, ÊTRE or AVOIR goal-shooting, participes
@@ -147,8 +147,21 @@ the class exercise sheet.
   A missing accent gets one free retry.
 - **Rewards:** points, streaks, 1 to 3 stars per station, a mystery sticker pack at 7/10,
   special stickers for exploits, ranks from Remplaçant to Ballon d'Or, a house leaderboard.
+- **Module 2, compréhension + expression écrite** (the real test format: one reading
+  comprehension, one piece of writing). 22 original texts in three levels (6e to 5e, A2),
+  each with 9 questions: multiple choice, true/false, a short written answer (keyword check,
+  then an honest self-check against the model answer), *hunt the verbs* (tap 2 or 3 verbs of
+  one tense in the text), *why this tense?*, and two verbs to conjugate with the text hidden.
+  🔊 reads the text aloud, 📘 gives useful words in English. Then a writing workshop: 10
+  practice subjects, sentence starters, and a live coach that colours every imparfait and
+  passé composé and flags the usual slips (agreement with être, *a tombé*, *c'est* instead
+  of *c'était*, *il fait*, agreement wrongly made with avoir).
+- **Three players.** The public page says *Joueur 1/2/3*. To fill the names on a device
+  without putting them in this repo, open the page once with `#noms=Name1,Name2,Name3` at
+  the end of its address: the names are stored on that device and the address is cleaned.
 - `node test/test-francais.js` checks the engine against hand-checked forms, the worksheet
-  answers, every question bank and every diagnosis.
+  answers, every question bank, every tagged verb in the 22 texts, the writing coach and
+  every diagnosis.
 
 ## Topics — the actual Year 6 course
 

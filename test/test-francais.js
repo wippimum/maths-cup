@@ -9,8 +9,10 @@ const vm = require('vm');
 
 const html = fs.readFileSync(path.join(__dirname, '..', 'examen-de-francais', 'index.html'), 'utf8');
 const src = html.split('<script id="engine">')[1].split('</script>')[0];
+const textes = html.split('<script id="textes">')[1].split('</script>')[0];
 const sandbox = { window: {} };
 vm.runInNewContext(src, sandbox);
+vm.runInNewContext(textes, sandbox);
 const F = sandbox.window.FR;
 
 let checks = 0, fails = 0;
@@ -85,7 +87,39 @@ has(diag('a mangé', b('manger', 'imp', 2)), 'passé composé', 'passé composé
 has(diag('finissait', b('finir', 'imp', 3)), '-ions', 'right stem, wrong ending');
 has(diag('sommes allés', b('aller', 'pc', 5, 'm')), 'mauvaise personne', 'wrong person of the auxiliary');
 
-// 7. nothing personal in the published page
+// 7. module 2: every text is complete and every tagged verb is a real form in the right tense
+const AUX = F.AVOIR.concat(F.ETRE);
+const IMPS = new Set(), PPS = new Set();
+Object.keys(F.V).forEach((v) => { for (let p = 0; p < 6; p++) IMPS.add(F.imp(v, p)); ['', 'e', 's', 'es'].forEach((x) => PPS.add(F.V[v].pp + x)); });
+const ids = new Set();
+eq(F.TEXTS.length >= 20, true, 'at least 20 reading texts');
+F.TEXTS.forEach((T) => {
+  const who = `text "${T.t}"`;
+  checks++; if (ids.has(T.id)) { fails++; console.log(`  ✗ duplicate id ${T.id}`); } ids.add(T.id);
+  eq([T.q.length, T.vf.length, T.o.length, T.c.length], [3, 2, 3, 2], `${who} has every part`);
+  T.q.forEach((q) => { checks++; if ((q.match(/\*/g) || []).length !== 1 || q.split('|').length < 4) { fails++; console.log(`  ✗ ${who}: bad choice "${q}"`); } });
+  const tags = [...T.x.matchAll(/\[([ip]):([^\]]+)\]/g)];
+  const imps = tags.filter((m) => m[1] === 'i'), pcs = tags.filter((m) => m[1] === 'p');
+  checks++; if (imps.length < 3 || pcs.length < 3) { fails++; console.log(`  ✗ ${who}: needs 3+ verbs of each tense (${imps.length}/${pcs.length})`); }
+  imps.forEach((m) => { checks++; if (!IMPS.has(m[2])) { fails++; console.log(`  ✗ ${who}: "${m[2]}" is not an imparfait the engine knows`); } });
+  pcs.forEach((m) => {
+    const w = m[2].replace(/^n’/, '').replace(/ pas /, ' ').split(' ');
+    checks++; if (w.length !== 2 || !AUX.includes(w[0]) || !PPS.has(w[1])) { fails++; console.log(`  ✗ ${who}: "${m[2]}" is not a passé composé the engine knows`); }
+  });
+  checks++; if (/\[[^ip]/.test(T.x.replace(/\[[ip]:[^\]]+\]/g, ''))) { fails++; console.log(`  ✗ ${who}: broken tag`); }
+  T.c.forEach((line) => { checks++; try { F.parseLine(line); } catch (e) { fails++; console.log(`  ✗ ${who}: ${e.message}`); } });
+  // the analyzer must see the same verbs as the tags (proves the tags are complete and not hiding a stray tense)
+  const r = F.analyze(T.x.replace(/\[[ip]:([^\]]+)\]/g, '$1'));
+  checks++; if (r.imp.length !== imps.length) { fails++; console.log(`  ✗ ${who}: tagged ${imps.length} imparfaits, the checker finds ${r.imp.length}`); }
+});
+
+// 8. the writing coach on the worksheet's model answer, and on typical slips
+const model = F.analyze(F.MODEL);
+eq([model.imp.length, model.pc.length, model.warn.length, model.sentences], [6, 6, 0, 8], 'coach on the model answer');
+const slips = F.analyze('Elle est allé au parc. Il a tombé. C’est super. Il fait beau. Elles ont jouées. Nous sommes partis.');
+eq(slips.warn.length, 5, 'coach flags the five slips (and accepts "nous sommes partis")');
+
+// 9. nothing personal in the published page
 [/\bHamdan\b/i, /\bSultan\b/i, /[\w.+-]+@[\w-]+\.[\w.]+/].forEach((re) => {
   checks++; const m = html.match(re); if (m) { fails++; console.log(`  ✗ the page contains "${m[0]}"; it is public`); }
 });
