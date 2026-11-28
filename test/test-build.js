@@ -86,6 +86,24 @@ if (!direct.length) ok();
 if (!/function curStep\(\)/.test(app)) bad('app.js has no curStep() helper'); else ok();
 if (!/return \(step && step\.mode\) \|\| 'build'/.test(app)) bad('stepMode() no longer tolerates a missing step'); else ok();
 
+// 4b. no two source files export the same name. Every file merges its exports into one shared
+// object (window.WAC), so a second file exporting a name silently REPLACES the first: a Year 7
+// orderFractions once took over the Year 6 "Order & compare fractions" level that way.
+{
+  // Known, deliberate overrides: coords.js replaces topics5.js's coordinate questions (it loads
+  // later and adds negative axes), and numbers.js and fraction.js carry the same gcd helper.
+  const INTENDED = { gcd: ['numbers.js', 'fraction.js'], readCoordinate: ['topics5.js', 'coords.js'], reflectPoint: ['topics5.js', 'coords.js'] };
+  const owner = {};
+  files.forEach((f) => {
+    let mod; try { mod = require(path.join(ROOT, 'src', f)); } catch (e) { return; }
+    Object.keys(mod || {}).forEach((k) => {
+      if (owner[k] && owner[k] !== f && INTENDED[k] && INTENDED[k].includes(f) && INTENDED[k].includes(owner[k])) ok();
+      else if (owner[k] && owner[k] !== f) bad(`${f} and ${owner[k]} both export "${k}" — the one loaded last silently replaces the other`);
+      else { owner[k] = f; ok(); }
+    });
+  });
+}
+
 // 5. nothing personal committed — this repo is public.
 // "the Al Falasi brothers" in the footer is deliberate; it is the boys' FIRST names and
 // any email address that must never appear, so the URL can't be tied back to them.

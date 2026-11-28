@@ -841,17 +841,23 @@
     // inside the conversion level rather than taking a row of its own, and multiply and
     // divide share one. Borrowing keeps all three of its rows — it is the lesson he is
     // actually on, and the whole-take-a-fraction case is two of the six worked examples.
-    { id: 'y7frac', year: 7, name: 'Fractions & Mixed Numbers', icon: '½', blurb: 'KS3: adding and subtracting mixed numbers — carrying, borrowing, and always in its simplest form.', levels: [
-      { id: 'y7-mixed', name: 'Mixed ↔ improper', badge: '🔄', generate: () => { const r = Math.random(); return r < 0.25 ? T.oddOneOut() : r < 0.62 ? T.mixedToImproper() : T.improperToMixed(); } },
-      { id: 'y7-lowest', name: 'Improper → mixed, simplest form', badge: '➗', generate: () => T.improperLowestTerms() },
-      { id: 'y7-mixed-same', name: 'Mixed numbers, same denominator', badge: '➕', generate: () => (Math.random() < 0.25 ? T.sameDenTopHeavy() : T.sameDenMixed()) },
-      { id: 'y7-carry', name: 'Adding with carrying', badge: '🎒', generate: () => T.carryMixed() },
-      { id: 'bor-whole', name: 'A whole take a fraction', badge: '1️⃣', generate: () => T.borrowFromWhole() },
-      { id: 'y7-borrow', name: 'Subtracting with borrowing', badge: '🔻', generate: () => T.borrowMixedPair(Math.random() < 0.5) },
-      { id: 'bor-decide', name: 'Borrow or not? You decide', badge: '🤔', generate: () => T.borrowOrNot() },
-      { id: 'y7-diffden', name: 'Different denominators', badge: '🏆', generate: () => T.mixedPlusFraction() },
-      { id: 'y7-muldiv', name: 'Multiply & divide', badge: '✖️', generate: () => (Math.random() < 0.5 ? T.multMixed() : T.divideFractions()) },
-      { id: 'y7-solo', name: 'No steps — just the answer', badge: '🔥', generate: () => T.unaided() },
+    { id: 'y7frac', year: 7, name: 'Fractions & Mixed Numbers', icon: '½', blurb: 'KS3 (CGP Section 5): equivalent fractions, ordering, mixed numbers, carrying and borrowing, multiplying and dividing, fractions and decimals.', levels: [
+      { id: 'y7-equiv', group: '1 · Fraction basics', name: 'Equivalent fractions', badge: '🟰', generate: () => T.equivMissing() },
+      { id: 'y7-cancel', group: '1 · Fraction basics', name: 'Lowest terms, step by step', badge: '✂️', generate: () => T.cancelDown() },
+      { id: 'y7-order', group: '1 · Fraction basics', name: 'Ordering fractions', badge: '📶', generate: () => T.y7OrderFractions() },
+      { id: 'y7-mixed', group: '2 · Mixed numbers', name: 'Mixed ↔ improper', badge: '🔄', generate: () => { const r = Math.random(); return r < 0.25 ? T.oddOneOut() : r < 0.62 ? T.mixedToImproper() : T.improperToMixed(); } },
+      { id: 'y7-lowest', group: '2 · Mixed numbers', name: 'Improper → mixed, simplest form', badge: '➗', generate: () => T.improperLowestTerms() },
+      { id: 'y7-mixed-same', group: '3 · Adding & subtracting', name: 'Mixed numbers, same denominator', badge: '➕', generate: () => (Math.random() < 0.25 ? T.sameDenTopHeavy() : T.sameDenMixed()) },
+      { id: 'y7-carry', group: '3 · Adding & subtracting', name: 'Adding with carrying', badge: '🎒', generate: () => T.carryMixed() },
+      { id: 'bor-whole', group: '3 · Adding & subtracting', name: 'A whole take a fraction', badge: '1️⃣', generate: () => T.borrowFromWhole() },
+      { id: 'y7-borrow', group: '3 · Adding & subtracting', name: 'Subtracting with borrowing', badge: '🔻', generate: () => T.borrowMixedPair(Math.random() < 0.5) },
+      { id: 'bor-decide', group: '3 · Adding & subtracting', name: 'Borrow or not? You decide', badge: '🤔', generate: () => T.borrowOrNot() },
+      { id: 'y7-diffden', group: '3 · Adding & subtracting', name: 'Different denominators', badge: '🏆', generate: () => T.mixedPlusFraction() },
+      { id: 'y7-rest', group: '3 · Adding & subtracting', name: 'What fraction is left?', badge: '🧁', generate: () => T.restFraction() },
+      { id: 'y7-times', group: '4 · Multiply, divide & decimals', name: 'Multiplying fractions', badge: '✖️', generate: () => T.timesFraction() },
+      { id: 'y7-muldiv', group: '4 · Multiply, divide & decimals', name: 'Mixed numbers: × and ÷, reciprocals', badge: '➗', generate: () => (Math.random() < 0.5 ? T.multMixed() : T.divideFractions()) },
+      { id: 'y7-dec', group: '4 · Multiply, divide & decimals', name: 'Fractions ↔ decimals', badge: '🔟', generate: () => T.fracDecimal() },
+      { id: 'y7-solo', group: '4 · Multiply, divide & decimals', name: 'No steps — just the answer', badge: '🔥', generate: () => T.unaided() },
     ] },
     // Year 7 Topic 5 geometry (KS3), two tiles. Every question is cut into one-move steps:
     // which shape, which reason, equal or 180, then the number. See geometry7.js.

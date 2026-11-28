@@ -743,7 +743,175 @@
       ] };
   }
 
-  const api = { improperLowestTerms, multMixed, divideFractions, oddOneOut,
+
+  // ================================================================== CGP Section 5, checked
+  // These six follow sections of the CGP Foundation book (Section 5, Fractions) that the
+  // levels above did not reach: 5.1 equivalent fractions and lowest terms, 5.3 ordering,
+  // 5.4 "the rest" problems, 5.5 multiplying, 5.6 fractions and decimals. One move per step.
+  const say = (msg) => ({ correct: false, id: 'g7-say', ctx: { msg } });
+  const uniq = (a) => [...new Set(a.map(String))];
+  const primeFactors = (n) => { const out = []; for (let p = 2; n > 1; p++) while (n % p === 0) { out.push(p); n /= p; } return out; };
+
+  // ---- 5.1 the missing number in a pair of equivalent fractions
+  function equivMissing() {
+    const d = pick([2, 3, 4, 5, 6, 7, 8]), n = rand(1, d - 1), k = rand(2, 6);
+    if (gcd(n, d) !== 1) return equivMissing();
+    const up = Math.random() < 0.6;
+    if (up) {
+      const D = d * k, N = n * k;
+      return { subject: 'y7frac', sig: `eq:${n}/${d}=${D}`, given: `Fill in the missing number:  ${n}/${d} = ?/${D}`, answer: String(N),
+        steps: [
+          nStep({ key: 'k', prompt: `The bottoms: what do you multiply ${d} by to get ${D}?`, answer: k, lo: 1, hi: k + 6, hint: `${d} × ${k} = ${D}.`, why: 'Equivalent fractions have the same value. Whatever you do to the bottom, you must do to the top.', resultText: `× ${k}`, expr: `${D} ÷ ${d}` }),
+          nStep({ key: 'n', prompt: `Do the same to the top: ${n} × ${k} = ?`, answer: N, lo: Math.max(1, N - 8), hi: N + 8, hint: `${n} × ${k} = ${N}.`, why: `${n}/${d} and ${N}/${D} are the same amount, cut into ${k} times as many pieces.`, longWay: `${d} × ${k} = ${D}\n${n} × ${k} = ${N}\nso ${n}/${d} = ${N}/${D}`, resultText: `${n}/${d} = ${N}/${D}`, expr: `${n} × ${k}`, isAnswer: true }),
+        ] };
+    }
+    const N = n * k, D = d * k;
+    return { subject: 'y7frac', sig: `eqd:${N}/${D}=${n}`, given: `Find b:  ${N}/${D} = ${n}/b`, answer: String(d),
+      steps: [
+        nStep({ key: 'k', prompt: `The tops: what do you divide ${N} by to get ${n}?`, answer: k, lo: 1, hi: k + 6, hint: `${N} ÷ ${k} = ${n}.`, why: 'Whatever you do to the top, do to the bottom.', resultText: `÷ ${k}`, expr: `${N} ÷ ${n}` }),
+        nStep({ key: 'b', prompt: `Do the same to the bottom: ${D} ÷ ${k} = ?`, answer: d, lo: 1, hi: d + 8, hint: `${D} ÷ ${k} = ${d}.`, why: 'Dividing top and bottom by the same number keeps the value the same.', longWay: `${N} ÷ ${k} = ${n}\n${D} ÷ ${k} = ${d}\nso b = ${d}`, resultText: `b = ${d}`, expr: `${D} ÷ ${k}`, isAnswer: true }),
+      ] };
+  }
+
+  // ---- 5.1 cancel down one common factor at a time (and "A as a fraction of B")
+  function cancelDown() {
+    const q = pick([3, 4, 5, 7, 8, 9]), p = rand(1, q - 1);
+    const g = pick([4, 6, 8, 9, 10, 12]);
+    if (gcd(p, q) !== 1) return cancelDown();
+    const A = p * g, B = q * g;
+    const asFrac = Math.random() < 0.4;
+    const steps = [];
+    if (asFrac) steps.push(sStep({ key: 'write', prompt: `Express ${A} as a fraction of ${B}. First, write it as a fraction:`, answer: `${A}/${B}`, pool: shuffle(uniq([`${A}/${B}`, `${B}/${A}`, `${A}/${A + B}`, `${B - A}/${B}`])),
+      diagnose: (v) => say(`The first number goes on top, the second underneath: ${A}/${B}.`), hint: `“${A} as a fraction of ${B}” is ${A}/${B}.`, why: 'Write the first number over the second, then simplify.', resultText: `${A}/${B}` }));
+    let a = A, b = B;
+    primeFactors(g).forEach((f, i) => {
+      const notF = [2, 3, 5, 7, 11].filter((x) => x !== f && !(a % x === 0 && b % x === 0)).slice(0, 3);
+      steps.push(nStep({ key: 'f' + i, prompt: `${a}/${b}: which of these is a common factor of ${a} and ${b}?`, answer: f, pool: shuffle([f, ...notF]), hint: `${f} goes into both ${a} and ${b}.`, why: 'A common factor divides both the numerator and the denominator exactly.', resultText: `${f} is a common factor`, expr: `a number that divides ${a} and ${b}` }));
+      const na = a / f, nb = b / f;
+      steps.push(sStep({ key: 'd' + i, prompt: `Divide top and bottom by ${f}:`, answer: `${na}/${nb}`, pool: shuffle(uniq([`${na}/${nb}`, `${na}/${b}`, `${a}/${nb}`, `${a - f}/${b - f}`])),
+        diagnose: () => say(`Divide BOTH: ${a} ÷ ${f} = ${na} and ${b} ÷ ${f} = ${nb}.`), hint: `${a} ÷ ${f} = ${na}, ${b} ÷ ${f} = ${nb}.`, why: 'Cancelling down: divide top and bottom by the same number.', resultText: `${na}/${nb}` }));
+      a = na; b = nb;
+    });
+    steps.push(sStep({ key: 'done', prompt: `${p}/${q}: is there any common factor left (apart from 1)? So the lowest terms are…`, answer: `${p}/${q}`, pool: shuffle(uniq([`${p}/${q}`, `${p * 2}/${q * 2}`, `${q}/${p}`, `${p}/${q + 1}`])), isAnswer: true,
+      diagnose: () => say(`${p} and ${q} share no factor except 1, so ${p}/${q} is in its lowest terms.`), hint: `${p} and ${q} have no common factor: ${p}/${q}.`, why: 'Keep cancelling until top and bottom have no common factor. Then it is in its lowest terms.', longWay: `${A}/${B}` + primeFactors(g).map((f) => ` → ÷${f}`).join('') + ` → ${p}/${q}`, resultText: `${A}/${B} = ${p}/${q}` }));
+    return { subject: 'y7frac', sig: `cd:${A}/${B}:${asFrac}`, given: asFrac ? `Express ${A} as a fraction of ${B}, in its lowest terms.` : `Write ${A}/${B} in its lowest terms.`, answer: `${p}/${q}`, steps };
+  }
+
+  // ---- 5.3 put three fractions in order
+  function y7OrderFractions() {
+    const sets = [[2, 4, 8], [3, 4, 6], [2, 3, 6], [4, 5, 10], [2, 5, 10], [3, 4, 12], [2, 3, 4], [5, 6, 10]];
+    const ds = shuffle(pick(sets));
+    const fr = ds.map((d) => { let n; do { n = rand(1, d - 1); } while (gcd(n, d) !== 1); return [n, d]; });
+    const L = ds.reduce((a, b) => lcm(a, b), 1);
+    const scaled = fr.map(([n, d]) => n * (L / d));
+    if (new Set(scaled).size < 3) return y7OrderFractions();
+    const str = (f) => `${f[0]}/${f[1]}`;
+    const sorted = fr.map((f, i) => [f, scaled[i]]).sort((a, b) => a[1] - b[1]);
+    const ans = sorted.map((x) => str(x[0])).join(', ');
+    const wrongOrders = uniq([fr.map(str).join(', '), sorted.slice().reverse().map((x) => str(x[0])).join(', '), fr.slice().sort((a, b) => a[1] - b[1]).map(str).join(', '), fr.slice().sort((a, b) => a[0] - b[0]).map(str).join(', ')]).filter((o) => o !== ans).slice(0, 3);
+    const steps = [
+      nStep({ key: 'L', prompt: `Find a common denominator: the smallest number that ${ds.join(', ')} all go into.`, answer: L, pool: uniq([L, ds[0] * ds[1] * ds[2], Math.max(...ds), L * 2]).map(Number).filter((v, i, a) => a.indexOf(v) === i).slice(0, 4), hint: `${L} is in the ${ds.join(', ')} times tables.`, why: 'You can only compare fractions fairly when they are cut into the same size pieces: a common denominator.', resultText: `common denominator ${L}`, expr: `the LCM of ${ds.join(', ')}` }),
+    ];
+    fr.forEach(([n, d], i) => steps.push(nStep({ key: 'r' + i, prompt: `${n}/${d} = ?/${L}`, answer: scaled[i], lo: 1, hi: L, hint: `× ${L / d}: ${n} × ${L / d} = ${scaled[i]}.`, why: 'Multiply top and bottom by the same number.', resultText: `${n}/${d} = ${scaled[i]}/${L}`, expr: `${n} × ${L / d}` })));
+    steps.push(sStep({ key: 'order', prompt: `Now compare the numerators (${scaled.join(', ')}). Smallest to largest, in their ORIGINAL form:`, answer: ans, pool: shuffle([ans, ...wrongOrders]), isAnswer: true,
+      diagnose: () => say(`Over ${L}ths they are ${sorted.map((x) => x[1] + '/' + L).join(', ')}. In original form: ${ans}.`), hint: `${sorted.map((x) => x[1]).join(' < ')}.`, why: 'Same denominator: the bigger numerator is the bigger fraction. Then write them back the way they started.', longWay: fr.map((f, i) => `${str(f)} = ${scaled[i]}/${L}`).join('\n') + `\norder: ${ans}`, resultText: ans }));
+    return { subject: 'y7frac', sig: `or:${fr.map(str).join(',')}`, given: `Put in order, smallest first:  ${fr.map(str).join(',  ')}`, answer: ans, steps };
+  }
+
+  // ---- 5.4 what fraction is left? ("the rest are…")
+  const REST = [
+    ['A maths exam has some questions.', 'are on number', 'are on algebra', 'the rest are on geometry', 'What fraction are on geometry?'],
+    ['In a school survey,', 'of the pupils walk to school', 'catch the bus', 'the rest come by car', 'What fraction come by car?'],
+    ['A bag of sweets:', 'are chocolates', 'are toffees', 'the rest are mints', 'What fraction are mints?'],
+    ['In a garden,', 'of the flowers are roses', 'are tulips', 'the rest are daisies', 'What fraction are daisies?'],
+  ];
+  function restFraction() {
+    const [d1, d2] = pick([[2, 3], [2, 5], [3, 4], [4, 5], [2, 7], [3, 5], [4, 6], [5, 6]]);
+    let n1, n2;
+    do { n1 = rand(1, d1 - 1); n2 = rand(1, d2 - 1); } while (gcd(n1, d1) !== 1 || gcd(n2, d2) !== 1 || n1 / d1 + n2 / d2 >= 1);
+    const L = lcm(d1, d2), a = n1 * L / d1, b = n2 * L / d2, r = L - a - b, g = gcd(r, L);
+    const ctx = pick(REST);
+    const fin = `${r / g}/${L / g}`;
+    return { subject: 'y7frac', sig: `rest:${n1}/${d1}+${n2}/${d2}`, given: `${ctx[0]} ${n1}/${d1} ${ctx[1]}, ${n2}/${d2} ${ctx[2]} and ${ctx[3]}. ${ctx[4]}`, answer: fin,
+      steps: [
+        nStep({ key: 'whole', prompt: 'All the parts together make the whole. As a number, the whole is…', answer: 1, pool: [1, 100, 2, 10], hint: 'Everything = 1 whole.', why: 'The fractions of every group must add up to 1.', resultText: 'everything = 1', expr: 'the whole thing' }),
+        nStep({ key: 'L', prompt: `Common denominator for ${d1} and ${d2}?`, answer: L, pool: uniq([L, d1 * d2 === L ? L * 2 : d1 * d2, d1 + d2, Math.max(d1, d2)]).map(Number), hint: `${L} is in both times tables.`, why: 'To take fractions away, they need the same denominator.', resultText: `${L}ths`, expr: `the LCM of ${d1} and ${d2}` }),
+        nStep({ key: 'a', prompt: `${n1}/${d1} = ?/${L}`, answer: a, lo: 1, hi: L, hint: `${n1} × ${L / d1} = ${a}.`, why: 'Multiply top and bottom by the same number.', resultText: `${a}/${L}`, expr: `${n1} × ${L / d1}` }),
+        nStep({ key: 'b', prompt: `${n2}/${d2} = ?/${L}`, answer: b, lo: 1, hi: L, hint: `${n2} × ${L / d2} = ${b}.`, why: 'Multiply top and bottom by the same number.', resultText: `${b}/${L}`, expr: `${n2} × ${L / d2}` }),
+        sStep({ key: 'rest', prompt: `1 = ${L}/${L}. So the rest = ${L}/${L} − ${a}/${L} − ${b}/${L} = ? (simplest form)`, answer: fin, pool: shuffle(uniq([fin, `${r}/${L}` === fin ? `${r + 1}/${L}` : `${r}/${L}`, `${a + b}/${L}`, `${r}/${d1 + d2}`])), isAnswer: true,
+          diagnose: (v) => say(v === `${r}/${L}` ? 'The value is right, but it is not finished: simplify it.' : v === `${a + b}/${L}` ? 'That is the two groups you know. The rest is what is LEFT of 1.' : `${L} − ${a} − ${b} = ${r}, so ${r}/${L}${g > 1 ? ` = ${fin}` : ''}.`),
+          hint: `${L} − ${a} − ${b} = ${r}: ${r}/${L}${g > 1 ? ` = ${fin}` : ''}.`, why: 'Take the known fractions away from 1 whole.', longWay: `1 − ${n1}/${d1} − ${n2}/${d2}\n= ${L}/${L} − ${a}/${L} − ${b}/${L}\n= ${r}/${L}${g > 1 ? ` = ${fin}` : ''}`, resultText: `the rest = ${fin}` }),
+      ] };
+  }
+
+  // ---- 5.5 multiplying: by a unit fraction, whole × fraction, fraction "of", fraction × fraction
+  function timesFraction() {
+    const kind = pick(['unit', 'whole', 'of', 'two']);
+    if (kind === 'unit') {
+      const d = rand(2, 9), q = rand(2, 12), W = d * q;
+      return { subject: 'y7frac', sig: `tu:${W}x1/${d}`, given: `Work out  ${W} × 1/${d}`, answer: String(q),
+        steps: [
+          sStep({ key: 'rule', prompt: `Multiplying by 1/${d} is the same as…`, answer: `dividing by ${d}`, pool: shuffle([`dividing by ${d}`, `multiplying by ${d}`, `adding ${d}`, `taking away ${d}`]), diagnose: () => say(`× 1/${d} means one ${d === 2 ? 'half' : `${d}th`} of it: that is ÷ ${d}.`), hint: `× 1/${d} = ÷ ${d}.`, why: 'Multiplying by a unit fraction (1 on top) is the same as dividing by the bottom number.', resultText: `÷ ${d}` }),
+          nStep({ key: 'q', prompt: `${W} ÷ ${d} = ?`, answer: q, lo: 1, hi: q + 10, hint: `${W} ÷ ${d} = ${q}.`, why: `${W} × 1/${d} = ${W} ÷ ${d}.`, longWay: `${W} × 1/${d} = ${W} ÷ ${d} = ${q}`, resultText: `${q}`, expr: `${W} ÷ ${d}`, isAnswer: true }),
+        ] };
+    }
+    if (kind === 'whole' || kind === 'of') {
+      const d = rand(3, 9), n = rand(2, d - 1), q = rand(2, 9), W = d * q;
+      if (gcd(n, d) !== 1) return timesFraction();
+      const steps = [];
+      if (kind === 'of') steps.push(sStep({ key: 'of', prompt: `${n}/${d} of ${W}: what does “of” mean here?`, answer: '×', pool: ['×', '+', '−', '÷'], diagnose: () => say('In maths, “of” means multiply: 3/5 of 20 = 3/5 × 20.'), hint: '“of” = ×.', why: 'You can replace “of” with a multiplication sign.', resultText: `${n}/${d} × ${W}` }));
+      steps.push(nStep({ key: 'div', prompt: `Divide by the bottom: ${W} ÷ ${d} = ?`, answer: q, lo: 1, hi: q + 10, hint: `${W} ÷ ${d} = ${q}.`, why: 'Multiplying by a fraction: divide by the denominator and multiply by the numerator (either order).', resultText: `${W} ÷ ${d} = ${q}`, expr: `${W} ÷ ${d}` }));
+      steps.push(nStep({ key: 'mul', prompt: `Multiply by the top: ${q} × ${n} = ?`, answer: q * n, lo: Math.max(1, q * n - 10), hi: q * n + 10, hint: `${q} × ${n} = ${q * n}.`, why: `${W} ÷ ${d} is one ${d}th; ${n} of them is ${q * n}.`, longWay: `${W} ÷ ${d} = ${q}\n${q} × ${n} = ${q * n}`, resultText: `${q * n}`, expr: `${q} × ${n}`, isAnswer: true }));
+      return { subject: 'y7frac', sig: `tw:${kind}:${n}/${d}x${W}`, given: kind === 'of' ? `Find ${n}/${d} of ${W}` : `Work out  ${W} × ${n}/${d}`, answer: String(q * n), steps };
+    }
+    const b = rand(2, 7), d = rand(2, 9), a = rand(1, b - 1), c = rand(1, d - 1);
+    if (gcd(a, b) !== 1 || gcd(c, d) !== 1) return timesFraction();
+    const N = a * c, D = b * d, g = gcd(N, D), fin = `${N / g}/${D / g}`;
+    return { subject: 'y7frac', sig: `tt:${a}/${b}x${c}/${d}`, given: `Work out  ${a}/${b} × ${c}/${d}  (simplest form)`, answer: fin,
+      steps: [
+        nStep({ key: 'top', prompt: `Multiply the tops: ${a} × ${c} = ?`, answer: N, lo: 1, hi: N + 10, hint: `${a} × ${c} = ${N}.`, why: 'To multiply fractions, multiply the numerators and the denominators separately.', resultText: `top ${N}`, expr: `${a} × ${c}` }),
+        nStep({ key: 'bot', prompt: `Multiply the bottoms: ${b} × ${d} = ?`, answer: D, lo: Math.max(2, D - 10), hi: D + 10, hint: `${b} × ${d} = ${D}.`, why: 'No common denominator needed when you multiply.', resultText: `bottom ${D}`, expr: `${b} × ${d}` }),
+        sStep({ key: 'simp', prompt: `${N}/${D} in its simplest form:`, answer: fin, pool: shuffle(uniq([fin, g > 1 ? `${N}/${D}` : `${N}/${D + 1}`, `${a + c}/${b + d}`, `${N}/${b + d}`])), isAnswer: true,
+          diagnose: (v) => say(v === `${N}/${D}` ? 'Right value, but not finished: simplify it.' : v === `${a + c}/${b + d}` ? 'Don’t add: multiply top × top and bottom × bottom.' : `${N}/${D}${g > 1 ? ` ÷ ${g} = ${fin}` : ' is already as simple as it gets'}.`),
+          hint: g > 1 ? `Divide top and bottom by ${g}: ${fin}.` : `${fin} can’t be simplified.`, why: 'Always give fractions in their simplest form.', longWay: `${a}/${b} × ${c}/${d} = ${N}/${D}${g > 1 ? ` = ${fin}` : ''}`, resultText: fin }),
+      ] };
+  }
+
+  // ---- 5.6 fractions and decimals, without a calculator
+  function fracDecimal() {
+    const kind = pick(['to', 'to', 'recur', 'back']);
+    if (kind === 'to') {
+      const opts = [[1, 2], [1, 4], [3, 4], [2, 5], [3, 5], [4, 5], [7, 20], [9, 20], [3, 25], [11, 25], [7, 50], [17, 50], [3, 8], [5, 8]];
+      const [n, d] = pick(opts);
+      const T = [10, 100, 1000].find((t) => t % d === 0), k = T / d, N = n * k;
+      const dec = (n / d).toString();
+      return { subject: 'y7frac', sig: `fd:${n}/${d}`, given: `Write ${n}/${d} as a decimal (no calculator).`, answer: dec,
+        steps: [
+          nStep({ key: 'T', prompt: `Which of 10, 100, 1000 can ${d} be turned into by multiplying?`, answer: T, pool: [10, 100, 1000], hint: `${d} × ${k} = ${T}.`, why: 'Fractions over 10, 100 or 1000 turn straight into decimals: tenths, hundredths, thousandths.', resultText: `over ${T}`, expr: `${d} × ${k}` }),
+          nStep({ key: 'N', prompt: `${n}/${d} = ?/${T}  (multiply the top by ${k} too)`, answer: N, lo: 1, hi: N + 20, hint: `${n} × ${k} = ${N}.`, why: 'Do the same to the top as the bottom.', resultText: `${N}/${T}`, expr: `${n} × ${k}` }),
+          sStep({ key: 'dec', prompt: `${N}/${T} as a decimal:`, answer: dec, pool: shuffle(uniq([dec, (N / (T * 10)).toString(), (N / (T / 10)).toString(), `0.${n}${d}`])), isAnswer: true,
+            diagnose: () => say(`${N}/${T} is ${N} ${T === 10 ? 'tenths' : T === 100 ? 'hundredths' : 'thousandths'}: ${dec}.`), hint: `${N} ÷ ${T} = ${dec}.`, why: `Over ${T}: the last digit sits in the ${T === 10 ? 'tenths' : T === 100 ? 'hundredths' : 'thousandths'} column.`, longWay: `${n}/${d} = ${N}/${T} = ${dec}`, resultText: `${n}/${d} = ${dec}` }),
+        ] };
+    }
+    if (kind === 'recur') {
+      const R = pick([[1, 3, '0.333…'], [2, 3, '0.666…'], [1, 9, '0.111…'], [4, 9, '0.444…'], [1, 6, '0.1666…'], [5, 6, '0.8333…']]);
+      const [n, d, dec] = R;
+      return { subject: 'y7frac', sig: `fr:${n}/${d}`, given: `Write ${n}/${d} as a decimal.`, answer: dec,
+        steps: [
+          sStep({ key: 'kind', prompt: `Can ${d} be turned into 10, 100 or 1000 by multiplying?`, answer: 'No, so the decimal goes on for ever (recurring)', pool: ['No, so the decimal goes on for ever (recurring)', 'Yes, so it stops (terminating)'], diagnose: () => say(`${d} has a factor of 3, and 10, 100, 1000 are only made of 2s and 5s. So it can't: the decimal recurs.`), hint: `${d} is not a factor of 10, 100 or 1000.`, why: 'If the denominator (in lowest terms) has only 2s and 5s as prime factors, the decimal stops. Otherwise it recurs.', resultText: 'recurring' }),
+          sStep({ key: 'dec', prompt: `${n} ÷ ${d} = ?`, answer: dec, pool: shuffle(uniq([dec, dec.replace('…', ''), `0.${n}${d}`, `${d}.${n}`])), isAnswer: true, diagnose: () => say(`${n} ÷ ${d} = ${dec}: it never stops. We write it with a dot over the repeating digit.`), hint: `${n} ÷ ${d} = ${dec}`, why: 'A recurring decimal repeats for ever; a dot goes over the repeating digit.', longWay: `${n}/${d} = ${n} ÷ ${d} = ${dec}`, resultText: `${n}/${d} = ${dec}` }),
+        ] };
+    }
+    const D = pick([10, 100]), N = D === 10 ? pick([2, 4, 5, 6, 8]) : pick([15, 24, 35, 45, 64, 75, 85, 36]);
+    const g = gcd(N, D), fin = `${N / g}/${D / g}`, dec = (N / D).toString();
+    return { subject: 'y7frac', sig: `fb:${dec}`, given: `Write ${dec} as a fraction in its simplest form.`, answer: fin,
+      steps: [
+        sStep({ key: 'over', prompt: `${dec} has its last digit in the ${D === 10 ? 'tenths' : 'hundredths'} column. So ${dec} = ?`, answer: `${N}/${D}`, pool: shuffle(uniq([`${N}/${D}`, `${N}/${D * 10}`, `${N}/${D / 10 || 1}`, `${D}/${N}`])), diagnose: () => say(`${dec} = ${N} ${D === 10 ? 'tenths' : 'hundredths'} = ${N}/${D}.`), hint: `${N}/${D}.`, why: 'Tenths go over 10, hundredths over 100.', resultText: `${N}/${D}` }),
+        sStep({ key: 'simp', prompt: `Simplify ${N}/${D}:`, answer: fin, pool: shuffle(uniq([fin, `${N}/${D}`, `${N / g}/${D}`, `${N}/${D / g}`])), isAnswer: true, diagnose: (v) => say(v === `${N}/${D}` ? 'Right value, not finished: simplify.' : `Divide top AND bottom by ${g}: ${fin}.`), hint: `÷ ${g}: ${fin}.`, why: 'Cancel down by the highest common factor.', longWay: `${dec} = ${N}/${D} = ${fin}`, resultText: `${dec} = ${fin}` }),
+      ] };
+  }
+
+  const api = { equivMissing, cancelDown, y7OrderFractions, restFraction, timesFraction, fracDecimal, improperLowestTerms, multMixed, divideFractions, oddOneOut,
     sameDenTopHeavy, sameDenMixed, carryMixed, borrowMixed, mixedPlusFraction, unaided,
     borrowFromWhole, borrowMixedPair, borrowOrNot };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

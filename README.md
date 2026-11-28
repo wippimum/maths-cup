@@ -57,9 +57,20 @@ the two below it"), and the **three-term** questions from the phone photos
 | Borrow or not? You decide | half need one, half don't — noticing is the skill |
 | Different denominators | `3 2/15 + 6/5`, `3 15/22 − 5/2` |
 | Multiply & divide | multiplying mixed numbers, reciprocals, dividing by a fraction |
+| **Equivalent fractions** (CGP 5.1) | the missing number: `1/5 = ?/20`, `12/30 = 4/b` |
+| **Lowest terms, step by step** (CGP 5.1) | cancel one common factor at a time; "express 20 as a fraction of 100" |
+| **Ordering fractions** (CGP 5.3) | common denominator first, compare numerators, write them back |
+| **What fraction is left?** (CGP 5.4) | "½ walk, ⅕ catch the bus, the rest come by car" |
+| **Multiplying fractions** (CGP 5.5) | × a unit fraction is ÷, whole × fraction, "3/5 of 20", fraction × fraction |
+| **Fractions ↔ decimals** (CGP 5.6) | via 10, 100, 1000; terminating or recurring; decimal back to a fraction |
 | **No steps — just the answer** 🔥 | the same questions with the scaffolding removed |
 
-Ten levels, ordered by difficulty and measured rather than assumed — step counts climb
+**Checked against the CGP book's Section 5 (Fractions)**, now readable from the family's Drive:
+the six bold rows above are the parts of the section the tile did not reach, added as 16 levels
+in four groups (basics, mixed numbers, adding and subtracting, multiply/divide/decimals).
+`node test/test-fractions7.js` recomputes every one of their answers with exact fractions.
+
+The original ten levels were ordered by difficulty and measured rather than assumed — step counts climb
 1 → 6 across the ladder. Two rows carry more than one thing so the list stays short:
 the odd-one-out rides inside the conversion level, and multiply shares a row with
 divide. Borrowing keeps three rows of its own, because it is the lesson he is on.
@@ -431,6 +442,7 @@ node test/test-curriculum.js # every Toddle objective has a level, and every lev
 node test/test-build.js     # the app is correctly assembled: every src file has a script
                             # tag AND an sw.js entry, version stamps agree, load order is
                             # sound, and no names or addresses leaked into a public repo
+node test/test-fractions7.js # Year 7 fractions from CGP Section 5: every answer recomputed exactly
 node test/test-geometry7.js # Year 7 geometry: every drawn angle measured against its label,
                             # the rules, shapes, clues and polygon facts checked independently
 node test/test-vocab.js     # the app says what the class says: every term from the unit
