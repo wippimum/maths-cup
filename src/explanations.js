@@ -271,6 +271,9 @@
     'choose-wrong': () => `Not quite — check which ones really belong, then untap the wrong ones and add any missing.`,
     'pick-wrong': () => `Not that one — read the prompt again and pick the number it's asking for.`,
     'empty': () => `Tap an answer (or a card) first, then press Check.`,
+    // Year 7 geometry: each wrong option carries its own sentence, written where the
+    // question is built (it knows which rule, which angle and which number went wrong).
+    'g7-say': (ctx) => ctx.msg || 'Not quite: read the step again, or tap Hint.',
 
     // Fallback: not a recognised mistake, just not the right move yet.
     'generic': (ctx) => {

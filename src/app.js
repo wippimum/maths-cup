@@ -5,7 +5,7 @@
   const $ = (id) => document.getElementById(id);
   const MATCH_LEN = 10;
 
-  const SUBJ_SHORT = { numeracy: 'Numeracy', integers: 'Integers', bidmas: 'Order of operations', hcf: 'HCF', lcm: 'LCM', primes: 'Primes', fractions: 'Fractions', algebra1: 'Intro to algebra', coords: 'Symmetry & co-ordinates', rounding: 'Degrees of accuracy', decimals: 'Decimals', algebra: 'Linear equations', angles: 'Angles', fdp: 'Fractions, decimals & %', area: 'Mensuration 2D', measures: 'Units & measures', stats: 'Statistical measures', graphs: 'Graphs & data', percent: 'Percentages', geometry: 'Geometric properties', volume: '3D shape & volume', ratio: 'Ratio (extra)', solve: 'Problem solving', y7frac: 'Fractions & mixed numbers', y7comp: 'Computing · Test 1' };
+  const SUBJ_SHORT = { numeracy: 'Numeracy', integers: 'Integers', bidmas: 'Order of operations', hcf: 'HCF', lcm: 'LCM', primes: 'Primes', fractions: 'Fractions', algebra1: 'Intro to algebra', coords: 'Symmetry & co-ordinates', rounding: 'Degrees of accuracy', decimals: 'Decimals', algebra: 'Linear equations', angles: 'Angles', fdp: 'Fractions, decimals & %', area: 'Mensuration 2D', measures: 'Units & measures', stats: 'Statistical measures', graphs: 'Graphs & data', percent: 'Percentages', geometry: 'Geometric properties', volume: '3D shape & volume', ratio: 'Ratio (extra)', solve: 'Problem solving', y7frac: 'Fractions & mixed numbers', y7comp: 'Computing · Test 1', y7ang: 'Angles & parallel lines', y7shape: 'Quadrilaterals & polygons' };
   // School (Toddle) topic numbers, straight from the unit-plan folder names. A few topics
   // are split across more than one tile so no single tile ends up with a dozen levels:
   // T2 is Integers + Order of operations, T3 is HCF + LCM + Primes, T12 is Mensuration +
@@ -13,7 +13,7 @@
   // The school's topic number now lives on the subject itself (see SUBJECTS in
   // problems.js), so the tiles can be listed in course order T1 → T17 and the
   // number can never drift away from the tile it labels.
-  const TASK_WORD = { algebra1: 'ALGEBRA', measures: 'CONVERT', algebra: 'SOLVE', hcf: 'FIND THE HCF', lcm: 'FIND THE LCM', primes: 'PRIMES', ratio: 'RATIO', decimals: 'WORK OUT', percent: 'WORK OUT', solve: 'PROBLEM', fractions: 'FRACTIONS', integers: 'WORK OUT', bidmas: 'WORK IT OUT IN ORDER', rounding: 'ROUND', stats: 'STATISTICS', fdp: 'CONVERT', numeracy: 'WORK OUT', angles: 'FIND THE ANGLE', area: 'WORK OUT', volume: 'VOLUME', coords: 'COORDINATES', geometry: 'SHAPE FACTS', graphs: 'READ THE CHART', y7comp: 'COMPUTING' };
+  const TASK_WORD = { algebra1: 'ALGEBRA', measures: 'CONVERT', algebra: 'SOLVE', hcf: 'FIND THE HCF', lcm: 'FIND THE LCM', primes: 'PRIMES', ratio: 'RATIO', decimals: 'WORK OUT', percent: 'WORK OUT', solve: 'PROBLEM', fractions: 'FRACTIONS', integers: 'WORK OUT', bidmas: 'WORK IT OUT IN ORDER', rounding: 'ROUND', stats: 'STATISTICS', fdp: 'CONVERT', numeracy: 'WORK OUT', angles: 'FIND THE ANGLE', area: 'WORK OUT', volume: 'VOLUME', coords: 'COORDINATES', geometry: 'SHAPE FACTS', graphs: 'READ THE CHART', y7comp: 'COMPUTING', y7ang: 'FIND THE ANGLE', y7shape: 'SHAPE FACTS' };
 
   // ---------------- persistent save ----------------
   const KEY = 'wac-save-v1';

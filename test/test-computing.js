@@ -19,7 +19,7 @@ const path = require('path');
 const W = {};
 for (const f of ['numbers', 'format', 'fraction', 'mathfmt', 'parser', 'explanations', 'figures', 'steps', 'topics',
   'topics2', 'topics3', 'topics4', 'topics5', 'primes', 'coords', 'numeracy1', 'algebra1', 'curriculum1', 'curriculum2',
-  'year7', 'computing7', 'unaided', 'harder', 'harder2', 'bidmas', 'solving', 'problems']) {
+  'year7', 'computing7', 'geometry7', 'unaided', 'harder', 'harder2', 'bidmas', 'solving', 'problems']) {
   Object.assign(W, require('../src/' + f + '.js'));
 }
 const REPS = Number(process.env.REPS || 80);

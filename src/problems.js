@@ -853,6 +853,37 @@
       { id: 'y7-muldiv', name: 'Multiply & divide', badge: '✖️', generate: () => (Math.random() < 0.5 ? T.multMixed() : T.divideFractions()) },
       { id: 'y7-solo', name: 'No steps — just the answer', badge: '🔥', generate: () => T.unaided() },
     ] },
+    // Year 7 Topic 5 geometry (KS3), two tiles. Every question is cut into one-move steps:
+    // which shape, which reason, equal or 180, then the number. See geometry7.js.
+    { id: 'y7ang', year: 7, name: 'Angles & Parallel Lines', icon: '📐', blurb: 'KS3: angle facts and notation, triangles and the exterior angle, F, Z and C in parallel lines, multi-step problems, algebra.', levels: [
+      { id: 'a7-notation', group: '1 · Angle facts', name: 'Naming angles: ∠ABC', badge: '🔤', generate: () => T.angNotation() },
+      { id: 'a7-facts', group: '1 · Angle facts', name: 'Line, point, vertically opposite', badge: '📏', generate: () => T.angFacts() },
+      { id: 'a7-tri', group: '1 · Angle facts', name: 'Triangles & the outside angle', badge: '🔺', generate: () => T.angTriangle() },
+      { id: 'a7-spot', group: '2 · Parallel lines', name: 'Spot the pair: F, Z or C', badge: '👀', generate: () => T.parSpot() },
+      { id: 'a7-corr', group: '2 · Parallel lines', name: 'Corresponding angles (F)', badge: '🅵', generate: () => T.parOne('corresponding') },
+      { id: 'a7-alt', group: '2 · Parallel lines', name: 'Alternate angles (Z)', badge: '🆉', generate: () => T.parOne('alternate') },
+      { id: 'a7-coint', group: '2 · Parallel lines', name: 'Co-interior angles (C)', badge: '🅲', generate: () => T.parOne('cointerior') },
+      { id: 'a7-mixed', group: '2 · Parallel lines', name: 'Which rule? You decide', badge: '🤔', generate: () => T.parOne() },
+      { id: 'a7-chain', group: '3 · Problems', name: 'Two steps: the stepping stone', badge: '🧗', generate: () => T.parChain() },
+      { id: 'a7-tripar', group: '3 · Problems', name: 'Triangles in parallel lines', badge: '🔻', generate: () => T.parTriangle() },
+      { id: 'a7-conv', group: '3 · Problems', name: 'Are the lines parallel?', badge: '⚖️', generate: () => T.parConverse() },
+      { id: 'a7-alg', group: '3 · Problems', name: 'Algebra with angles', badge: '🧮', generate: () => T.parAlgebra() },
+      { id: 'a7-solo', group: '3 · Problems', name: 'No steps — just the answer', badge: '🔥', generate: () => T.angSolo() },
+    ] },
+    { id: 'y7shape', year: 7, name: 'Quadrilaterals & Polygons', icon: '🔷', blurb: 'KS3: name shapes from their properties, triangles, diagonals, symmetry, angles in quadrilaterals, interior and exterior angles of polygons.', levels: [
+      { id: 's7-tree', group: '1 · Properties', name: 'Name it, step by step', badge: '🌳', generate: () => T.shapeTree() },
+      { id: 's7-tri', group: '1 · Properties', name: 'Types of triangle', badge: '🔺', generate: () => T.triTypes() },
+      { id: 's7-diag', group: '1 · Properties', name: 'Diagonals', badge: '✖️', generate: () => T.shapeDiag() },
+      { id: 's7-sym', group: '1 · Properties', name: 'Lines of symmetry & rotation', badge: '🪞', generate: () => T.shapeSym() },
+      { id: 's7-clue', group: '1 · Properties', name: 'Which shape am I?', badge: '🕵️', generate: () => T.shapeClues() },
+      { id: 's7-asn', group: '1 · Properties', name: 'Always, sometimes, never', badge: '🤔', generate: () => T.shapeASN() },
+      { id: 's7-q360', group: '2 · Angles in shapes', name: 'Angles in a quadrilateral', badge: '🔷', generate: () => T.quadAngles() },
+      { id: 's7-qspecial', group: '2 · Angles in shapes', name: 'Special quadrilaterals', badge: '🪁', generate: () => T.quadSpecial() },
+      { id: 's7-psum', group: '3 · Polygons', name: 'Angle sum of a polygon', badge: '⬟', generate: () => T.polySum() },
+      { id: 's7-preg', group: '3 · Polygons', name: 'Regular polygons: inside & outside', badge: '⬢', generate: () => T.polyRegular() },
+      { id: 's7-pmiss', group: '3 · Polygons', name: 'Missing angle in a polygon', badge: '❓', generate: () => T.polyMissing() },
+      { id: 's7-solo', group: '3 · Polygons', name: 'No steps — just the answer', badge: '🔥', generate: () => T.shapeSolo() },
+    ] },
     // COMPUTING, not maths: the Year 7 Computing Term 1 test, built from the school's
     // revision poster (see computing7.js). Seven sections, each LEARN → PRACTISE → REAL
     // LIFE, then the mixed test. `group` puts a section heading above each ladder.

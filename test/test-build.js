@@ -53,9 +53,9 @@ const AFTER = {                       // file : files that must already have loa
   topics: ['numbers', 'format'],
   topics2: ['topics'], topics3: ['topics'], topics4: ['topics'], topics5: ['topics'],
   primes: ['numbers'], coords: ['topics'],
-  algebra1: ['topics'], curriculum1: ['topics'], curriculum2: ['topics', 'figures'], year7: ['topics'], computing7: ['topics', 'explanations'], unaided: [],
+  algebra1: ['topics'], curriculum1: ['topics'], curriculum2: ['topics', 'figures'], year7: ['topics'], computing7: ['topics', 'explanations'], geometry7: ['topics', 'unaided', 'explanations'], unaided: [],
   harder: ['topics'], harder2: ['topics', 'figures'],
-  problems: ['steps', 'topics', 'harder', 'harder2', 'algebra1', 'curriculum1', 'curriculum2', 'year7', 'computing7', 'unaided', 'solving', 'bidmas'],
+  problems: ['steps', 'topics', 'harder', 'harder2', 'algebra1', 'curriculum1', 'curriculum2', 'year7', 'computing7', 'geometry7', 'unaided', 'solving', 'bidmas'],
   app: ['problems', 'history', 'explanations'],
 };
 Object.entries(AFTER).forEach(([f, deps]) => {
@@ -91,7 +91,7 @@ if (!/return \(step && step\.mode\) \|\| 'build'/.test(app)) bad('stepMode() no 
 // any email address that must never appear, so the URL can't be tied back to them.
 const SECRETS = [/[\w.+-]+@[\w-]+\.[\w.]+/, /\bHamdan\b/i, /\bSultan\b/i, /\bAlya\b/i, /\bLeyna\b/i,
   /\b(Hamdan|Sultan)[\s\w]*Al\s*Falasi\b/i];
-fs.readdirSync(path.join(ROOT, 'src')).concat(['index.html', 'stars.html', 'heroes.html', 'examen-de-francais/index.html', 'geometry-y7/index.html', 'sw.js', 'manifest.json', 'README.md']).forEach((f) => {
+fs.readdirSync(path.join(ROOT, 'src')).concat(['index.html', 'stars.html', 'heroes.html', 'examen-de-francais/index.html', 'sw.js', 'manifest.json', 'README.md']).forEach((f) => {
   const p = f.endsWith('.js') && !f.includes('.') === false && fs.existsSync(path.join(ROOT, 'src', f))
     ? path.join(ROOT, 'src', f) : path.join(ROOT, f);
   if (!fs.existsSync(p) || fs.statSync(p).isDirectory()) return;
