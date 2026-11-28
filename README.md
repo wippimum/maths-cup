@@ -166,6 +166,48 @@ the class exercise sheet.
   answers, every question bank, every tagged verb in the 22 texts, the writing coach and
   every diagnosis.
 
+### Geometry Y7: Geometry Cup (quadrilaterals & angles in parallel lines)
+
+`geometry-y7/index.html` is a separate, self-contained page (no build, no `src/` files), the
+same pattern as the French cup. It is reached from the Year 7 menu (📐 button) and from the
+year chooser. Built from the two Topic 5 homework sheets, both Corbettmaths exam-style
+questions with their answer keys: **Quadrilaterals** (14 questions, 36 marks) and
+**Angles: Parallel Lines** (16 questions, 54 marks).
+
+- **Two lessons, 19 slides.** Quadrilaterals: what a quadrilateral is (and why its angles make
+  360°), the marks code (ticks, arrows, right-angle squares), line vs rotational symmetry with
+  a shape you turn a quarter at a time, the parallelogram family and the kite/arrowhead/
+  trapezium cards (tap to show mirror lines and diagonals), the property table (sheet Q10),
+  always/sometimes/never (Q12, Q13), a **shape lab** where you drag four corners and it names
+  the shape live, and dotty-grid drawing with Q14 worked. Parallel lines: the four old facts,
+  the transversal (slide it: only two angle sizes ever appear), F, Z and C each cycled through
+  every pair, an **angle explorer** (tap any angle, its family lights up in the rule colours),
+  the exact reasons examiners accept, and step-by-step worked examples of Q4 and Q13.
+  Every slide ends with a quick check whose wrong answers explain themselves.
+- **13 practice stations**, generated fresh each time: name the shape (the last three with no
+  marks, like Q1), true / false / may be true, which shape am I, symmetry (tap the mirror
+  lines, then the rotation order), draw it on the dotty grid (tap four dots; the classifier
+  checks it), angles in a quadrilateral (bonus), name the pair, find the angle + reason,
+  two-step chains, triangles in parallel lines (four layouts: Q10, Q11, Q12, Q13), parallel or
+  not (Q9), algebra (Q16).
+- **Every reason is its own step.** Questions that say "give a reason" ask for the number and
+  then the reason, from the exact sentences in the lesson. Choosing the wrong rule gets an
+  explanation of where that rule's angles sit and where these ones sit.
+- **Exam room:** both sheets, all 30 questions, marked like the paper (partial marks on the
+  true/false tables and on Q14), plus a fresh mock across both topics.
+- **Colours mean the same everywhere:** gold = given, pink = the angle to find, blue = F
+  (corresponding), orange = Z (alternate), green = C (co-interior), violet = vertically opposite.
+- **Two definitions follow the sheets**: a trapezium has *exactly* one pair of parallel sides
+  (Q13 marks "rotational symmetry order 2" as False), and "draw a kite / parallelogram" wants an
+  ordinary one, so a rhombus or rectangle drawn there is sent back with the reason.
+- **Three players**, *Player 1/2/3* on the public page. To fill names on a device without
+  putting them in the repo, open it once with `#names=Name1,Name2,Name3` on the address.
+- `node test/test-geometry.js` checks it without a browser: the classifier on hand-checked
+  shapes, every generated drawing **measured** against the number printed on it and the
+  answer expected, the parallel-line rules against the sheet's lettered diagram, both sheets
+  against the answer keys and mark totals, and the dotty-grid checker. It found that Q16 had
+  been drawn at 120° when x = 25 makes both angles 135°; the drawing is now true to size.
+
 ## Topics — the actual Year 6 course
 
 The menu follows the school's **Toddle unit plans**, topic by topic. Every
@@ -381,6 +423,8 @@ node test/test-curriculum.js # every Toddle objective has a level, and every lev
 node test/test-build.js     # the app is correctly assembled: every src file has a script
                             # tag AND an sw.js entry, version stamps agree, load order is
                             # sound, and no names or addresses leaked into a public repo
+node test/test-geometry.js  # the Geometry Cup: every drawn angle measured against its label,
+                            # both homework sheets against their answer keys
 node test/test-vocab.js     # the app says what the class says: every term from the unit
                             # plans appears in text a player actually reads, and no
                             # correct-but-different synonym is used instead
