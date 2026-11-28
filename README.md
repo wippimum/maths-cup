@@ -186,6 +186,7 @@ the direction: every question type on them is covered, and so is what sits aroun
 | Angles & Parallel Lines | Quadrilaterals & Polygons |
 | --- | --- |
 | Naming angles: ∠ABC | Name it, step by step (parallel pairs → sides → corners → name) |
+| Angle facts with algebra (CGP 15.1–15.2) | Which shapes have this property? (CGP 15.4) |
 | Line, point, vertically opposite | Types of triangle (by sides, then by angles) |
 | Triangles & the outside angle | Diagonals: equal? at 90°? cut in half? → which shape |
 | Spot the pair: inside? same side? → F, Z or C | Lines of symmetry (test each line) & rotation |
@@ -204,9 +205,16 @@ named, and checks the clue puzzles, diagonal facts, polygon sums and algebra. It
 two quiet errors while being written: a "general" trapezium that could come out with a
 right angle, and kites that could get right angles or equal diagonals by coincidence.
 
-The KS3 CGP books were not available in the session that built this, so the levels follow
-the national curriculum and public KS3 sources. They should be checked against the books
-(and the school's unit plan) when those are to hand.
+**Checked against the CGP book** (CGP *Mathematics for GCSE, Foundation Level*, Section 15
+"Angles and 2D Shapes", book pages 168–188). After reading it, the tiles gained what the book
+teaches and they lacked: angles within a right angle (perpendicular lines), **angle facts with
+algebra** (form the equation, then solve it, the book's method), isosceles triangles from a
+base angle, rhombus angles and the book's kite question, **"which quadrilaterals have this
+property?"**, the unknown exterior angle (exterior angles make 360°), and the symmetry of
+triangles and regular polygons. The book's words sit beside the school's: *allied angles* =
+co-interior, *opposite angles* = vertically opposite, *acute-angled / obtuse-angled* triangles.
+The book itself is not in this repo (it is copyrighted, and the repo is public); it lives,
+split one section per file, in the family's private Google Drive.
 
 ## Topics — the actual Year 6 course
 

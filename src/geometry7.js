@@ -274,7 +274,7 @@
     opts.forEach((k) => { if (k !== rule) wrong[SHAPE[k]] = `${cap(SHAPE[k])} is for angles ${WHERE[k]}. These two are ${WHERE[rule]}.`; });
     return oStep({ key, prompt, options: opts.map((k) => SHAPE[k]), answer: SHAPE[rule], wrong,
       hint: `Put your finger on the ${given} and trace along the lines to the other angle. They are ${WHERE[rule]}.`,
-      why: `Corresponding angles make an F, alternate angles make a Z, co-interior angles make a C. The letter can be back to front, upside down or stretched: it is still that letter.`,
+      why: `Corresponding angles make an F, alternate angles make a Z, co-interior angles make a C. The letter can be back to front, upside down or stretched: it is still that letter. (Your CGP book calls co-interior angles “allied angles”, and calls vertically opposite angles just “opposite angles”. Same rules, different names.)`,
       resultText: `${cap(SHAPE[rule])}` });
   }
   function reasonStep(key, rule, prompt, pool) {
@@ -284,7 +284,7 @@
     opts.forEach((k) => { if (k !== rule) wrong[RS[k]] = `“${RS[k]}” is the rule for angles ${WHERE[k]}. Here the angles are ${WHERE[rule]}, so the reason is: ${RS[rule]}.`; });
     return oStep({ key, prompt: prompt || 'Which reason would you write in the exam?', options: opts.map((k) => RS[k]), answer: RS[rule], wrong,
       hint: `The angles are ${WHERE[rule]}.`,
-      why: `In an exam “give a reason” is a mark of its own. Write the whole rule with its proper name. “Z angles” or “F angles” get no mark.`,
+      why: `In an exam “give a reason” is a mark of its own. Write the whole rule with its proper name. “Z angles” or “F angles” get no mark. (The CGP book says “allied angles add up to 180°” and “opposite angles are equal”: those count too.)`,
       resultText: RS[rule] });
   }
 
@@ -332,7 +332,23 @@
   /* ---- 2. Line, point, vertically opposite ---- */
   function rayAt(O, deg, L) { return [O[0] + L * Math.cos(deg * DEG), O[1] - L * Math.sin(deg * DEG)]; }
   function angFacts() {
-    const kind = pick(['line', 'line', 'point', 'vert']);
+    const kind = pick(['line', 'line', 'point', 'vert', 'right']);
+    if (kind === 'right') {
+      const a = rand(15, 75), x = 90 - a;
+      const K = new Kit(260, 200), O = [60, 170];
+      K.line(O, [240, 170]); K.line(O, [60, 20]); K.line(O, rayAt(O, a, 150)); K.right(O, [240, 170], [60, 20]);
+      K.arc(O, 0, a, { label: `${a}°`, r: 34 }); K.arc(O, a, x, { label: 'x', kind: 'unknown', r: 34 });
+      return {
+        subject: 'y7ang', sig: `fr:${a}`, given: 'The two lines are perpendicular (the little square). Find x.', diagram: K.svg(), answer: `${x}°`, geo: K.geo,
+        steps: [
+          oStep({ key: 'sq', prompt: 'What does the little square in the corner tell you?', options: ['The corner is a right angle: 90°', 'The angle is 180°', 'The two angles are equal'], answer: 'The corner is a right angle: 90°',
+            wrong: { 'The angle is 180°': '180° is a straight line. The little square means a right angle: 90°.', 'The two angles are equal': 'The square says nothing about equal angles. It means the whole corner is 90°.' },
+            hint: 'Perpendicular lines meet at 90°, shown by the little square.', why: 'Perpendicular lines meet at a right angle. The book shows it with a little square.', resultText: 'the whole corner is 90°' }),
+          nStep({ key: 'x', prompt: `Angles within a right angle add up to 90°. So x = 90 − ${a} = ?`, answer: x, traps: { [180 - a]: 'Use 90, not 180: this is a right angle, not a straight line.', [a]: 'x is the other part of the right angle, not the same size.' },
+            hint: `90 − ${a} = ${x}.`, why: 'Angles within a right angle add up to 90°.', longWay: `${a} + x = 90\nx = 90 − ${a} = ${x}°`, resultText: `x = ${x}°`, expr: `90 − ${a}`, isAnswer: true }),
+        ],
+      };
+    }
     if (kind === 'vert') {
       const a = rand(30, 150);
       if (Math.abs(a - 90) < 6) return angFacts();
@@ -390,7 +406,23 @@
     return { A, B, C };
   }
   function angTriangle() {
-    const kind = pick(['sum', 'ext', 'ext', 'iso']);
+    const kind = pick(['sum', 'ext', 'ext', 'iso', 'isoB']);
+    if (kind === 'isoB') {
+      const base = rand(30, 75), apex = 180 - 2 * base;
+      const { A, B, C } = triPts(base, base);
+      const d = free({ pts: { A, B, C }, hide: ['A', 'B', 'C'], lines: [['A', 'B'], ['B', 'C'], ['C', 'A']], ticks: [['A', 'C', 1], ['B', 'C', 1]],
+        angles: [{ at: 'A', from: 'B', to: 'C', t: `${base}°` }, { at: 'B', from: 'A', to: 'C', t: 'j', kind: 'step' }, { at: 'C', from: 'A', to: 'B', t: 'k', kind: 'unknown' }] });
+      return {
+        subject: 'y7ang', sig: `tib:${base}`, given: 'An isosceles triangle (the marked sides are equal). Find j, then the top angle k.', diagram: d.svg, answer: `${apex}°`, geo: d.geo,
+        steps: [
+          nStep({ key: 'j', prompt: `The triangle is isosceles, so j is the same size as which angle? So j = ?`, answer: base, traps: { [apex]: 'j is a base angle: it matches the other base angle.', [180 - base]: 'Equal sides give EQUAL base angles. Copy it.' },
+            hint: `j matches the ${base}° (both at the ends of the unmarked side).`, why: RS.iso + '.', resultText: `j = ${base}°`, expr: `the same as ${base}` }),
+          nStep({ key: 'two', prompt: `Add the two base angles: ${base} + ${base} = ?`, answer: 2 * base, hint: `${base} + ${base} = ${2 * base}.`, why: 'Total the angles you know.', resultText: `${2 * base}°`, expr: `${base} + ${base}` }),
+          nStep({ key: 'k', prompt: `Angles in a triangle add up to 180°. So k = 180 − ${2 * base} = ?`, answer: apex, traps: { [180 - base]: `Take BOTH base angles away: 180 − ${2 * base}.` },
+            hint: `180 − ${2 * base} = ${apex}.`, why: RS.tri + '.', longWay: `j = ${base}° (isosceles)\n${base} + ${base} + k = 180\nk = 180 − ${2 * base} = ${apex}°`, resultText: `k = ${apex}°`, expr: `180 − ${2 * base}`, isAnswer: true }),
+        ],
+      };
+    }
     if (kind === 'iso') {
       const apex = 2 * rand(10, 50), base = (180 - apex) / 2;
       const { A, B, C } = triPts(base, base);
@@ -790,9 +822,9 @@
   /* ---- S2. Triangles: by sides, then by angles ---- */
   function triTypes() {
     const T = pick([
-      { k: 'eq', a: 60, b: 60, s: 'equilateral', ang: 'all acute' }, { k: 'iso', a: 70, b: 70, s: 'isosceles', ang: 'all acute' },
-      { k: 'isoR', a: 45, b: 45, s: 'isosceles', ang: 'right-angled' }, { k: 'isoO', a: 30, b: 30, s: 'isosceles', ang: 'obtuse' },
-      { k: 'sc', a: 50, b: 70, s: 'scalene', ang: 'all acute' }, { k: 'scR', a: 90, b: 35, s: 'scalene', ang: 'right-angled' }, { k: 'scO', a: 25, b: 40, s: 'scalene', ang: 'obtuse' },
+      { k: 'eq', a: 60, b: 60, s: 'equilateral', ang: 'acute-angled' }, { k: 'iso', a: 70, b: 70, s: 'isosceles', ang: 'acute-angled' },
+      { k: 'isoR', a: 45, b: 45, s: 'isosceles', ang: 'right-angled' }, { k: 'isoO', a: 30, b: 30, s: 'isosceles', ang: 'obtuse-angled' },
+      { k: 'sc', a: 50, b: 70, s: 'scalene', ang: 'acute-angled' }, { k: 'scR', a: 90, b: 35, s: 'scalene', ang: 'right-angled' }, { k: 'scO', a: 25, b: 40, s: 'scalene', ang: 'obtuse-angled' },
     ]);
     const { A, B, C } = triPts(T.a, T.b);
     const sides = [len(sub(B, A)), len(sub(C, B)), len(sub(A, C))];
@@ -802,8 +834,8 @@
     const angs = [T.a, T.b, 180 - T.a - T.b];
     const rightAt = angs.indexOf(90);
     const d = free({ pts: { A, B, C }, hide: ['A', 'B', 'C'], lines: [['A', 'B'], ['B', 'C'], ['C', 'A']], ticks, rights: rightAt === 0 ? [['A', 'B', 'C']] : rightAt === 1 ? [['B', 'A', 'C']] : rightAt === 2 ? [['C', 'A', 'B']] : [] });
-    const full = `${T.ang === 'right-angled' ? 'right-angled ' : T.ang === 'obtuse' ? 'obtuse ' : ''}${T.s} triangle`.replace('right-angled equilateral', 'equilateral');
-    const fulls = ['equilateral triangle', 'isosceles triangle', 'scalene triangle', 'right-angled isosceles triangle', 'right-angled scalene triangle', 'obtuse isosceles triangle', 'obtuse scalene triangle'];
+    const full = T.s === 'equilateral' ? 'equilateral triangle' : `${T.ang} ${T.s} triangle`;
+    const fulls = ['equilateral triangle', 'acute-angled isosceles triangle', 'acute-angled scalene triangle', 'right-angled isosceles triangle', 'right-angled scalene triangle', 'obtuse-angled isosceles triangle', 'obtuse-angled scalene triangle'];
     return {
       subject: 'y7shape', sig: `tt:${T.k}`, given: 'Name this triangle: first by its sides, then by its angles.', diagram: d.svg, answer: full,
       steps: [
@@ -811,8 +843,8 @@
           wrong: { 3: 'Count the sides with tick marks.', 2: 'Count the sides with tick marks.', none: 'Some sides carry matching ticks.' }, hint: 'Count the sides that carry the same tick mark.', why: 'Ticks show equal sides.', resultText: `${nEq || 'no'} equal sides` }),
         oStep({ key: 'bysides', prompt: 'So, by its sides, it is…', options: ['equilateral', 'isosceles', 'scalene'], answer: T.s,
           wrong: { equilateral: 'Equilateral means ALL THREE sides equal.', isosceles: 'Isosceles means exactly TWO sides equal.', scalene: 'Scalene means NO sides equal.' }, hint: '3 equal: equilateral. 2 equal: isosceles. None: scalene.', why: 'Equilateral = 3 equal sides (and 3 angles of 60°). Isosceles = 2 equal sides (and 2 equal angles). Scalene = all different.', resultText: T.s }),
-        oStep({ key: 'byang', prompt: 'Now the angles. What is its biggest angle like?', options: ['all acute', 'right-angled', 'obtuse'], answer: T.ang,
-          wrong: { 'all acute': 'Look for a right-angle square or a wide, blunt corner.', 'right-angled': 'There is no little square: no right angle.', obtuse: 'No corner is wider than a right angle.' }, hint: 'A little square = right angle. A corner wider than a square corner = obtuse.', why: 'Acute < 90°, right = 90°, obtuse between 90° and 180°. A triangle can have at most one right or obtuse angle.', resultText: T.ang }),
+        oStep({ key: 'byang', prompt: 'Now the angles. Is it acute-angled (3 acute angles), right-angled (1 right angle) or obtuse-angled (1 obtuse angle)?', options: ['acute-angled', 'right-angled', 'obtuse-angled'], answer: T.ang,
+          wrong: { 'acute-angled': 'Look for a right-angle square or a wide, blunt corner.', 'right-angled': 'There is no little square: no right angle.', 'obtuse-angled': 'No corner is wider than a right angle.' }, hint: 'A little square = right angle. A corner wider than a square corner = obtuse.', why: 'Acute < 90°, right = 90°, obtuse between 90° and 180°. A triangle can have at most one right or obtuse angle. (These are the CGP book’s names.)', resultText: T.ang }),
         oStep({ key: 'full', prompt: 'Put it together. Its full name is…', options: fulls, answer: full,
           wrong: Object.fromEntries(fulls.filter((x) => x !== full).map((x) => [x, `Sides: ${T.s}. Angles: ${T.ang}. So: ${full}.`])), hint: `${T.s} + ${T.ang}.`, why: 'Name the angle type first (if it is right or obtuse), then the side type.', longWay: `${nEq || 'no'} equal sides: ${T.s}\nbiggest angle: ${T.ang}\nso: ${full}`, resultText: full, isAnswer: true }),
       ],
@@ -842,7 +874,26 @@
   }
 
   /* ---- S4. Symmetry: test each line, then turn it ---- */
+  function polySym() {
+    const T = pick([['equilateral triangle', 3, 3, 3], ['isosceles triangle', 3, 1, 1], ['scalene triangle', 3, 0, 1], ['regular pentagon', 5, 5, 5], ['regular hexagon', 6, 6, 6], ['regular octagon', 8, 8, 8], ['square', 4, 4, 4]]);
+    const [nm, n, lines, rot] = T;
+    let svg;
+    if (/triangle/.test(nm)) { const t = nm.startsWith('eq') ? triPts(60, 60) : nm.startsWith('iso') ? triPts(68, 68) : triPts(48, 72); const K = new Kit(300, 210); K.poly([t.A, t.B, t.C]); svg = K.svg(); }
+    else svg = polySVG(n, false, []);
+    const regular = /regular|equilateral|square/.test(nm);
+    return {
+      subject: 'y7shape', sig: `psym:${nm}`, given: `How much symmetry does a${/^[aeiou]/.test(nm) ? 'n' : ''} ${nm} have?`, diagram: svg, answer: `${lines} lines, order ${rot}`,
+      steps: [
+        oStep({ key: 'reg', prompt: `Is a${/^[aeiou]/.test(nm) ? 'n' : ''} ${nm} regular (all sides AND all angles equal)?`, options: ['Yes', 'No'], answer: regular ? 'Yes' : 'No', wrong: { Yes: 'Its sides are not all equal.', No: 'All its sides and angles are equal: it is regular.' }, hint: regular ? 'All sides and angles are equal.' : 'Not all sides are equal.', why: 'A regular polygon has equal sides and equal angles. An equilateral triangle and a square are regular.', resultText: regular ? 'regular' : 'not regular' }),
+        nStep({ key: 'lines', prompt: regular ? `A regular shape has as many lines of symmetry as it has sides. How many lines?` : `How many lines of symmetry? (fold it in your head)`, answer: lines, traps: { [n]: regular ? '' : 'Only a REGULAR shape has as many mirror lines as sides.' }, hint: `${lines}.`, why: regular ? `A regular ${n}-sided shape has ${n} lines of symmetry.` : nm.startsWith('iso') ? 'An isosceles triangle has 1: down the middle, between the two equal sides.' : 'A scalene triangle has none: no fold makes the halves match.', resultText: `${lines} line${lines === 1 ? '' : 's'} of symmetry` }),
+        oStep({ key: 'rot', prompt: 'What is its order of rotational symmetry?', options: ['1', '2', '3', '4', '5', '6', '8'].filter((o) => +o <= Math.max(4, n)), answer: String(rot),
+          wrong: Object.fromEntries(['1', '2', '3', '4', '5', '6', '8'].filter((o) => +o !== rot).map((o) => [o, regular ? `A regular ${n}-sided shape fits its outline ${n} times in one turn: order ${n}.` : 'It only fits back at the start of a turn: order 1.'])),
+          hint: regular ? `Order ${n}: it fits after every 1/${n} of a turn.` : 'Order 1 (it only looks the same once per full turn).', why: 'Order of rotational symmetry = how many positions it looks exactly the same in during one turn. A shape that only fits once has order 1.', longWay: `${lines} lines of symmetry\norder ${rot}`, resultText: `order ${rot}`, isAnswer: true }),
+      ],
+    };
+  }
   function shapeSym() {
+    if (Math.random() < 0.35) return polySym();
     const type = pick(['square', 'rectangle', 'rhombus', 'parallelogram', 'kite', 'isotrap', 'trapezium', 'arrowhead', 'righttrap']);
     const P = onScreen(type, 0, 300, 200), f = facts(P);
     const labs = ['a', 'b', 'c', 'd'], cols = ['#1f6fd1', '#d35400', '#7d3cb5', '#0a7d34'];
@@ -975,7 +1026,32 @@
 
   /* ---- S8. Angles in SPECIAL quadrilaterals: use the properties ---- */
   function quadSpecial() {
-    const kind = pick(['parallelogram', 'kite', 'isotrap']);
+    const kind = pick(['parallelogram', 'kite', 'isotrap', 'rhombus', 'kite2']);
+    if (kind === 'rhombus') {
+      const a = rand(52, 78), b = 180 - a;
+      const s4 = 4, P = toScreen([[0, 0], [s4, 0], [s4 + s4 * Math.cos(a * DEG), s4 * Math.sin(a * DEG)], [s4 * Math.cos(a * DEG), s4 * Math.sin(a * DEG)]], 320, 210);
+      const q = quadSVG(P, { angles: [{ i: 0, t: `${a}°` }, { i: 2, t: 'x', kind: 'step' }, { i: 1, t: 'y', kind: 'unknown' }] });
+      return { subject: 'y7shape', sig: `rh:${a}`, given: 'This is a rhombus. Find x, then y.', diagram: q.svg, answer: `${b}°`, geo: q.geo,
+        steps: [
+          oStep({ key: 'opp', prompt: `x is opposite the ${a}°. In a rhombus, opposite angles are…`, options: ['equal', 'add up to 180°', 'add up to 360°'], answer: 'equal', wrong: { 'add up to 180°': 'That is NEIGHBOURING angles. Opposite angles are equal.', 'add up to 360°': 'All four together make 360°.' }, hint: 'Opposite angles of a rhombus are equal.', why: 'A rhombus is a parallelogram with equal sides: opposite angles are equal.', resultText: 'opposite angles are equal' }),
+          nStep({ key: 'x', prompt: 'So x = ?', answer: a, traps: { [b]: 'Opposite angles are EQUAL.' }, hint: `x = ${a}°.`, why: 'Opposite angles of a rhombus are equal.', resultText: `x = ${a}°`, expr: `the same as ${a}` }),
+          oStep({ key: 'nb', prompt: `y is NEXT to the ${a}° (they share a side). Neighbouring angles in a rhombus…`, options: ['add up to 180°', 'are equal', 'add up to 90°'], answer: 'add up to 180°', wrong: { 'are equal': 'Neighbours are not equal (unless it is a square). They add up to 180°.', 'add up to 90°': 'They add up to 180° (they are allied / co-interior angles).' }, hint: 'Neighbouring angles add up to 180°.', why: 'Neighbouring angles sit between two parallel sides: they add up to 180°.', resultText: 'neighbours add to 180°' }),
+          nStep({ key: 'y', prompt: `So y = 180 − ${a} = ?`, answer: b, traps: { [a]: 'Neighbours add up to 180°, they are not equal.' }, hint: `180 − ${a} = ${b}.`, why: 'Neighbouring angles in a rhombus add up to 180°.', longWay: `x = ${a}° (opposite angles are equal)\ny = 180 − ${a} = ${b}° (neighbouring angles add to 180°)`, resultText: `y = ${b}°`, expr: `180 − ${a}`, isAnswer: true }),
+        ] };
+    }
+    if (kind === 'kite2') {
+      let top, side, bot;
+      do { side = rand(95, 125); top = rand(60, 100); bot = 360 - 2 * side - top; } while (bot < 30 || bot > 80);
+      const w = 2.6, P = toScreen([[0, -w / Math.tan(bot / 2 * DEG)], [w, 0], [0, w / Math.tan(top / 2 * DEG)], [-w, 0]], 320, 210);
+      // the side angles of this kite come out at (360 - top - bot) / 2 = side, exactly
+      const q = quadSVG(P, { angles: [{ i: 1, t: `${side}°` }, { i: 2, t: `${top}°` }, { i: 3, t: 'a', kind: 'step' }, { i: 0, t: 'b', kind: 'unknown' }] });
+      return { subject: 'y7shape', sig: `k2:${side},${top}`, given: 'This is a kite. Find a, then b.', diagram: q.svg, answer: `${bot}°`, geo: q.geo,
+        steps: [
+          nStep({ key: 'a', prompt: `In a kite one pair of opposite angles is equal. a and the ${side}° are that pair. So a = ?`, answer: side, traps: { [180 - side]: 'They are EQUAL, not adding to 180°.', [top]: `a matches the ${side}° (the other side corner), not the top.` }, hint: `a = ${side}°.`, why: 'A kite has 2 pairs of equal sides and 1 pair of equal angles in opposite corners.', resultText: `a = ${side}°`, expr: `the same as ${side}` }),
+          nStep({ key: 'sum', prompt: `Add the three you know: ${side} + ${side} + ${top} = ?`, answer: 2 * side + top, hint: `= ${2 * side + top}.`, why: 'A kite is a quadrilateral: its angles add up to 360°.', resultText: `${2 * side + top}°`, expr: `${side} + ${side} + ${top}` }),
+          nStep({ key: 'b', prompt: `So b = 360 − ${2 * side + top} = ?`, answer: bot, traps: { [Math.abs(180 - (2 * side + top)) || 1]: 'Quadrilaterals use 360, not 180.' }, hint: `360 − ${2 * side + top} = ${bot}.`, why: RS.quad + '.', longWay: `a = ${side}° (kite: one pair of equal angles)\n${side} + ${side} + ${top} + b = 360\nb = 360 − ${2 * side + top} = ${bot}°`, resultText: `b = ${bot}°`, expr: `360 − ${2 * side + top}`, isAnswer: true }),
+        ] };
+    }
     if (kind === 'parallelogram') {
       const a = pick([rand(55, 80), rand(100, 125)]), at = pick([1, 2]);
       const pts = quadFromAngles(a, 180 - a, a, 6, 4), P = toScreen(pts, 320, 210);
@@ -1041,6 +1117,19 @@
   }
   function polyRegular() {
     const n = pick([3, 4, 5, 6, 8, 9, 10, 12]), ext = 360 / n, int = 180 - ext;
+    if (Math.random() < 0.25) {
+      const m = pick([5, 6, 7]); let ex;
+      do { ex = []; let left = 360; for (let i = 0; i < m - 1; i++) { const v = rand(25, 95); ex.push(v); left -= v; } ex.push(left); } while (ex[m - 1] < 20 || ex[m - 1] > 110);
+      const known = ex.slice(0, -1), ks = known.reduce((a, b) => a + b, 0), last = ex[m - 1];
+      return {
+        subject: 'y7shape', sig: `pe:${ex.join(',')}`, given: `A shape has ${m} exterior angles. ${m - 1} of them are ${known.join('°, ')}°. Find the last one.`, answer: `${last}°`,
+        steps: [
+          nStep({ key: 'sum', prompt: 'The exterior angles of ANY polygon add up to?', answer: 360, traps: { 180: 'Walking round the shape you turn one full turn: 360°.', [(m - 2) * 180]: 'That is the INTERIOR angle sum. Exterior angles always make 360°.' }, hint: 'One full turn.', why: 'The sum of the exterior angles of any polygon is 360°.', resultText: 'exterior angles add up to 360°', expr: 'a full turn' }),
+          nStep({ key: 'known', prompt: `Add the ones you know: ${known.join(' + ')} = ?`, answer: ks, hint: `= ${ks}.`, why: 'Total what you know.', resultText: `${ks}°`, expr: known.join(' + ') }),
+          nStep({ key: 'x', prompt: `So the last one = 360 − ${ks} = ?`, answer: last, traps: { [ks]: 'That is the total you know: take it from 360.' }, hint: `360 − ${ks} = ${last}.`, why: 'They must make 360° altogether.', longWay: `exterior angles add up to 360°\n${known.join(' + ')} = ${ks}\n360 − ${ks} = ${last}°`, resultText: `${last}°`, expr: `360 − ${ks}`, isAnswer: true }),
+        ],
+      };
+    }
     if (Math.random() < 0.6) {
       return {
         subject: 'y7shape', sig: `pr:${n}`, given: `Find the size of each inside angle of a regular ${POLY[n]}.`, diagram: polySVG(n, false, [{ i: 0, t: 'x', kind: 'unknown' }]), answer: `${int}°`,
@@ -1076,6 +1165,84 @@
     };
   }
 
+
+  /* ---- angle facts with algebra: form an equation, solve it (CGP 15.1 example 2, 15.2 example 2) ---- */
+  const term = (k, c) => `${k === 1 ? '' : k}x${c > 0 ? ' + ' + c : c < 0 ? ' − ' + (-c) : ''}`;
+  function angAlgebra() {
+    const kind = pick(['line', 'point', 'tri']);
+    const total = kind === 'point' ? 360 : 180;
+    let parts, x0;
+    for (;;) {
+      x0 = rand(10, 40);
+      const n = kind === 'point' ? pick([3, 4]) : 3;
+      parts = [];
+      for (let i = 0; i < n; i++) parts.push([rand(1, 3), pick([0, 0, rand(5, 40), -rand(5, 15)])]);
+      if (kind === 'tri' && Math.random() < 0.5) parts = [[1, 0], [2, 0], [3, 0]];
+      const known = rand(0, 1) && kind !== 'tri' ? rand(30, 90) : 0;
+      if (known) parts.push([0, known]);
+      const sum = parts.reduce((s2, p) => s2 + p[0] * x0 + p[1], 0);
+      const vals = parts.map((p) => p[0] * x0 + p[1]);
+      if (sum !== total || vals.some((v) => v < 15)) continue;
+      break;
+    }
+    const k = parts.reduce((s2, p) => s2 + p[0], 0), c = parts.reduce((s2, p) => s2 + p[1], 0);
+    const labels = parts.map((p) => (p[0] ? term(p[0], p[1]) + '°' : `${p[1]}°`));
+    const vals = parts.map((p) => p[0] * x0 + p[1]);
+    let svg;
+    if (kind === 'tri') {
+      const A = vals[0], B = vals[1];
+      const t = triPts(A, B), K = new Kit(320, 220);
+      K.poly([t.A, t.B, t.C]);
+      K.angle(t.A, t.B, t.C, { label: labels[0] }); K.angle(t.B, t.A, t.C, { label: labels[1] }); K.angle(t.C, t.A, t.B, { label: labels[2] });
+      svg = K.svg('Not drawn accurately');
+    } else {
+      const K = new Kit(320, kind === 'line' ? 190 : 230), O = kind === 'line' ? [160, 150] : [160, 115];
+      if (kind === 'line') K.line([20, 150], [300, 150]);
+      let dd = kind === 'line' ? 0 : rand(0, 30);
+      vals.forEach((v, i) => { if (kind === 'point' || i > 0) K.line(O, rayAt(O, dd, kind === 'line' ? 120 : 100)); K.arc(O, dd, v, { label: labels[i], r: v < 40 ? 34 : 24 }); dd += v; });
+      svg = K.svg('Not drawn accurately');
+    }
+    const fact = kind === 'tri' ? 'tri' : kind === 'line' ? 'line' : 'point';
+    const lhs = labels.map((l) => l.replace('°', '')).join(' + ');
+    return {
+      subject: 'y7ang', sig: `aa:${kind}:${labels.join('|')}`, given: `Find the value of x. (${kind === 'tri' ? 'A triangle' : kind === 'line' ? 'Angles on a straight line' : 'Angles around a point'}.)`, diagram: svg, answer: `x = ${x0}`,
+      steps: [
+        reasonStep('fact', fact, 'Which fact gives you the equation?', ['line', 'point', 'tri', 'quad']),
+        oStep({ key: 'eq', prompt: 'Write the equation:', options: [`${lhs} = ${total}`, `${lhs} = ${total === 180 ? 360 : 180}`, `${lhs} = 90`], answer: `${lhs} = ${total}`,
+          wrong: { [`${lhs} = ${total === 180 ? 360 : 180}`]: `${RS[fact]}: use ${total}.`, [`${lhs} = 90`]: '90 is a right angle.' }, hint: `All the angles together make ${total}°.`, why: 'CGP’s method: use the angle fact to form an equation, then solve it.', resultText: `${lhs} = ${total}` }),
+        nStep({ key: 'k', prompt: 'Collect the x terms: how many x altogether?', answer: k, traps: { [parts.length]: 'Add the NUMBERS IN FRONT of each x, not the number of angles.' }, hint: `${parts.filter((p) => p[0]).map((p) => p[0]).join(' + ')} = ${k}.`, why: 'Like terms add up.', resultText: `${k}x`, expr: parts.filter((p) => p[0]).map((p) => p[0]).join(' + ') }),
+        nStep({ key: 'kx', prompt: c ? `Simplify: ${term(k, c)} = ${total}. So ${k}x = ${total} ${c > 0 ? '− ' + c : '+ ' + (-c)} = ?` : `So ${k}x = ${total}. Nothing to move: ${k}x = ?`, answer: total - c, traps: c ? { [total + c]: `Do the opposite of ${c > 0 ? '+' + c : '−' + (-c)}.` } : {}, hint: `${total} ${c > 0 ? '− ' + c : c < 0 ? '+ ' + (-c) : ''} = ${total - c}.`, why: 'Move the numbers to the other side with the opposite operation.', resultText: `${k}x = ${total - c}`, expr: c ? `${total} ${c > 0 ? '− ' + c : '+ ' + (-c)}` : `${total}` }),
+        nStep({ key: 'x', prompt: `x = ${total - c} ÷ ${k} = ?`, answer: x0, hint: `${total - c} ÷ ${k} = ${x0}.`, why: 'Divide by the number in front of x.', longWay: `${lhs} = ${total}\n${term(k, c)} = ${total}\n${k}x = ${total - c}\nx = ${x0}\nCheck: the angles are ${vals.join('°, ')}°`, resultText: `x = ${x0}`, expr: `${total - c} ÷ ${k}`, isAnswer: true }),
+      ],
+      algebra: { parts, x0, total },
+    };
+  }
+
+  /* ---- which quadrilaterals have this property? (CGP 15.4 Exercise 6 Q2) ---- */
+  const QPROPS = [
+    ['4 equal sides', ['square', 'rhombus']], ['4 angles of 90°', ['square', 'rectangle']],
+    ['2 pairs of parallel sides', ['square', 'rectangle', 'rhombus', 'parallelogram']], ['at least 1 pair of parallel sides', ['square', 'rectangle', 'rhombus', 'parallelogram', 'trapezium']],
+    ['exactly 1 pair of parallel sides', ['trapezium']], ['no parallel sides at all', ['kite']], ['opposite angles equal', ['square', 'rectangle', 'rhombus', 'parallelogram']],
+    ['diagonals that cross at 90°', ['square', 'rhombus', 'kite']], ['rotational symmetry of order 2 or more', ['square', 'rectangle', 'rhombus', 'parallelogram']],
+  ];
+  const QPOOL = ['square', 'rectangle', 'rhombus', 'parallelogram', 'kite', 'trapezium'];
+  function shapeHave() {
+    let a, b;
+    do { a = pick(QPROPS); b = pick(QPROPS); } while (a === b || !b[1].some((x) => a[1].includes(x)) || b[1].filter((x) => a[1].includes(x)).length === a[1].length);
+    const both = a[1].filter((x) => b[1].includes(x));
+    const ch = (key, prompt, expected, pool, last) => chooseStep({ key, prompt, expected, pool, isAnswer: last,
+      hint: `${expected.join(', ')}.`, why: 'Test each shape against the property, one at a time. (A square counts as a rectangle and a rhombus too: it has all their properties.)',
+      resultText: expected.join(', '), longWay: last ? `${a[0]}: ${a[1].join(', ')}\nand ${b[0]}: ${both.join(', ')}` : undefined,
+      diagnose: (sel) => { const bad = sel.filter((s2) => !expected.includes(s2)); const miss = expected.filter((s2) => !sel.includes(s2)); return say(bad.length ? `A ${bad[0]} does not have that property. Untap it.` : `A ${miss[0]} has it too. Tap it.`); } });
+    return {
+      subject: 'y7shape', sig: `qh:${a[0]}|${b[0]}`, given: `Which quadrilaterals have ${a[0]} AND ${b[0]}?`, answer: both.join(', '),
+      steps: [
+        ch('a', `Step 1: tap ALL the quadrilaterals with ${a[0]}.`, a[1], QPOOL, false),
+        ch('b', `Step 2: of those, tap the ones that ALSO have ${b[0]}.`, both, a[1].length > 1 ? a[1] : QPOOL, true),
+      ],
+    };
+  }
+
   /* ---- no steps: the same questions with the scaffolding removed ---- */
   function soloFrom(gens) {
     const U = () => ((root.WAC && root.WAC.unaidedFrom) ? root.WAC : require('./unaided.js'));
@@ -1088,8 +1255,8 @@
   const shapeSolo = soloFrom([shapeTree, quadAngles, quadSpecial, polySum, polyRegular, polyMissing]);
 
   const api = {
-    angNotation, angFacts, angTriangle, parSpot, parOne, parChain, parTriangle, parConverse, parAlgebra, angSolo,
-    shapeTree, triTypes, shapeDiag, shapeSym, shapeClues, shapeASN, quadAngles, quadSpecial, polySum, polyRegular, polyMissing, shapeSolo,
+    angNotation, angFacts, angAlgebra, angTriangle, parSpot, parOne, parChain, parTriangle, parConverse, parAlgebra, angSolo,
+    shapeTree, triTypes, shapeHave, shapeDiag, shapeSym, polySym, shapeClues, shapeASN, quadAngles, quadSpecial, polySum, polyRegular, polyMissing, shapeSolo,
     _g7: { relation, valueOf, isInside, measure, facts, classify, makeShape, onScreen, KEYS, DATA, CLUES, ASN, parallel },
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

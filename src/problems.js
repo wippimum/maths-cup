@@ -855,9 +855,10 @@
     ] },
     // Year 7 Topic 5 geometry (KS3), two tiles. Every question is cut into one-move steps:
     // which shape, which reason, equal or 180, then the number. See geometry7.js.
-    { id: 'y7ang', year: 7, name: 'Angles & Parallel Lines', icon: '📐', blurb: 'KS3: angle facts and notation, triangles and the exterior angle, F, Z and C in parallel lines, multi-step problems, algebra.', levels: [
+    { id: 'y7ang', year: 7, name: 'Angles & Parallel Lines', icon: '📐', blurb: 'KS3 (CGP Section 15): angle facts and notation, angle equations, triangles, F, Z and C in parallel lines, multi-step problems, algebra.', levels: [
       { id: 'a7-notation', group: '1 · Angle facts', name: 'Naming angles: ∠ABC', badge: '🔤', generate: () => T.angNotation() },
       { id: 'a7-facts', group: '1 · Angle facts', name: 'Line, point, vertically opposite', badge: '📏', generate: () => T.angFacts() },
+      { id: 'a7-algfacts', group: '1 · Angle facts', name: 'Angle facts with algebra', badge: '🧮', generate: () => T.angAlgebra() },
       { id: 'a7-tri', group: '1 · Angle facts', name: 'Triangles & the outside angle', badge: '🔺', generate: () => T.angTriangle() },
       { id: 'a7-spot', group: '2 · Parallel lines', name: 'Spot the pair: F, Z or C', badge: '👀', generate: () => T.parSpot() },
       { id: 'a7-corr', group: '2 · Parallel lines', name: 'Corresponding angles (F)', badge: '🅵', generate: () => T.parOne('corresponding') },
@@ -870,9 +871,10 @@
       { id: 'a7-alg', group: '3 · Problems', name: 'Algebra with angles', badge: '🧮', generate: () => T.parAlgebra() },
       { id: 'a7-solo', group: '3 · Problems', name: 'No steps — just the answer', badge: '🔥', generate: () => T.angSolo() },
     ] },
-    { id: 'y7shape', year: 7, name: 'Quadrilaterals & Polygons', icon: '🔷', blurb: 'KS3: name shapes from their properties, triangles, diagonals, symmetry, angles in quadrilaterals, interior and exterior angles of polygons.', levels: [
+    { id: 'y7shape', year: 7, name: 'Quadrilaterals & Polygons', icon: '🔷', blurb: 'KS3 (CGP Section 15): name shapes from their properties, triangles, diagonals, symmetry, angles in special quadrilaterals, interior and exterior angles of polygons.', levels: [
       { id: 's7-tree', group: '1 · Properties', name: 'Name it, step by step', badge: '🌳', generate: () => T.shapeTree() },
       { id: 's7-tri', group: '1 · Properties', name: 'Types of triangle', badge: '🔺', generate: () => T.triTypes() },
+      { id: 's7-have', group: '1 · Properties', name: 'Which shapes have this property?', badge: '✅', generate: () => T.shapeHave() },
       { id: 's7-diag', group: '1 · Properties', name: 'Diagonals', badge: '✖️', generate: () => T.shapeDiag() },
       { id: 's7-sym', group: '1 · Properties', name: 'Lines of symmetry & rotation', badge: '🪞', generate: () => T.shapeSym() },
       { id: 's7-clue', group: '1 · Properties', name: 'Which shape am I?', badge: '🕵️', generate: () => T.shapeClues() },

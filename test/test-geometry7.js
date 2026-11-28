@@ -46,7 +46,12 @@ DRAWN.forEach((k) => {
     (p.geo || []).forEach((g) => {
       const v = num(g.label);
       if (v != null) ok(Math.abs(size(g) - v) < 0.6, `${k}: arc labelled ${g.label} measures ${size(g).toFixed(1)}°`);
-      if (g.label === 'x' && ans != null) ok(Math.abs(size(g) - ans) < 0.6, `${k}: x drawn at ${size(g).toFixed(1)}°, answer ${ans}`);
+      // a letter is checked against the step that finds it ("y = 59°"), else against the final answer
+      if (/^[a-z]$/.test(String(g.label))) {
+        const st = p.steps.find((q) => new RegExp('^' + g.label + ' = (\\d+)°').test(q.resultText || ''));
+        const want = st ? +st.resultText.match(/= (\d+)°/)[1] : (g.label === 'x' ? ans : null);
+        if (want != null) ok(Math.abs(size(g) - want) < 0.6, `${k}: ${g.label} drawn at ${size(g).toFixed(1)}°, should be ${want}`);
+      }
     });
     ok((p.geo || []).length > 0, `${k} exposes its drawing`);
     const last = p.steps[p.steps.length - 1];
@@ -106,7 +111,8 @@ for (let i = 0; i < REPS; i++) {
   const p = W.polySum(), n = +p.steps[0].check && p.steps.length;
   const m = p.answer.match(/^(\d+)°$/); ok(m && +m[1] % 180 === 0, 'polygon sum is a multiple of 180');
   const r = W.polyRegular();
-  if (/inside angle of a regular/.test(r.given)) { const k = { triangle: 3, quadrilateral: 4, pentagon: 5, hexagon: 6, octagon: 8, nonagon: 9, decagon: 10, dodecagon: 12 }[r.given.match(/regular (\w+)/)[1]]; eq(num(r.answer), 180 - 360 / k, `regular ${k}-gon interior`); }
+  if (/exterior angles/.test(r.given)) { const ks = r.given.match(/are ([\d°, ]+)\. Find/)[1].split(',').map((v) => parseInt(v, 10)); eq(ks.reduce((a, b) => a + b, 0) + num(r.answer), 360, 'exterior angles make 360'); }
+  else if (/inside angle of a regular/.test(r.given)) { const k = { triangle: 3, quadrilateral: 4, pentagon: 5, hexagon: 6, octagon: 8, nonagon: 9, decagon: 10, dodecagon: 12 }[r.given.match(/regular (\w+)/)[1]]; eq(num(r.answer), 180 - 360 / k, `regular ${k}-gon interior`); }
   else { const int = +r.given.match(/is (\d+)°/)[1]; eq(+r.answer, 360 / (180 - int), `sides from interior ${int}`); }
   const q = W.polyMissing(); const ns = q.given.includes('pentagon') ? 5 : 6;
   const vals = [...q.diagram.matchAll(/>(\d+)°</g)].map((x) => +x[1]);
@@ -120,6 +126,24 @@ for (let i = 0; i < REPS; i++) {
   eq(A.c * A.x0 + A.d, G.valueOf(A.theta, A.x), 'second expression = drawn angle');
   ok(p.steps[p.steps.length - 1].check(String(A.x0)).correct, 'x accepted');
 }
+
+// 9b. angle facts with algebra: the expressions make the total at the answer
+for (let i = 0; i < REPS; i++) {
+  const p = W.angAlgebra(), A = p.algebra;
+  eq(A.parts.reduce((s, q) => s + q[0] * A.x0 + q[1], 0), A.total, 'angle algebra: the angles make the total');
+  ok(A.parts.every((q) => q[0] * A.x0 + q[1] >= 15), 'every angle is a sensible size');
+}
+// 9c. "which shapes have…": every answer has both properties, measured off the drawings
+const HAS = { '4 equal sides': (f) => f.allEq, '4 angles of 90°': (f) => f.rights === 4, '2 pairs of parallel sides': (f) => f.parallelPairs === 2, 'at least 1 pair of parallel sides': (f) => f.parallelPairs >= 1,
+  'exactly 1 pair of parallel sides': (f) => f.parallelPairs === 1, 'no parallel sides at all': (f) => f.parallelPairs === 0, 'opposite angles equal': (f) => f.parallelPairs === 2,
+  'diagonals that cross at 90°': (f) => f.diagPerp, 'rotational symmetry of order 2 or more': (f) => f.rot >= 2 };
+for (let i = 0; i < REPS; i++) {
+  const p = W.shapeHave(), m = p.given.match(/have (.+) AND (.+)\?/);
+  const want = ['square', 'rectangle', 'rhombus', 'parallelogram', 'kite', 'trapezium'].filter((n) => { const f = G.facts(G.onScreen(n, 0)); return HAS[m[1]](f) && HAS[m[2]](f); });
+  eq(p.answer.split(', ').sort(), want.sort(), `shapes with ${m[1]} and ${m[2]}`);
+}
+// 9d. symmetry of triangles and regular polygons
+for (let i = 0; i < 60; i++) { const p = W.polySym(); const nm = p.given.match(/an? (.+) have/)[1]; const n = { 'equilateral triangle': 3, 'regular pentagon': 5, 'regular hexagon': 6, 'regular octagon': 8, square: 4 }[nm]; if (n) eq(p.answer, `${n} lines, order ${n}`, nm); }
 
 // 10. notation: the answer is the angle at the middle letter
 for (let i = 0; i < REPS; i++) {
